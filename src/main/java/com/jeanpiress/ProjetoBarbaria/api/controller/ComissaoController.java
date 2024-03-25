@@ -16,20 +16,20 @@ import java.util.List;
 public class ComissaoController {
 
     @Autowired
-    private ComissaoRepository comissaoRepository;
+    private ComissaoRepository repository;
 
     @Autowired
     private ComissaoService service;
 
     @GetMapping
     public ResponseEntity<List<Comissao>> listar(){
-        List<Comissao> comissaoList = comissaoRepository.findAll();
+        List<Comissao> comissaoList = repository.findAll();
         return ResponseEntity.ok(comissaoList);
     }
 
     @GetMapping(value = "/{comissaoId}")
     public ResponseEntity<Comissao> buscarPorId(@PathVariable Long comissaoId) {
-        Comissao comissao = comissaoRepository.findById(comissaoId).
+        Comissao comissao = repository.findById(comissaoId).
                 orElseThrow(() -> new ComissaoNaoEncontradoException(comissaoId));
 
         return ResponseEntity.ok(comissao);

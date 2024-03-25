@@ -16,20 +16,20 @@ import java.util.List;
 public class CategoriaController {
 
     @Autowired
-    private CategoriaRepository categoriaRepository;
+    private CategoriaRepository repository;
 
     @Autowired
     private CategoriaService service;
 
     @GetMapping
     public ResponseEntity<List<Categoria>> listar(){
-        List<Categoria> categoriaList = categoriaRepository.findAll();
+        List<Categoria> categoriaList = repository.findAll();
         return ResponseEntity.ok(categoriaList);
     }
 
     @GetMapping(value = "/{categoriaId}")
     public ResponseEntity<Categoria> buscarPorId(@PathVariable Long categoriaId) {
-        Categoria categoria = categoriaRepository.findById(categoriaId).
+        Categoria categoria = repository.findById(categoriaId).
                 orElseThrow(() -> new CategoriaNaoEncontradoException(categoriaId));
 
         return ResponseEntity.ok(categoria);

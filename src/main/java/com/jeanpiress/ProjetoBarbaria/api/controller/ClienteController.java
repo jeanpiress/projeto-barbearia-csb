@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 @RestController()
@@ -17,20 +16,20 @@ import java.util.List;
 public class ClienteController {
 
     @Autowired
-    private ClienteRepository clienteRepository;
+    private ClienteRepository repository;
 
     @Autowired
     private ClienteService service;
 
     @GetMapping
     public ResponseEntity<List<Cliente>> listar(){
-        List<Cliente> clienteList = clienteRepository.findAll();
+        List<Cliente> clienteList = repository.findAll();
         return ResponseEntity.ok(clienteList);
     }
 
     @GetMapping(value = "/{clienteId}")
     public ResponseEntity<Cliente> buscarPorId(@PathVariable Long clienteId) {
-        Cliente cliente = clienteRepository.findById(clienteId).
+        Cliente cliente = repository.findById(clienteId).
                 orElseThrow(() -> new ClienteNaoEncontradoException(clienteId));
 
         return ResponseEntity.ok(cliente);

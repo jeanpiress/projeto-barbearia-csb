@@ -29,7 +29,6 @@ public class Produto {
     private BigDecimal precoEmPontos;
     private BigDecimal comissaoBase;
 
-
     @ManyToOne
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;

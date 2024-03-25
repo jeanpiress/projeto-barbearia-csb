@@ -1,5 +1,6 @@
 package com.jeanpiress.ProjetoBarbaria.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,6 +24,7 @@ public class ItemPedido {
     private Integer quantidade;
     private String observacao;
 
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "pedido_id", nullable = false)
     private Pedido pedido;
