@@ -1,0 +1,37 @@
+package com.jeanpiress.ProjetoBarbaria.domain.services;
+
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ProfissionalNaoEncontradoException;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
+import com.jeanpiress.ProjetoBarbaria.domain.model.Profissional;
+import com.jeanpiress.ProjetoBarbaria.repositories.ProfissionalRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+
+@Service
+public class ProfissionalService {
+
+    private static final String MSG_PROFISSIONAL_EM_USO = "Profissional de código %d não pode ser removido, pois esta em uso";
+    @Autowired
+    private ProfissionalRepository repository;
+
+    @Transactional
+    public Profissional adicionar(Profissional profissional) {
+        return repository.save(profissional);
+    }
+
+    @Transactional
+    public void remover(Long profissionalId) {
+        try {
+            repository.deleteById(profissionalId);
+        }catch (EmptyResultDataAccessException e) {
+            throw new ProfissionalNaoEncontradoException(profissionalId);
+        }catch (DataIntegrityViolationException e) {
+            throw new EntidadeEmUsoException(
+                    String.format(MSG_PROFISSIONAL_EM_USO, profissionalId));
+        }
+    }
+}
