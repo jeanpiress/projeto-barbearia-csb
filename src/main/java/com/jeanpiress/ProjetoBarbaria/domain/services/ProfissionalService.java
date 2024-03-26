@@ -1,7 +1,9 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.CategoriaNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ProfissionalNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
+import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Profissional;
 import com.jeanpiress.ProjetoBarbaria.repositories.ProfissionalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,10 @@ public class ProfissionalService {
     @Autowired
     private ProfissionalRepository repository;
 
+    public Profissional buscarPorId(Long profissionalId){
+        return repository.findById(profissionalId).
+                orElseThrow(() -> new CategoriaNaoEncontradoException(profissionalId));
+    }
     @Transactional
     public Profissional adicionar(Profissional profissional) {
         return repository.save(profissional);

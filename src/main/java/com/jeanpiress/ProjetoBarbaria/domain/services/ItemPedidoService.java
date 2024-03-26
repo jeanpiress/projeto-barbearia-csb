@@ -1,8 +1,11 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.CategoriaNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ItemPedidoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
+import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbaria.domain.model.ItemPedido;
+import com.jeanpiress.ProjetoBarbaria.domain.model.Pedido;
 import com.jeanpiress.ProjetoBarbaria.repositories.ItemPedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,8 +21,18 @@ public class ItemPedidoService {
     @Autowired
     private ItemPedidoRepository repository;
 
+    @Autowired
+    private PedidoService pedidoService;
+
+    public ItemPedido buscarPorId(Long itemPedidoId){
+        return repository.findById(itemPedidoId).
+                orElseThrow(() -> new CategoriaNaoEncontradoException(itemPedidoId));
+    }
     @Transactional
     public ItemPedido adicionar(ItemPedido itemPedido) {
+        Long pedidoId = itemPedido.getPedido().getId();
+        Pedido pedido = pedidoService.buscarPorId(pedidoId);
+        itemPedido.setPedido(pedido);
         return repository.save(itemPedido);
     }
 

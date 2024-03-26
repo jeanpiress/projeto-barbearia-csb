@@ -29,8 +29,7 @@ public class ItemPedidoController {
 
     @GetMapping(value = "/{itemPedidoId}")
     public ResponseEntity<ItemPedido> buscarPorId(@PathVariable Long itemPedidoId) {
-        ItemPedido itemPedido = repository.findById(itemPedidoId).
-                orElseThrow(() -> new ItemPedidoNaoEncontradoException(itemPedidoId));
+        ItemPedido itemPedido = service.buscarPorId(itemPedidoId);
 
         return ResponseEntity.ok(itemPedido);
     }

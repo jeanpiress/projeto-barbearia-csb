@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,9 +25,9 @@ public class ItemPedido {
     private Integer quantidade;
     private String observacao;
 
-    @JsonIgnore
-    @OneToOne
-    @JoinColumn(name = "pedido_id", nullable = false)
+
+    @ManyToOne
+    @JoinColumn(name = "pedido_id")
     private Pedido pedido;
 
     @ManyToMany
@@ -34,6 +35,6 @@ public class ItemPedido {
             name = "item_pedido_produto",
             joinColumns = @JoinColumn(name = "item_pedido_id"),
             inverseJoinColumns = @JoinColumn(name = "produto_id"))
-    private List<Produto> produtos;
+    private List<Produto> produtos = new ArrayList<>();
 
 }

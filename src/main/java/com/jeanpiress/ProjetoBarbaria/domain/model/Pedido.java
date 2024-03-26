@@ -1,5 +1,6 @@
 package com.jeanpiress.ProjetoBarbaria.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPedido;
@@ -7,6 +8,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -22,8 +24,9 @@ public class Pedido {
     private Long id;
     private OffsetDateTime horario;
 
-    @OneToOne(mappedBy = "pedido")
-    private ItemPedido itemPedido;
+    @JsonIgnore
+    @OneToMany(mappedBy = "pedido")
+    private List<ItemPedido> itemPedidos;
 
     private StatusPagamento statusPagamento;
     private FormaPagamento formaPagamento;

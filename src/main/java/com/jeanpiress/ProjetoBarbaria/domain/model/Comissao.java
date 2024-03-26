@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,7 +25,7 @@ public class Comissao {
             name = "comissao_produto",
             joinColumns = @JoinColumn(name = "comissao_id"),
             inverseJoinColumns = @JoinColumn(name = "produto_id"))
-    private List<Produto> produtos;
+    private List<Produto> produtos = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "profissional_id")

@@ -1,7 +1,9 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.CategoriaNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ClienteNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
+import com.jeanpiress.ProjetoBarbaria.domain.model.Categoria;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbaria.repositories.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,10 @@ public class ClienteService {
     @Autowired
     private ClienteRepository repository;
 
+    public Cliente buscarPorId(Long clienteId){
+        return repository.findById(clienteId).
+                orElseThrow(() -> new CategoriaNaoEncontradoException(clienteId));
+    }
     @Transactional
     public Cliente adicionar(Cliente cliente) {
         return repository.save(cliente);

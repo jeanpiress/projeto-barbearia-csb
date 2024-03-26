@@ -10,6 +10,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Service
 public class CategoriaService {
@@ -17,6 +18,11 @@ public class CategoriaService {
     private static final String MSG_CATEGORIA_EM_USO = "Categoria de código %d não pode ser removido, pois esta em uso";
     @Autowired
     private CategoriaRepository repository;
+
+    public Categoria buscarPorId(Long categoriaId){
+       return repository.findById(categoriaId).
+                orElseThrow(() -> new CategoriaNaoEncontradoException(categoriaId));
+    }
 
     @Transactional
     public Categoria adicionar(Categoria categoria) {

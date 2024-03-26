@@ -1,7 +1,9 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.CategoriaNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ProdutoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
+import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Produto;
 import com.jeanpiress.ProjetoBarbaria.repositories.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,10 @@ public class ProdutoService {
     @Autowired
     private ProdutoRepository repository;
 
+    public Produto buscarPorId(Long produtoId){
+        return repository.findById(produtoId).
+                orElseThrow(() -> new CategoriaNaoEncontradoException(produtoId));
+    }
     @Transactional
     public Produto adicionar(Produto produto) {
         return repository.save(produto);

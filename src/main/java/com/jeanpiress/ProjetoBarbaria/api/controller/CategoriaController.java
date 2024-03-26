@@ -29,8 +29,7 @@ public class CategoriaController {
 
     @GetMapping(value = "/{categoriaId}")
     public ResponseEntity<Categoria> buscarPorId(@PathVariable Long categoriaId) {
-        Categoria categoria = repository.findById(categoriaId).
-                orElseThrow(() -> new CategoriaNaoEncontradoException(categoriaId));
+        Categoria categoria = service.buscarPorId(categoriaId);
 
         return ResponseEntity.ok(categoria);
     }

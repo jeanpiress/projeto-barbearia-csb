@@ -29,8 +29,7 @@ public class ClienteController {
 
     @GetMapping(value = "/{clienteId}")
     public ResponseEntity<Cliente> buscarPorId(@PathVariable Long clienteId) {
-        Cliente cliente = repository.findById(clienteId).
-                orElseThrow(() -> new ClienteNaoEncontradoException(clienteId));
+       Cliente cliente = service.buscarPorId(clienteId);
 
         return ResponseEntity.ok(cliente);
     }

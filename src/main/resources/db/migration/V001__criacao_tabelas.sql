@@ -1,3 +1,4 @@
+use projeto_barbearia;
 create table categoria (
 	id bigint not null auto_increment,
 	nome varchar(80) not null,
@@ -47,7 +48,6 @@ create table item_pedido (
 create table pedido (
 	id bigint not null auto_increment,
 	horario TIMESTAMP,
-    item_pedido_id bigint,
     status_pagamento varchar(10) not null,
     forma_pagamento varchar(10) not null,
     status_pedido varchar(10) not null,
@@ -105,14 +105,19 @@ CREATE TABLE comissao_produto (
 
 )engine=InnoDB default charset=utf8;
 
+CREATE TABLE item_pedido_produto (
+    item_pedido_id BIGINT,
+    produto_id BIGINT,
+    PRIMARY KEY (item_pedido_id, produto_id)
+
+)engine=InnoDB default charset=utf8;
+
+
 alter table produto add constraint fk_produto_categoria
 foreign key (categoria_id) references categoria (id);
 
 alter table item_pedido add constraint fk_item_pedido_pedido
 foreign key (pedido_id) references pedido (id);
-
-alter table pedido add constraint fk_pedido_item_pedido
-foreign key (item_pedido_id) references item_pedido (id);
 
 alter table pedido add constraint fk_pedido_cliente
 foreign key (cliente_id) references cliente (id);
@@ -126,5 +131,9 @@ FOREIGN KEY (comissao_id) REFERENCES comissao(id);
 alter table comissao_produto add constraint fk_comissao_produto_produto
 FOREIGN KEY (produto_id) REFERENCES produto(id);
 
+alter table item_pedido_produto add constraint item_pedido_produto_item_pedido
+FOREIGN KEY (item_pedido_id) REFERENCES item_pedido(id);
 
+alter table item_pedido_produto add constraint item_pedido_produto_produto
+FOREIGN KEY (produto_id) REFERENCES produto(id);
 

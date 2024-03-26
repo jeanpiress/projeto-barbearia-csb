@@ -29,9 +29,7 @@ public class ProfissionalController {
 
     @GetMapping(value = "/{profissionalId}")
     public ResponseEntity<Profissional> buscarPorId(@PathVariable Long profissionalId) {
-        Profissional profissional = repository.findById(profissionalId).
-                orElseThrow(() -> new ProfissionalNaoEncontradoException(profissionalId));
-
+        Profissional profissional = service.buscarPorId(profissionalId);
         return ResponseEntity.ok(profissional);
     }
 

@@ -29,8 +29,7 @@ public class ComissaoController {
 
     @GetMapping(value = "/{comissaoId}")
     public ResponseEntity<Comissao> buscarPorId(@PathVariable Long comissaoId) {
-        Comissao comissao = repository.findById(comissaoId).
-                orElseThrow(() -> new ComissaoNaoEncontradoException(comissaoId));
+        Comissao comissao = service.buscarPorId(comissaoId);
 
         return ResponseEntity.ok(comissao);
     }

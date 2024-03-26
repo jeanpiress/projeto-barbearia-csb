@@ -27,8 +27,6 @@ public class Profissional {
     private Integer diaPagamento;
     private boolean ativo;
 
-
-
     @Embedded
     private Endereco endereco;
 }

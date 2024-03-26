@@ -25,8 +25,6 @@ public class Cliente {
     private OffsetDateTime previsaoRetorno;
     private String observacao;
 
-
-
     @Embedded
     private Endereco endereco;
 }

@@ -1,6 +1,5 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
-import com.jeanpiress.ProjetoBarbaria.domain.exceptions.PedidoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Pedido;
 import com.jeanpiress.ProjetoBarbaria.domain.services.PedidoService;
 import com.jeanpiress.ProjetoBarbaria.repositories.PedidoRepository;
@@ -21,6 +20,7 @@ public class PedidoController {
     @Autowired
     private PedidoService service;
 
+
     @GetMapping
     public ResponseEntity<List<Pedido>> listar(){
         List<Pedido> pedidoList = repository.findAll();
@@ -29,8 +29,7 @@ public class PedidoController {
 
     @GetMapping(value = "/{pedidoId}")
     public ResponseEntity<Pedido> buscarPorId(@PathVariable Long pedidoId) {
-        Pedido pedido = repository.findById(pedidoId).
-                orElseThrow(() -> new PedidoNaoEncontradoException(pedidoId));
+        Pedido pedido = service.buscarPorId(pedidoId);
 
         return ResponseEntity.ok(pedido);
     }
@@ -39,6 +38,7 @@ public class PedidoController {
     public ResponseEntity<Pedido> adicionar(@RequestBody Pedido pedido) {
         Pedido pedidoCriado = service.adicionar(pedido);
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoCriado);
+
     }
 
     @DeleteMapping("/{pedidoId}")

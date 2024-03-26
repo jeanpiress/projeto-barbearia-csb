@@ -1,4 +1,3 @@
-use projeto_barbearia;
 set foreign_key_checks = 0;
 SET sql_safe_updates = 0;
 
@@ -28,7 +27,7 @@ insert into categoria (id, nome) values (1, 'cabelo');
 insert into categoria (id, nome) values (2, 'barba');
 insert into categoria (id, nome) values (3, 'produto');
 
-insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao) values (1, 'jean', '34999708382', utc_timestamp, utc_timestamp, 100, utc_timestamp, 'sem obs');
+insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, endereco_bairro, endereco_cep, endereco_complemento, endereco_logradouro, endereco_numero) values (1, 'jean', '34999708382', utc_timestamp, utc_timestamp, 100, utc_timestamp, 'sem obs','morumbi', '38407381', 'casa', 'rua grupiara', '313');
 insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao) values (2, 'Kirk', '34999708385', utc_timestamp, utc_timestamp, 50, utc_timestamp, 'sem obs');
 
 insert into comissao (id, profissional_id, porcentagem_comissao) values (1, 1, 50.00);
@@ -37,7 +36,7 @@ insert into produto (id, nome, preco, ativo, tem_estoque, estoque, vendido_por_p
 
 insert into profissional (id, nome, nome_exibicao, celular, cpf, data_nascimento, salario_fixo, dia_pagamento, ativo) values (1, 'Jean Carlo', 'jean', '34999708382', '10158594614', utc_timestamp, 0, 5, true);
 
-insert into pedido (id, horario, item_pedido_id, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id) values(1, utc_timestamp, null, 1, 1, 1, 1, 1);
+insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id) values(1, utc_timestamp, 1, 1, 1, 1, 1);
 
 insert into item_pedido (id, preco_unitario, preco_total, quantidade, observacao, pedido_id) values (1, 45.00, 45.00, 1, null, 1);
 

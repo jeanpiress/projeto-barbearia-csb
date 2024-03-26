@@ -1,7 +1,9 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.CategoriaNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ComissaoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
+import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Comissao;
 import com.jeanpiress.ProjetoBarbaria.repositories.ComissaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,10 @@ public class ComissaoService {
     @Autowired
     private ComissaoRepository repository;
 
+    public Comissao buscarPorId(Long comissaoId){
+        return repository.findById(comissaoId).
+                orElseThrow(() -> new CategoriaNaoEncontradoException(comissaoId));
+    }
     @Transactional
     public Comissao adicionar(Comissao comissao) {
         return repository.save(comissao);
