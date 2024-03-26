@@ -14,6 +14,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -35,9 +36,10 @@ public class ItemPedidoService {
     }
     @Transactional
     public ItemPedido adicionar(ItemPedido itemPedido) {
-        Long pedidoId = itemPedido.getPedido().getId();
-        Pedido pedido = pedidoService.buscarPorId(pedidoId);
-        itemPedido.setPedido(pedido);
+        Long produtoId = itemPedido.getProduto().getId();
+        Produto produto = produtoService.buscarPorId(produtoId);
+        itemPedido.setProduto(produto);
+        calcularValores(itemPedido);
         return repository.save(itemPedido);
     }
 
@@ -53,4 +55,15 @@ public class ItemPedidoService {
         }
     }
 
+    public void calcularValores(ItemPedido itemPedido){
+        Produto produto = itemPedido.getProduto();
+        Integer quantidade = itemPedido.getQuantidade();
+        BigDecimal valorUnitario = produto.getPreco();
+        BigDecimal valorTotal =  valorUnitario.multiply(BigDecimal.valueOf(quantidade));
+
+        itemPedido.setPrecoUnitario(produto.getPreco());
+        itemPedido.setPrecoUnitario(valorUnitario);
+        itemPedido.setPrecoTotal(valorTotal);
+
+    }
 }

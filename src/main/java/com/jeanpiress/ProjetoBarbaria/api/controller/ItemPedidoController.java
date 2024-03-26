@@ -36,8 +36,8 @@ public class ItemPedidoController {
 
     @PostMapping
     public ResponseEntity<ItemPedido> adicionar(@RequestBody ItemPedido itemPedido) {
-        ItemPedido itemPedidoCriado = service.adicionar(itemPedido);
-        return ResponseEntity.status(HttpStatus.CREATED).body(itemPedidoCriado);
+       ItemPedido itemPedidoCriado = service.adicionar(itemPedido);
+       return ResponseEntity.status(HttpStatus.CREATED).body(itemPedidoCriado);
     }
 
     @DeleteMapping("/{itemPedidoId}")
