@@ -1,0 +1,1 @@
+ALTER TABLE item_pedido MODIFY COLUMN pedido_id BIGINT DEFAULT NULL;
