@@ -20,12 +20,9 @@ public class Comissao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToMany
-    @JoinTable(
-            name = "comissao_produto",
-            joinColumns = @JoinColumn(name = "comissao_id"),
-            inverseJoinColumns = @JoinColumn(name = "produto_id"))
-    private List<Produto> produtos = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "produto_id")
+    private Produto produto;
 
     @OneToOne
     @JoinColumn(name = "profissional_id")

@@ -34,12 +34,12 @@ public class ComissaoController {
         return ResponseEntity.ok(comissao);
     }
 
-  /*  @PostMapping
+    @PostMapping
     public ResponseEntity<Comissao> adicionar(@RequestBody Comissao comissao) {
-        Comissao comissaoCriado = service.adicionar(comissao);
-        return ResponseEntity.status(HttpStatus.CREATED).body(comissaoCriado);
+        Comissao comissaoCriada = service.adicionar(comissao);
+        return ResponseEntity.status(HttpStatus.CREATED).body(comissaoCriada);
     }
-*/
+
     @DeleteMapping("/{comissaoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable Long comissaoId){

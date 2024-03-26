@@ -28,6 +28,7 @@ create table cliente (
 create table comissao (
 	id bigint not null auto_increment,
 	profissional_id bigint not null,
+	produto_id bigint not null,
 	porcentagem_comissao decimal not null,
 
 
@@ -98,13 +99,6 @@ create table profissional (
 	primary key (id)
 ) engine=InnoDB default charset=utf8;
 
-CREATE TABLE comissao_produto (
-    comissao_id BIGINT,
-    produto_id BIGINT,
-    PRIMARY KEY (comissao_id, produto_id)
-
-)engine=InnoDB default charset=utf8;
-
 CREATE TABLE item_pedido_produto (
     item_pedido_id BIGINT,
     produto_id BIGINT,
@@ -125,15 +119,15 @@ foreign key (cliente_id) references cliente (id);
 alter table pedido add constraint fk_pedido_profissional
 foreign key (profissional_id) references profissional (id);
 
-alter table comissao_produto add constraint fk_comissao_produto_comissao
-FOREIGN KEY (comissao_id) REFERENCES comissao(id);
-
-alter table comissao_produto add constraint fk_comissao_produto_produto
-FOREIGN KEY (produto_id) REFERENCES produto(id);
-
 alter table item_pedido_produto add constraint item_pedido_produto_item_pedido
 FOREIGN KEY (item_pedido_id) REFERENCES item_pedido(id);
 
 alter table item_pedido_produto add constraint item_pedido_produto_produto
 FOREIGN KEY (produto_id) REFERENCES produto(id);
+
+alter table comissao add constraint comissao_produto
+FOREIGN KEY (produto_id)  REFERENCES produto(id);
+
+alter table comissao add constraint comissao_profissional
+FOREIGN KEY (profissional_id)  REFERENCES profissional(id);
 

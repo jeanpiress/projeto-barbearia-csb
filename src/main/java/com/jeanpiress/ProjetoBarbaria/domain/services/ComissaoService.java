@@ -5,6 +5,8 @@ import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ComissaoNaoEncontradoExc
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Comissao;
+import com.jeanpiress.ProjetoBarbaria.domain.model.Produto;
+import com.jeanpiress.ProjetoBarbaria.domain.model.Profissional;
 import com.jeanpiress.ProjetoBarbaria.repositories.ComissaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,12 +22,22 @@ public class ComissaoService {
     @Autowired
     private ComissaoRepository repository;
 
+    @Autowired
+    private ProdutoService produtoService;
+
+    @Autowired
+    private ProfissionalService profissionalService;
+
     public Comissao buscarPorId(Long comissaoId){
         return repository.findById(comissaoId).
                 orElseThrow(() -> new CategoriaNaoEncontradoException(comissaoId));
     }
     @Transactional
     public Comissao adicionar(Comissao comissao) {
+        Produto produto = produtoService.buscarPorId(comissao.getProduto().getId());
+        Profissional profissional = profissionalService.buscarPorId(comissao.getProfissional().getId());
+        comissao.setProduto(produto);
+        comissao.setProfissional(profissional);
         return repository.save(comissao);
     }
 
