@@ -36,5 +36,5 @@ insert into comissao (id, profissional_id, produto_id, porcentagem_comissao) val
 
 insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id) values(1, utc_timestamp, 1, 1, 1, 1, 1);
 
-insert into item_pedido (id, preco_unitario, preco_total, quantidade, observacao, pedido_id) values (1, 45.00, 45.00, 1, null, 1);
+insert into item_pedido (id, preco_unitario, preco_total, quantidade, observacao, pedido_id, produto_id) values (1, 45.00, 45.00, 1, null, 1, 1);
 

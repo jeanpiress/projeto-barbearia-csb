@@ -42,6 +42,7 @@ create table item_pedido (
     quantidade bigint not null,
     observacao varchar(255),
     pedido_id bigint not null,
+    produto_id bigint not null,
 
 	primary key (id)
 ) engine=InnoDB default charset=utf8;
@@ -99,13 +100,6 @@ create table profissional (
 	primary key (id)
 ) engine=InnoDB default charset=utf8;
 
-CREATE TABLE item_pedido_produto (
-    item_pedido_id BIGINT,
-    produto_id BIGINT,
-    PRIMARY KEY (item_pedido_id, produto_id)
-
-)engine=InnoDB default charset=utf8;
-
 
 alter table produto add constraint fk_produto_categoria
 foreign key (categoria_id) references categoria (id);
@@ -113,17 +107,14 @@ foreign key (categoria_id) references categoria (id);
 alter table item_pedido add constraint fk_item_pedido_pedido
 foreign key (pedido_id) references pedido (id);
 
+alter table item_pedido add constraint fk_item_pedido_produto
+foreign key (produto_id) references produto (id);
+
 alter table pedido add constraint fk_pedido_cliente
 foreign key (cliente_id) references cliente (id);
 
 alter table pedido add constraint fk_pedido_profissional
 foreign key (profissional_id) references profissional (id);
-
-alter table item_pedido_produto add constraint item_pedido_produto_item_pedido
-FOREIGN KEY (item_pedido_id) REFERENCES item_pedido(id);
-
-alter table item_pedido_produto add constraint item_pedido_produto_produto
-FOREIGN KEY (produto_id) REFERENCES produto(id);
 
 alter table comissao add constraint comissao_produto
 FOREIGN KEY (produto_id)  REFERENCES produto(id);

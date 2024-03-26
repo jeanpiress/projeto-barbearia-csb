@@ -14,6 +14,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class ItemPedidoService {
@@ -52,17 +53,4 @@ public class ItemPedidoService {
         }
     }
 
-    public ItemPedido adicionarProduto(Long itemPedidoId, Long produtoId){
-        ItemPedido itemPedido = buscarPorId(itemPedidoId);
-        Produto produto = produtoService.buscarPorId(produtoId);
-        itemPedido.adicionarProduto(produto);
-        return itemPedido;
-    }
-
-    public ItemPedido removerProduto(Long itemPedidoId, Long produtoId){
-        ItemPedido itemPedido = buscarPorId(itemPedidoId);
-        Produto produto = produtoService.buscarPorId(produtoId);
-        itemPedido.removerProduto(produto);
-        return itemPedido;
-    }
 }

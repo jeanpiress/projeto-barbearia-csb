@@ -31,18 +31,8 @@ public class ItemPedido {
     @JsonIgnore
     private Pedido pedido;
 
-    @ManyToMany
-    @JoinTable(
-            name = "item_pedido_produto",
-            joinColumns = @JoinColumn(name = "item_pedido_id"),
-            inverseJoinColumns = @JoinColumn(name = "produto_id"))
-    private List<Produto> produtos = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "produto_id")
+    private Produto produto;
 
-    public void adicionarProduto(Produto produto){
-        produtos.add(produto);
-    }
-
-    public void removerProduto(Produto produto){
-        produtos.remove(produto);
-    }
 }
