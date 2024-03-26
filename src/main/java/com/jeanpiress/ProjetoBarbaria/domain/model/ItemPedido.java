@@ -28,6 +28,7 @@ public class ItemPedido {
 
     @ManyToOne
     @JoinColumn(name = "pedido_id")
+    @JsonIgnore
     private Pedido pedido;
 
     @ManyToMany
@@ -37,4 +38,11 @@ public class ItemPedido {
             inverseJoinColumns = @JoinColumn(name = "produto_id"))
     private List<Produto> produtos = new ArrayList<>();
 
+    public void adicionarProduto(Produto produto){
+        produtos.add(produto);
+    }
+
+    public void removerProduto(Produto produto){
+        produtos.remove(produto);
+    }
 }

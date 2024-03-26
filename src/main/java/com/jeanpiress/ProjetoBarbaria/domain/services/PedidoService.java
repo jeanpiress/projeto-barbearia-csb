@@ -55,4 +55,20 @@ public class PedidoService {
                     String.format(MSG_PEDIDO_EM_USO, pedidoId));
         }
     }
+
+    @Transactional
+    public Pedido adicionarItemPedido(Long pedidoId, Long itemPedidoId){
+        Pedido pedido = buscarPorId(pedidoId);
+        ItemPedido itemPedido = itemPedidoService.buscarPorId(itemPedidoId);
+        pedido.adicionarItemPedido(itemPedido);
+        return pedido;
+    }
+
+    @Transactional
+    public Pedido removerItemPedido(Long pedidoId, Long itemPedidoId){
+        Pedido pedido = buscarPorId(pedidoId);
+        ItemPedido itemPedido = itemPedidoService.buscarPorId(itemPedidoId);
+        pedido.removerItemPedido(itemPedido);
+        return pedido;
+    }
 }

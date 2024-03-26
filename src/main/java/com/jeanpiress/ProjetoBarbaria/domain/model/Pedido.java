@@ -8,6 +8,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -24,10 +25,8 @@ public class Pedido {
     private Long id;
     private OffsetDateTime horario;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "pedido")
-    private List<ItemPedido> itemPedidos;
-
+    private List<ItemPedido> itemPedidos = new ArrayList<>();
     private StatusPagamento statusPagamento;
     private FormaPagamento formaPagamento;
     private StatusPedido statusPedido;
@@ -41,4 +40,11 @@ public class Pedido {
     private Profissional profissional;
 
 
+    public void adicionarItemPedido(ItemPedido itemPedido){
+        itemPedidos.add(itemPedido);
+    }
+
+    public void removerItemPedido(ItemPedido itemPedido){
+        itemPedidos.remove(itemPedido);
+    }
 }

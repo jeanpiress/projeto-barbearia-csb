@@ -1,6 +1,8 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
+import com.jeanpiress.ProjetoBarbaria.domain.model.ItemPedido;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Pedido;
+import com.jeanpiress.ProjetoBarbaria.domain.services.ItemPedidoService;
 import com.jeanpiress.ProjetoBarbaria.domain.services.PedidoService;
 import com.jeanpiress.ProjetoBarbaria.repositories.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,6 @@ public class PedidoController {
 
     @Autowired
     private PedidoService service;
-
 
     @GetMapping
     public ResponseEntity<List<Pedido>> listar(){
@@ -46,6 +47,17 @@ public class PedidoController {
     public void deletar(@PathVariable Long pedidoId){
         service.remover(pedidoId);
 
+    }
+    @PutMapping("/{pedidoId}/add-item/{itemPedidoId}")
+    public ResponseEntity<Pedido> adicionarItemPedido(@PathVariable Long pedidoId, @PathVariable Long itemPedidoId){
+        Pedido pedido = service.adicionarItemPedido(pedidoId, itemPedidoId);
+        return ResponseEntity.ok(pedido);
+    }
+
+    @DeleteMapping("/{pedidoId}/remove-item/{itemPedidoId}")
+    public ResponseEntity<Pedido> removerItemPedido(@PathVariable Long pedidoId, @PathVariable Long itemPedidoId){
+        Pedido pedido = service.removerItemPedido(pedidoId, itemPedidoId);
+        return ResponseEntity.ok(pedido);
     }
 
 }

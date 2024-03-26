@@ -6,6 +6,7 @@ import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbaria.domain.model.ItemPedido;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Pedido;
+import com.jeanpiress.ProjetoBarbaria.domain.model.Produto;
 import com.jeanpiress.ProjetoBarbaria.repositories.ItemPedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,6 +24,9 @@ public class ItemPedidoService {
 
     @Autowired
     private PedidoService pedidoService;
+
+    @Autowired
+    private ProdutoService produtoService;
 
     public ItemPedido buscarPorId(Long itemPedidoId){
         return repository.findById(itemPedidoId).
@@ -46,5 +50,19 @@ public class ItemPedidoService {
             throw new EntidadeEmUsoException(
                     String.format(MSG_ITEM_EM_USO, itemPedidoId));
         }
+    }
+
+    public ItemPedido adicionarProduto(Long itemPedidoId, Long produtoId){
+        ItemPedido itemPedido = buscarPorId(itemPedidoId);
+        Produto produto = produtoService.buscarPorId(produtoId);
+        itemPedido.adicionarProduto(produto);
+        return itemPedido;
+    }
+
+    public ItemPedido removerProduto(Long itemPedidoId, Long produtoId){
+        ItemPedido itemPedido = buscarPorId(itemPedidoId);
+        Produto produto = produtoService.buscarPorId(produtoId);
+        itemPedido.removerProduto(produto);
+        return itemPedido;
     }
 }

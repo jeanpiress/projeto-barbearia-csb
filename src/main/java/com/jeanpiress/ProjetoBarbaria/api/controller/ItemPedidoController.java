@@ -47,4 +47,16 @@ public class ItemPedidoController {
 
     }
 
+    @PutMapping("/{itemPedidoId}/add-produto/{produtoId}")
+    public ResponseEntity<ItemPedido> adicionarProduto(@PathVariable Long itemPedidoId, @PathVariable Long produtoId){
+        ItemPedido itemPedido = service.adicionarProduto(itemPedidoId, produtoId);
+       return ResponseEntity.ok(itemPedido);
+    }
+
+    @DeleteMapping("/{itemPedidoId}/remove-produto/{produtoId}")
+    public ResponseEntity<ItemPedido> removerProduto(@PathVariable Long itemPedidoId, @PathVariable Long produtoId){
+        ItemPedido itemPedido = service.removerProduto(itemPedidoId, produtoId);
+        return ResponseEntity.ok(itemPedido);
+    }
+
 }
