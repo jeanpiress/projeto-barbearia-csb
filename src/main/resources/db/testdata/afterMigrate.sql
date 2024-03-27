@@ -30,11 +30,17 @@ insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, 
 
 insert into produto (id, nome, preco, ativo, tem_estoque, estoque, vendido_por_ponto, peso_pontuacao_cliente, peso_pontuacao_profissional, preco_em_pontos, comissao_base, categoria_id) values (1, 'corte', 45.00, true, false, 0, false, 1, 1, 0, 50.00, 1);
 
+insert into produto (id, nome, preco, ativo, tem_estoque, estoque, vendido_por_ponto, peso_pontuacao_cliente, peso_pontuacao_profissional, preco_em_pontos, comissao_base, categoria_id) values (2, 'barba', 45.00, true, false, 0, false, 1, 1, 0, 50.00, 1);
+
 insert into profissional (id, nome, nome_exibicao, celular, cpf, data_nascimento, salario_fixo, dia_pagamento, ativo) values (1, 'Jean Carlo', 'jean', '34999708382', '10158594614', utc_timestamp, 0, 5, true);
 
 insert into comissao (id, profissional_id, produto_id, porcentagem_comissao) values (1, 1, 1, 50.00);
 
-insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id) values(1, utc_timestamp, 1, 1, 1, 1, 1);
+insert into comissao (id, profissional_id, produto_id, porcentagem_comissao) values (2, 1, 2, 50.00);
 
-insert into item_pedido (id, preco_unitario, preco_total, quantidade, observacao, pedido_id, produto_id) values (1, 45.00, 45.00, 1, null, 1, 1);
+insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada) values(1, utc_timestamp, 1, 1, 1, 1, 1, 0);
+
+insert into item_pedido (id, preco_unitario, preco_total, quantidade, observacao, pedido_id, produto_id) values (1, 45.00, 45.00, 1, null, null, 1);
+
+insert into item_pedido (id, preco_unitario, preco_total, quantidade, observacao, pedido_id, produto_id) values (2, 45.00, 45.00, 1, null, null, 2);
 

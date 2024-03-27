@@ -7,6 +7,7 @@ import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPedido;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,8 @@ public class Pedido {
     @JoinColumn(name = "profissional_id")
     private Profissional profissional;
 
+    private BigDecimal comissaoGerada;
+
 
     public void adicionarItemPedido(ItemPedido itemPedido){
         itemPedidos.add(itemPedido);
@@ -47,4 +50,6 @@ public class Pedido {
     public void removerItemPedido(ItemPedido itemPedido){
         itemPedidos.remove(itemPedido);
     }
+
+
 }

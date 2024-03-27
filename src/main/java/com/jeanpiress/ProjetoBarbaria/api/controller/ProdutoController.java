@@ -2,6 +2,7 @@ package com.jeanpiress.ProjetoBarbaria.api.controller;
 
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ProdutoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Categoria;
+import com.jeanpiress.ProjetoBarbaria.domain.model.Comissao;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Produto;
 import com.jeanpiress.ProjetoBarbaria.domain.services.CategoriaService;
 import com.jeanpiress.ProjetoBarbaria.domain.services.ProdutoService;
@@ -41,9 +42,6 @@ public class ProdutoController {
 
     @PostMapping
     public ResponseEntity<Produto> adicionar(@RequestBody Produto produto) {
-        Long categoriaId = produto.getCategoria().getId();
-        Categoria catagoria = categoriaService.buscarPorId(categoriaId);
-        produto.setCategoria(catagoria);
         Produto produtoCriado = service.adicionar(produto);
         return ResponseEntity.status(HttpStatus.CREATED).body(produtoCriado);
     }

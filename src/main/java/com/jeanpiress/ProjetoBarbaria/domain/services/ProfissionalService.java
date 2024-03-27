@@ -12,6 +12,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Set;
 
 @Service
 public class ProfissionalService {
@@ -39,5 +40,9 @@ public class ProfissionalService {
             throw new EntidadeEmUsoException(
                     String.format(MSG_PROFISSIONAL_EM_USO, profissionalId));
         }
+    }
+
+    public Set<Long> buscarIdProfissionaisAtivos(){
+       return repository.buscarIdProfissionaisAtivos();
     }
 }

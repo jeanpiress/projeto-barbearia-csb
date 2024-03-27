@@ -3,10 +3,7 @@ package com.jeanpiress.ProjetoBarbaria.domain.services;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.CategoriaNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.PedidoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
-import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
-import com.jeanpiress.ProjetoBarbaria.domain.model.ItemPedido;
-import com.jeanpiress.ProjetoBarbaria.domain.model.Pedido;
-import com.jeanpiress.ProjetoBarbaria.domain.model.Profissional;
+import com.jeanpiress.ProjetoBarbaria.domain.model.*;
 import com.jeanpiress.ProjetoBarbaria.repositories.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -14,6 +11,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class PedidoService {
@@ -30,6 +29,9 @@ public class PedidoService {
 
     @Autowired
     private ProfissionalService profissionalService;
+
+    @Autowired
+    private ComissaoService comissaoService;
 
     public Pedido buscarPorId(Long pedidoId){
         return repository.findById(pedidoId).
@@ -59,9 +61,17 @@ public class PedidoService {
     @Transactional
     public Pedido adicionarItemPedido(Long pedidoId, Long itemPedidoId){
         Pedido pedido = buscarPorId(pedidoId);
+        Long profissionalId = pedido.getProfissional().getId();
         ItemPedido itemPedido = itemPedidoService.buscarPorId(itemPedidoId);
-        pedido.adicionarItemPedido(itemPedido);
-        return pedido;
+        if(!pedido.getItemPedidos().contains(itemPedido)) {
+            itemPedido.setPedido(pedido);
+            itemPedidoService.adicionar(itemPedido);
+            pedido.adicionarItemPedido(itemPedido);
+            BigDecimal comissaoGerada = gerarcomissao(profissionalId, itemPedido);
+            BigDecimal comissaoPedido = pedido.getComissaoGerada().add(comissaoGerada);
+            pedido.setComissaoGerada(comissaoPedido);
+        }
+        return repository.save(pedido);
     }
 
     @Transactional
@@ -70,5 +80,15 @@ public class PedidoService {
         ItemPedido itemPedido = itemPedidoService.buscarPorId(itemPedidoId);
         pedido.removerItemPedido(itemPedido);
         return pedido;
+    }
+
+    public BigDecimal gerarcomissao(Long profissionalId, ItemPedido itemPedido){
+        Long produtoId = itemPedido.getProduto().getId();
+        Comissao comissao = comissaoService.buscarPorProfissionalProduto(profissionalId, produtoId);
+        BigDecimal comissaoProdutoUnitario = comissaoService.calculoComissaoProduto(comissao);
+        Integer quantidade = itemPedido.getQuantidade();
+        BigDecimal comissaoProdutoFinal = comissaoProdutoUnitario.multiply(new BigDecimal(quantidade));
+
+        return  comissaoProdutoFinal;
     }
 }
