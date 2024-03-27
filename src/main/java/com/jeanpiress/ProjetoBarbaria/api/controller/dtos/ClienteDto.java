@@ -1,21 +1,16 @@
-package com.jeanpiress.ProjetoBarbaria.domain.model;
+package com.jeanpiress.ProjetoBarbaria.api.controller.dtos;
 
-import lombok.*;
+import com.jeanpiress.ProjetoBarbaria.domain.model.Endereco;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Embedded;
 import java.time.OffsetDateTime;
 
-@Entity
-@Data
-@Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@NoArgsConstructor
-@AllArgsConstructor
-public class Cliente {
+@Getter
+@Setter
+public class ClienteDto {
 
-    @EqualsAndHashCode.Include
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
     private String celular;

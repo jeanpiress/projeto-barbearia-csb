@@ -25,8 +25,8 @@ insert into categoria (id, nome) values (1, 'cabelo');
 insert into categoria (id, nome) values (2, 'barba');
 insert into categoria (id, nome) values (3, 'produto');
 
-insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, endereco_bairro, endereco_cep, endereco_complemento, endereco_logradouro, endereco_numero) values (1, 'jean', '34999708382', utc_timestamp, utc_timestamp, 100, utc_timestamp, 'sem obs','morumbi', '38407381', 'casa', 'rua grupiara', '313');
-insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao) values (2, 'Kirk', '34999708385', utc_timestamp, utc_timestamp, 50, utc_timestamp, 'sem obs');
+insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, endereco_bairro, endereco_cep, endereco_complemento, endereco_logradouro, endereco_numero, dias_retorno) values (1, 'jean', '34999708382', utc_timestamp, utc_timestamp, 100, utc_timestamp, 'sem obs','morumbi', '38407381', 'casa', 'rua grupiara', '313', 30);
+insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno) values (2, 'Kirk', '34999708385', utc_timestamp, utc_timestamp, 50, utc_timestamp, 'sem obs', 30);
 
 insert into produto (id, nome, preco, ativo, tem_estoque, estoque, vendido_por_ponto, peso_pontuacao_cliente, peso_pontuacao_profissional, preco_em_pontos, comissao_base, categoria_id) values (1, 'corte', 45.00, true, false, 0, false, 1, 1, 0, 50.00, 1);
 

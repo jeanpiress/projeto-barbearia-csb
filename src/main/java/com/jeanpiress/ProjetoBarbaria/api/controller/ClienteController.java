@@ -1,5 +1,9 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
+import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.ClienteAssembler;
+import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.dissembler.ClienteInputDissembler;
+import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.ClienteDto;
+import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.input.ClienteInput;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ClienteNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbaria.domain.services.ClienteService;
@@ -21,23 +25,32 @@ public class ClienteController {
     @Autowired
     private ClienteService service;
 
+    @Autowired
+    private ClienteAssembler clienteAssembler;
+
+    @Autowired
+    private ClienteInputDissembler clienteInputDissembler;
+
     @GetMapping
-    public ResponseEntity<List<Cliente>> listar(){
-        List<Cliente> clienteList = repository.findAll();
-        return ResponseEntity.ok(clienteList);
+    public ResponseEntity<List<ClienteDto>> listar(){
+       List<Cliente> clienteList = repository.findAll();
+       List<ClienteDto> clientesDto = clienteAssembler.collectionToModel(clienteList);
+       return ResponseEntity.ok(clientesDto);
     }
 
     @GetMapping(value = "/{clienteId}")
-    public ResponseEntity<Cliente> buscarPorId(@PathVariable Long clienteId) {
-       Cliente cliente = service.buscarPorId(clienteId);
-
-        return ResponseEntity.ok(cliente);
+    public ResponseEntity<ClienteDto> buscarPorId(@PathVariable Long clienteId) {
+        Cliente cliente = service.buscarPorId(clienteId);
+        ClienteDto clienteDto = clienteAssembler.toModel(cliente);
+        return ResponseEntity.ok(clienteDto);
     }
 
     @PostMapping
-    public ResponseEntity<Cliente> adicionar(@RequestBody Cliente cliente) {
+    public ResponseEntity<ClienteDto> adicionar(@RequestBody ClienteInput clienteInput) {
+        Cliente cliente = clienteInputDissembler.toDomainObject(clienteInput);
         Cliente clienteCriado = service.adicionar(cliente);
-        return ResponseEntity.status(HttpStatus.CREATED).body(clienteCriado);
+        ClienteDto clienteDto = clienteAssembler.toModel(clienteCriado);
+        return ResponseEntity.status(HttpStatus.CREATED).body(clienteDto);
     }
 
     @DeleteMapping("/{clienteId}")
