@@ -1,0 +1,1 @@
+alter table pedido add column comissao_gerada decimal(10,2);
