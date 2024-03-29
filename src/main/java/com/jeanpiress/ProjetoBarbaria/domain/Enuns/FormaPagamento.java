@@ -6,5 +6,6 @@ public enum FormaPagamento {
     PIX,
     CREDITO,
     DEBITO,
-    PONTO;
+    PONTO,
+    AGUARDANDO_PAGAMENTO;
 }

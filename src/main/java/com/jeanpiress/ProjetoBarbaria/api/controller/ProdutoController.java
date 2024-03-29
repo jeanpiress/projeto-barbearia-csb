@@ -1,12 +1,13 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
-import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ProdutoNaoEncontradoException;
-import com.jeanpiress.ProjetoBarbaria.domain.model.Categoria;
-import com.jeanpiress.ProjetoBarbaria.domain.model.Comissao;
+import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.ProdutoAssembler;
+import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.dissembler.ProdutoInputDissembler;
+import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.ProdutoDto;
+import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.input.ProdutoInput;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Produto;
 import com.jeanpiress.ProjetoBarbaria.domain.services.CategoriaService;
 import com.jeanpiress.ProjetoBarbaria.domain.services.ProdutoService;
-import com.jeanpiress.ProjetoBarbaria.repositories.ProdutoRepository;
+import com.jeanpiress.ProjetoBarbaria.domain.repositories.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,23 +28,32 @@ public class ProdutoController {
     @Autowired
     private CategoriaService categoriaService;
 
+    @Autowired
+    private ProdutoAssembler produtoAssembler;
+
+    @Autowired
+    private ProdutoInputDissembler produtoDissembler;
+
     @GetMapping
-    public ResponseEntity<List<Produto>> listar(){
-        List<Produto> produtoList = repository.findAll();
-        return ResponseEntity.ok(produtoList);
+    public ResponseEntity<List<ProdutoDto>> listar(){
+        List<Produto> produtos = repository.findAll();
+        List<ProdutoDto> produtosDto = produtoAssembler.collectionToModel(produtos);
+        return ResponseEntity.ok(produtosDto);
     }
 
     @GetMapping(value = "/{produtoId}")
-    public ResponseEntity<Produto> buscarPorId(@PathVariable Long produtoId) {
+    public ResponseEntity<ProdutoDto> buscarPorId(@PathVariable Long produtoId) {
         Produto produto = service.buscarPorId(produtoId);
-
-        return ResponseEntity.ok(produto);
+        ProdutoDto produtoDto = produtoAssembler.toModel(produto);
+        return ResponseEntity.ok(produtoDto);
     }
 
     @PostMapping
-    public ResponseEntity<Produto> adicionar(@RequestBody Produto produto) {
+    public ResponseEntity<ProdutoDto> adicionar(@RequestBody ProdutoInput produtoInput) {
+        Produto produto = produtoDissembler.toDomainObject(produtoInput);
         Produto produtoCriado = service.adicionar(produto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(produtoCriado);
+        ProdutoDto produtoDto = produtoAssembler.toModel(produtoCriado);
+        return ResponseEntity.status(HttpStatus.CREATED).body(produtoDto);
     }
 
     @DeleteMapping("/{produtoId}")

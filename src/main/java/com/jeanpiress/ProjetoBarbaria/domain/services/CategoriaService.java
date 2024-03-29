@@ -3,14 +3,13 @@ package com.jeanpiress.ProjetoBarbaria.domain.services;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.CategoriaNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Categoria;
-import com.jeanpiress.ProjetoBarbaria.repositories.CategoriaRepository;
+import com.jeanpiress.ProjetoBarbaria.domain.repositories.CategoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Optional;
 
 @Service
 public class CategoriaService {

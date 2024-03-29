@@ -4,10 +4,9 @@ import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.Client
 import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.dissembler.ClienteInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.ClienteDto;
 import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.input.ClienteInput;
-import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ClienteNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbaria.domain.services.ClienteService;
-import com.jeanpiress.ProjetoBarbaria.repositories.ClienteRepository;
+import com.jeanpiress.ProjetoBarbaria.domain.repositories.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

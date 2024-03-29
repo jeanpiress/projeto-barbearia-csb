@@ -1,9 +1,12 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
-import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ItemPedidoNaoEncontradoException;
+import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.ItemPedidoAssembler;
+import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.dissembler.ItemPedidoInputDissembler;
+import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.ItemPedidoDto;
+import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.input.ItemPedidoInput;
 import com.jeanpiress.ProjetoBarbaria.domain.model.ItemPedido;
 import com.jeanpiress.ProjetoBarbaria.domain.services.ItemPedidoService;
-import com.jeanpiress.ProjetoBarbaria.repositories.ItemPedidoRepository;
+import com.jeanpiress.ProjetoBarbaria.domain.repositories.ItemPedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,23 +24,32 @@ public class ItemPedidoController {
     @Autowired
     private ItemPedidoService service;
 
+    @Autowired
+    private ItemPedidoAssembler itemPedidoAssembler;
+
+    @Autowired
+    private ItemPedidoInputDissembler itemPedidoDissembler;
+
     @GetMapping
-    public ResponseEntity<List<ItemPedido>> listar(){
-        List<ItemPedido> itemPedidoList = repository.findAll();
-        return ResponseEntity.ok(itemPedidoList);
+    public ResponseEntity<List<ItemPedidoDto>> listar(){
+        List<ItemPedido> itensPedido = repository.findAll();
+        List<ItemPedidoDto> itensPedidoDto = itemPedidoAssembler.collectionToModel(itensPedido);
+        return ResponseEntity.ok(itensPedidoDto);
     }
 
     @GetMapping(value = "/{itemPedidoId}")
-    public ResponseEntity<ItemPedido> buscarPorId(@PathVariable Long itemPedidoId) {
+    public ResponseEntity<ItemPedidoDto> buscarPorId(@PathVariable Long itemPedidoId) {
         ItemPedido itemPedido = service.buscarPorId(itemPedidoId);
-
-        return ResponseEntity.ok(itemPedido);
+        ItemPedidoDto itemPedidoDto = itemPedidoAssembler.toModel(itemPedido);
+        return ResponseEntity.ok(itemPedidoDto);
     }
 
     @PostMapping
-    public ResponseEntity<ItemPedido> adicionar(@RequestBody ItemPedido itemPedido) {
-       ItemPedido itemPedidoCriado = service.adicionar(itemPedido);
-       return ResponseEntity.status(HttpStatus.CREATED).body(itemPedidoCriado);
+    public ResponseEntity<ItemPedidoDto> adicionar(@RequestBody ItemPedidoInput itemPedidoInput) {
+        ItemPedido itemPedido = itemPedidoDissembler.toDomainObject(itemPedidoInput);
+        ItemPedido itemPedidoCriado = service.adicionar(itemPedido);
+        ItemPedidoDto itemPedidoDto = itemPedidoAssembler.toModel(itemPedidoCriado);
+        return ResponseEntity.status(HttpStatus.CREATED).body(itemPedidoDto);
     }
 
     @DeleteMapping("/{itemPedidoId}")

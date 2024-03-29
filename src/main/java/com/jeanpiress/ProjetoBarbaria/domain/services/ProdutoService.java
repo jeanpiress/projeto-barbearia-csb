@@ -5,9 +5,8 @@ import com.jeanpiress.ProjetoBarbaria.domain.exceptions.CategoriaNaoEncontradoEx
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ProdutoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Categoria;
-import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Produto;
-import com.jeanpiress.ProjetoBarbaria.repositories.ProdutoRepository;
+import com.jeanpiress.ProjetoBarbaria.domain.repositories.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;

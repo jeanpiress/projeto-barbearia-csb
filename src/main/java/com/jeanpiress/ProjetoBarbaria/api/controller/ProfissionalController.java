@@ -1,9 +1,13 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
-import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ProfissionalNaoEncontradoException;
+import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.ProfissionalAssembler;
+import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.dissembler.ProfissionalInputDissembler;
+import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.ProdutoDto;
+import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.ProfissionalDto;
+import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.input.ProfissionalInput;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Profissional;
 import com.jeanpiress.ProjetoBarbaria.domain.services.ProfissionalService;
-import com.jeanpiress.ProjetoBarbaria.repositories.ProfissionalRepository;
+import com.jeanpiress.ProjetoBarbaria.domain.repositories.ProfissionalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,22 +25,32 @@ public class ProfissionalController {
     @Autowired
     private ProfissionalService service;
 
+    @Autowired
+    private ProfissionalAssembler profissionalAssembler;
+
+    @Autowired
+    private ProfissionalInputDissembler profissionalDissembler;
+
     @GetMapping
-    public ResponseEntity<List<Profissional>> listar(){
+    public ResponseEntity<List<ProfissionalDto>> listar(){
         List<Profissional> profissionais = repository.findAll();
-        return ResponseEntity.ok(profissionais);
+        List<ProfissionalDto> profissionaisDto = profissionalAssembler.collectionToModel(profissionais);
+        return ResponseEntity.ok(profissionaisDto);
     }
 
     @GetMapping(value = "/{profissionalId}")
-    public ResponseEntity<Profissional> buscarPorId(@PathVariable Long profissionalId) {
+    public ResponseEntity<ProfissionalDto> buscarPorId(@PathVariable Long profissionalId) {
         Profissional profissional = service.buscarPorId(profissionalId);
-        return ResponseEntity.ok(profissional);
+        ProfissionalDto profissionalDto = profissionalAssembler.toModel(profissional);
+        return ResponseEntity.ok(profissionalDto);
     }
 
     @PostMapping
-    public ResponseEntity<Profissional> adicionar(@RequestBody Profissional profissional) {
+    public ResponseEntity<ProfissionalDto> adicionar(@RequestBody ProfissionalInput profissionalInput) {
+        Profissional profissional = profissionalDissembler.toDomainObject(profissionalInput);
         Profissional profissionalCriado = service.adicionar(profissional);
-        return ResponseEntity.status(HttpStatus.CREATED).body(profissionalCriado);
+        ProfissionalDto profissionalDto = profissionalAssembler.toModel(profissionalCriado);
+        return ResponseEntity.status(HttpStatus.CREATED).body(profissionalDto);
     }
 
     @DeleteMapping("/{profissionalId}")

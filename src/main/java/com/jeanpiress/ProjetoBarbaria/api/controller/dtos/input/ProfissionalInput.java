@@ -6,19 +6,22 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Getter
 @Setter
-public class ClienteInput {
+public class ProfissionalInput {
 
     @NotBlank
     private String nome;
     @NotBlank
+    private String nomeExibicao;
+    @NotBlank
     private String celular;
+    private String cpf;
     private OffsetDateTime dataNascimento;
-    private String observacao;
-    @NotNull
-    private Integer diasRetorno;
+    private BigDecimal salarioFixo;
+    private Integer diaPagamento;
     private Endereco endereco;
 }

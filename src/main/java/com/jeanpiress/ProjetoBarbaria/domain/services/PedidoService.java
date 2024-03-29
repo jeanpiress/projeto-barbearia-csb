@@ -1,10 +1,13 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
+import com.jeanpiress.ProjetoBarbaria.domain.Enuns.FormaPagamento;
+import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPagamento;
+import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPedido;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.CategoriaNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.PedidoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.*;
-import com.jeanpiress.ProjetoBarbaria.repositories.PedidoRepository;
+import com.jeanpiress.ProjetoBarbaria.domain.repositories.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -12,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 public class PedidoService {
@@ -33,6 +35,7 @@ public class PedidoService {
     @Autowired
     private ComissaoService comissaoService;
 
+
     public Pedido buscarPorId(Long pedidoId){
         return repository.findById(pedidoId).
                 orElseThrow(() -> new CategoriaNaoEncontradoException(pedidoId));
@@ -43,6 +46,7 @@ public class PedidoService {
         Profissional profissional = profissionalService.buscarPorId(pedido.getProfissional().getId());
         pedido.setCliente(cliente);
         pedido.setProfissional(profissional);
+        preencherPedido(pedido);
         return repository.save(pedido);
     }
 
@@ -67,7 +71,7 @@ public class PedidoService {
             itemPedido.setPedido(pedido);
             itemPedidoService.adicionar(itemPedido);
             pedido.adicionarItemPedido(itemPedido);
-            BigDecimal comissaoGerada = gerarcomissao(profissionalId, itemPedido);
+            BigDecimal comissaoGerada = comissaoPorItem(profissionalId, itemPedido);
             BigDecimal comissaoPedido = pedido.getComissaoGerada().add(comissaoGerada);
             pedido.setComissaoGerada(comissaoPedido);
         }
@@ -78,11 +82,19 @@ public class PedidoService {
     public Pedido removerItemPedido(Long pedidoId, Long itemPedidoId){
         Pedido pedido = buscarPorId(pedidoId);
         ItemPedido itemPedido = itemPedidoService.buscarPorId(itemPedidoId);
-        pedido.removerItemPedido(itemPedido);
-        return pedido;
+        Long profissionalId = pedido.getProfissional().getId();
+        if(pedido.getItemPedidos().contains(itemPedido)) {
+            pedido.removerItemPedido(itemPedido);
+            itemPedidoService.remover(itemPedidoId);
+            BigDecimal comissaoGerada = comissaoPorItem(profissionalId, itemPedido);
+            BigDecimal comissaoPedido = pedido.getComissaoGerada().subtract(comissaoGerada);
+            pedido.setComissaoGerada(comissaoPedido);
+        }
+
+        return repository.save(pedido);
     }
 
-    public BigDecimal gerarcomissao(Long profissionalId, ItemPedido itemPedido){
+    public BigDecimal comissaoPorItem(Long profissionalId, ItemPedido itemPedido){
         Long produtoId = itemPedido.getProduto().getId();
         Comissao comissao = comissaoService.buscarPorProfissionalProduto(profissionalId, produtoId);
         BigDecimal comissaoProdutoUnitario = comissaoService.calculoComissaoProduto(comissao);
@@ -90,5 +102,13 @@ public class PedidoService {
         BigDecimal comissaoProdutoFinal = comissaoProdutoUnitario.multiply(new BigDecimal(quantidade));
 
         return  comissaoProdutoFinal;
+    }
+
+
+    public void preencherPedido(Pedido pedido){
+        pedido.setStatusPedido(StatusPedido.AGENDADO);
+        pedido.setFormaPagamento(FormaPagamento.AGUARDANDO_PAGAMENTO);
+        pedido.setStatusPagamento(StatusPagamento.APAGAR);
+
     }
 }

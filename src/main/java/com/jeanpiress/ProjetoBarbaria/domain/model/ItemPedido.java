@@ -5,8 +5,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Data
@@ -23,8 +21,6 @@ public class ItemPedido {
     private BigDecimal precoUnitario;
     private BigDecimal precoTotal;
     private Integer quantidade;
-    private String observacao;
-
 
     @ManyToOne
     @JoinColumn(name = "pedido_id")

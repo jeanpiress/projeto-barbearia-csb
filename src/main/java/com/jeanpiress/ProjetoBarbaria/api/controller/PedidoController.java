@@ -1,15 +1,18 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
-import com.jeanpiress.ProjetoBarbaria.domain.model.ItemPedido;
+import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.PedidoAssembler;
+import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.dissembler.PedidoInputDissembler;
+import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.PedidoDto;
+import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.input.PedidoInput;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Pedido;
-import com.jeanpiress.ProjetoBarbaria.domain.services.ItemPedidoService;
 import com.jeanpiress.ProjetoBarbaria.domain.services.PedidoService;
-import com.jeanpiress.ProjetoBarbaria.repositories.PedidoRepository;
+import com.jeanpiress.ProjetoBarbaria.domain.repositories.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -22,23 +25,33 @@ public class PedidoController {
     @Autowired
     private PedidoService service;
 
+    @Autowired
+    private PedidoAssembler pedidoAssembler;
+
+    @Autowired
+    private PedidoInputDissembler pedidoDissembler;
+
     @GetMapping
-    public ResponseEntity<List<Pedido>> listar(){
-        List<Pedido> pedidoList = repository.findAll();
-        return ResponseEntity.ok(pedidoList);
+    public ResponseEntity<List<PedidoDto>> listar(){
+        List<Pedido> pedidos = repository.findAll();
+        List<PedidoDto> pedidosDto = pedidoAssembler.collectionToModel(pedidos);
+        return ResponseEntity.ok(pedidosDto);
     }
 
     @GetMapping(value = "/{pedidoId}")
-    public ResponseEntity<Pedido> buscarPorId(@PathVariable Long pedidoId) {
+    public ResponseEntity<PedidoDto> buscarPorId(@PathVariable Long pedidoId) {
         Pedido pedido = service.buscarPorId(pedidoId);
+        PedidoDto pedidoDto = pedidoAssembler.toModel(pedido);
 
-        return ResponseEntity.ok(pedido);
+        return ResponseEntity.ok(pedidoDto);
     }
 
     @PostMapping
-    public ResponseEntity<Pedido> adicionar(@RequestBody Pedido pedido) {
+    public ResponseEntity<PedidoDto> adicionar(@RequestBody @Valid PedidoInput pedidoInput) {
+        Pedido pedido = pedidoDissembler.toDomainObject(pedidoInput);
         Pedido pedidoCriado = service.adicionar(pedido);
-        return ResponseEntity.status(HttpStatus.CREATED).body(pedidoCriado);
+        PedidoDto pedidoDto = pedidoAssembler.toModel(pedidoCriado);
+        return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDto);
 
     }
 

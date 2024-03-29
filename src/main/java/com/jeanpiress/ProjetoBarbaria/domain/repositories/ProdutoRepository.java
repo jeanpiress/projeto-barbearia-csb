@@ -1,4 +1,4 @@
-package com.jeanpiress.ProjetoBarbaria.repositories;
+package com.jeanpiress.ProjetoBarbaria.domain.repositories;
 
 import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Produto;

@@ -1,14 +1,12 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
 import com.jeanpiress.ProjetoBarbaria.domain.eventos.ProdutoCriadoEvento;
-import com.jeanpiress.ProjetoBarbaria.domain.exceptions.CategoriaNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ComissaoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
-import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Comissao;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Produto;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Profissional;
-import com.jeanpiress.ProjetoBarbaria.repositories.ComissaoRepository;
+import com.jeanpiress.ProjetoBarbaria.domain.repositories.ComissaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Set;
 
 @Service
