@@ -38,9 +38,9 @@ public class PedidoService {
 
     public Pedido buscarPorId(Long pedidoId){
         return repository.findById(pedidoId).
-                orElseThrow(() -> new CategoriaNaoEncontradoException(pedidoId));
+                orElseThrow(() -> new PedidoNaoEncontradoException(pedidoId));
     }
-    @Transactional
+
     public Pedido adicionar(Pedido pedido) {
         Cliente cliente = clienteService.buscarPorId(pedido.getCliente().getId());
         Profissional profissional = profissionalService.buscarPorId(pedido.getProfissional().getId());
@@ -50,7 +50,7 @@ public class PedidoService {
         return repository.save(pedido);
     }
 
-    @Transactional
+
     public void remover(Long pedidoId) {
         try {
             repository.deleteById(pedidoId);
@@ -62,7 +62,7 @@ public class PedidoService {
         }
     }
 
-    @Transactional
+
     public Pedido adicionarItemPedido(Long pedidoId, Long itemPedidoId){
         Pedido pedido = buscarPorId(pedidoId);
         Long profissionalId = pedido.getProfissional().getId();
@@ -78,7 +78,7 @@ public class PedidoService {
         return repository.save(pedido);
     }
 
-    @Transactional
+
     public Pedido removerItemPedido(Long pedidoId, Long itemPedidoId){
         Pedido pedido = buscarPorId(pedidoId);
         ItemPedido itemPedido = itemPedidoService.buscarPorId(itemPedidoId);
@@ -108,7 +108,7 @@ public class PedidoService {
     public void preencherPedido(Pedido pedido){
         pedido.setStatusPedido(StatusPedido.AGENDADO);
         pedido.setFormaPagamento(FormaPagamento.AGUARDANDO_PAGAMENTO);
-        pedido.setStatusPagamento(StatusPagamento.APAGAR);
+        pedido.setStatusPagamento(StatusPagamento.AGUARDANDO_PAGAMENTO);
 
     }
 }

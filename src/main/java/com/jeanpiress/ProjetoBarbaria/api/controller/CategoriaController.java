@@ -1,9 +1,9 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
-import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.CategoriaAssembler;
-import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.dissembler.CategoriaInputDissembler;
-import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.CategoriaDto;
-import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.input.CategoriaInput;
+import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.CategoriaAssembler;
+import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.CategoriaInputDissembler;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.CategoriaDto;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.CategoriaInput;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Categoria;
 import com.jeanpiress.ProjetoBarbaria.domain.services.CategoriaService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.CategoriaRepository;
@@ -46,7 +46,7 @@ public class CategoriaController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoriaDto> adicionar(@RequestBody CategoriaInput categoriaInput) {
+    public ResponseEntity<CategoriaDto> adicionar(@RequestBody @Valid CategoriaInput categoriaInput) {
         Categoria categoria = categoriaDissembler.toDomainObject(categoriaInput);
         Categoria categoriaCriada = service.adicionar(categoria);
         CategoriaDto categoriaDto = categoriaAssembler.toModel(categoriaCriada);

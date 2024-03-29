@@ -1,9 +1,9 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
-import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.ItemPedidoAssembler;
-import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.dissembler.ItemPedidoInputDissembler;
-import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.ItemPedidoDto;
-import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.input.ItemPedidoInput;
+import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.ItemPedidoAssembler;
+import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.ItemPedidoInputDissembler;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.ItemPedidoDto;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.ItemPedidoInput;
 import com.jeanpiress.ProjetoBarbaria.domain.model.ItemPedido;
 import com.jeanpiress.ProjetoBarbaria.domain.services.ItemPedidoService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ItemPedidoRepository;
@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController()
@@ -45,7 +46,7 @@ public class ItemPedidoController {
     }
 
     @PostMapping
-    public ResponseEntity<ItemPedidoDto> adicionar(@RequestBody ItemPedidoInput itemPedidoInput) {
+    public ResponseEntity<ItemPedidoDto> adicionar(@RequestBody @Valid ItemPedidoInput itemPedidoInput) {
         ItemPedido itemPedido = itemPedidoDissembler.toDomainObject(itemPedidoInput);
         ItemPedido itemPedidoCriado = service.adicionar(itemPedido);
         ItemPedidoDto itemPedidoDto = itemPedidoAssembler.toModel(itemPedidoCriado);

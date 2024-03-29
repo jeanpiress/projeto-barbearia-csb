@@ -36,7 +36,7 @@ public class ComissaoService {
         return repository.findById(comissaoId).
                 orElseThrow(() -> new ComissaoNaoEncontradoException(comissaoId));
     }
-    @Transactional
+
     public Comissao adicionar(Comissao comissao) {
         Produto produto = produtoService.buscarPorId(comissao.getProduto().getId());
         Profissional profissional = profissionalService.buscarPorId(comissao.getProfissional().getId());
@@ -45,7 +45,7 @@ public class ComissaoService {
         return repository.save(comissao);
     }
 
-    @Transactional
+
     public void remover(Long comissaoId) {
         try {
             repository.deleteById(comissaoId);
@@ -70,7 +70,7 @@ public class ComissaoService {
         return valorFinal;
     }
 
-    @Transactional
+
     @EventListener
     public void criarComissaoBase(ProdutoCriadoEvento produtoEvento){
         Produto produto = produtoEvento.getProduto();

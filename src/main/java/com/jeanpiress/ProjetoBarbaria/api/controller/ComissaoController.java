@@ -1,9 +1,9 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
-import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.ComissaoAssembler;
-import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.dissembler.ComissaoInputDissembler;
-import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.ComissaoDto;
-import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.input.ComissaoInput;
+import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.ComissaoAssembler;
+import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.ComissaoInputDissembler;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.ComissaoDto;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.ComissaoInput;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Comissao;
 import com.jeanpiress.ProjetoBarbaria.domain.services.ComissaoService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ComissaoRepository;

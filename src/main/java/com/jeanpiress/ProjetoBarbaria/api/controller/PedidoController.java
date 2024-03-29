@@ -1,9 +1,9 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
-import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.PedidoAssembler;
-import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.dissembler.PedidoInputDissembler;
-import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.PedidoDto;
-import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.input.PedidoInput;
+import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.PedidoAssembler;
+import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.PedidoInputDissembler;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.PedidoDto;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.PedidoInput;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Pedido;
 import com.jeanpiress.ProjetoBarbaria.domain.services.PedidoService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.PedidoRepository;

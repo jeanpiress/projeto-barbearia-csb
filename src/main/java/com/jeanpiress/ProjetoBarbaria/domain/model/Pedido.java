@@ -1,6 +1,5 @@
 package com.jeanpiress.ProjetoBarbaria.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPedido;

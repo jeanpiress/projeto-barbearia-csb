@@ -1,10 +1,9 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
-import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.ProfissionalAssembler;
-import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.dissembler.ProfissionalInputDissembler;
-import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.ProdutoDto;
-import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.ProfissionalDto;
-import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.input.ProfissionalInput;
+import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.ProfissionalAssembler;
+import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.ProfissionalInputDissembler;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.ProfissionalDto;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.ProfissionalInput;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Profissional;
 import com.jeanpiress.ProjetoBarbaria.domain.services.ProfissionalService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ProfissionalRepository;
@@ -13,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController()
@@ -46,7 +46,7 @@ public class ProfissionalController {
     }
 
     @PostMapping
-    public ResponseEntity<ProfissionalDto> adicionar(@RequestBody ProfissionalInput profissionalInput) {
+    public ResponseEntity<ProfissionalDto> adicionar(@RequestBody @Valid ProfissionalInput profissionalInput) {
         Profissional profissional = profissionalDissembler.toDomainObject(profissionalInput);
         Profissional profissionalCriado = service.adicionar(profissional);
         ProfissionalDto profissionalDto = profissionalAssembler.toModel(profissionalCriado);

@@ -33,9 +33,9 @@ public class ProdutoService {
 
     public Produto buscarPorId(Long produtoId){
         return repository.findById(produtoId).
-                orElseThrow(() -> new CategoriaNaoEncontradoException(produtoId));
+                orElseThrow(() -> new ProdutoNaoEncontradoException(produtoId));
     }
-    @Transactional
+
     public Produto adicionar(Produto produto) {
         Long categoriaId = produto.getCategoria().getId();
         Categoria catagoria = categoriaService.buscarPorId(categoriaId);
@@ -45,7 +45,7 @@ public class ProdutoService {
         return produtoCriado;
     }
 
-    @Transactional
+
     public void remover(Long produtoId) {
         try {
             repository.deleteById(produtoId);

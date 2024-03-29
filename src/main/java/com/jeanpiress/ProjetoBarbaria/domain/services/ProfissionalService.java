@@ -1,6 +1,5 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
-import com.jeanpiress.ProjetoBarbaria.domain.exceptions.CategoriaNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ProfissionalNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Profissional;
@@ -22,14 +21,14 @@ public class ProfissionalService {
 
     public Profissional buscarPorId(Long profissionalId){
         return repository.findById(profissionalId).
-                orElseThrow(() -> new CategoriaNaoEncontradoException(profissionalId));
+                orElseThrow(() -> new ProfissionalNaoEncontradoException(profissionalId));
     }
-    @Transactional
+
     public Profissional adicionar(Profissional profissional) {
         return repository.save(profissional);
     }
 
-    @Transactional
+
     public void remover(Long profissionalId) {
         try {
             repository.deleteById(profissionalId);

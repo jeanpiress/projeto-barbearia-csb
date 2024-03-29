@@ -1,9 +1,9 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
-import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.ClienteAssembler;
-import com.jeanpiress.ProjetoBarbaria.api.controller.converteDto.assebler.dissembler.ClienteInputDissembler;
-import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.ClienteDto;
-import com.jeanpiress.ProjetoBarbaria.api.controller.dtos.input.ClienteInput;
+import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.ClienteAssembler;
+import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.ClienteInputDissembler;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.ClienteDto;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.ClienteInput;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbaria.domain.services.ClienteService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ClienteRepository;
@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController()
@@ -45,7 +46,7 @@ public class ClienteController {
     }
 
     @PostMapping
-    public ResponseEntity<ClienteDto> adicionar(@RequestBody ClienteInput clienteInput) {
+    public ResponseEntity<ClienteDto> adicionar(@RequestBody @Valid ClienteInput clienteInput) {
         Cliente cliente = clienteInputDissembler.toDomainObject(clienteInput);
         Cliente clienteCriado = service.adicionar(cliente);
         ClienteDto clienteDto = clienteAssembler.toModel(clienteCriado);

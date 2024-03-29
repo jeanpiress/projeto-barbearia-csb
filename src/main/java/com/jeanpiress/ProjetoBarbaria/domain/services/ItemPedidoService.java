@@ -1,11 +1,8 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
-import com.jeanpiress.ProjetoBarbaria.domain.exceptions.CategoriaNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ItemPedidoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
-import com.jeanpiress.ProjetoBarbaria.domain.model.Comissao;
 import com.jeanpiress.ProjetoBarbaria.domain.model.ItemPedido;
-import com.jeanpiress.ProjetoBarbaria.domain.model.Pedido;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Produto;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ItemPedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +10,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 
 @Service
@@ -32,9 +28,9 @@ public class ItemPedidoService {
 
     public ItemPedido buscarPorId(Long itemPedidoId){
         return repository.findById(itemPedidoId).
-                orElseThrow(() -> new CategoriaNaoEncontradoException(itemPedidoId));
+                orElseThrow(() -> new ItemPedidoNaoEncontradoException(itemPedidoId));
     }
-    @Transactional
+
     public ItemPedido adicionar(ItemPedido itemPedido) {
         Long produtoId = itemPedido.getProduto().getId();
         Produto produto = produtoService.buscarPorId(produtoId);
@@ -43,7 +39,7 @@ public class ItemPedidoService {
         return repository.save(itemPedido);
     }
 
-    @Transactional
+
     public void remover(Long itemPedidoId) {
         try {
             repository.deleteById(itemPedidoId);

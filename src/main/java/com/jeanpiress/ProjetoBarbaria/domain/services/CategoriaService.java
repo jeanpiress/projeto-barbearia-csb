@@ -23,12 +23,12 @@ public class CategoriaService {
                 orElseThrow(() -> new CategoriaNaoEncontradoException(categoriaId));
     }
 
-    @Transactional
+
     public Categoria adicionar(Categoria categoria) {
         return repository.save(categoria);
     }
 
-    @Transactional
+
     public void remover(Long categoriaId) {
         try {
             repository.deleteById(categoriaId);

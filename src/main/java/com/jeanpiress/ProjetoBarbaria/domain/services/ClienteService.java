@@ -1,6 +1,5 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
-import com.jeanpiress.ProjetoBarbaria.domain.exceptions.CategoriaNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ClienteNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
@@ -21,14 +20,13 @@ public class ClienteService {
 
     public Cliente buscarPorId(Long clienteId){
         return repository.findById(clienteId).
-                orElseThrow(() -> new CategoriaNaoEncontradoException(clienteId));
+                orElseThrow(() -> new ClienteNaoEncontradoException(clienteId));
     }
-    @Transactional
+
     public Cliente adicionar(Cliente cliente) {
         return repository.save(cliente);
     }
 
-    @Transactional
     public void remover(Long clienteId) {
         try {
             repository.deleteById(clienteId);
