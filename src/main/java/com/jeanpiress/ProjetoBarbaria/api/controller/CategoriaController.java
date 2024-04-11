@@ -4,6 +4,8 @@ import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.CategoriaAssemble
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.CategoriaInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.CategoriaDto;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.CategoriaInput;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.CategoriaNaoEncontradoException;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.NegocioException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Categoria;
 import com.jeanpiress.ProjetoBarbaria.domain.services.CategoriaService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.CategoriaRepository;
@@ -51,6 +53,18 @@ public class CategoriaController {
         Categoria categoriaCriada = service.adicionar(categoria);
         CategoriaDto categoriaDto = categoriaAssembler.toModel(categoriaCriada);
         return ResponseEntity.status(HttpStatus.CREATED).body(categoriaDto);
+    }
+
+    @PutMapping(value = "/{categoriaId}")
+    public ResponseEntity<CategoriaDto> alterar(@RequestBody @Valid CategoriaInput categoriaInput, @PathVariable Long categoriaId) {
+        try {
+            Categoria categoria = service.buscarPorId(categoriaId);
+            categoriaDissembler.copyToDomainObject(categoriaInput, categoria);
+            CategoriaDto categoriaDto = categoriaAssembler.toModel(service.adicionar(categoria));
+            return ResponseEntity.status(HttpStatus.CREATED).body(categoriaDto);
+        }catch(CategoriaNaoEncontradoException e) {
+            throw new NegocioException(e.getMessage(), e);
+        }
     }
 
     @DeleteMapping("/{categoriaId}")

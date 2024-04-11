@@ -4,8 +4,9 @@ import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.ProdutoAssembler;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.ProdutoInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.ProdutoDto;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.ProdutoInput;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ProdutoNaoEncontradoException;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.NegocioException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Produto;
-import com.jeanpiress.ProjetoBarbaria.domain.services.CategoriaService;
 import com.jeanpiress.ProjetoBarbaria.domain.services.ProdutoService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class ProdutoController {
     private ProdutoService service;
 
     @Autowired
-    private CategoriaService categoriaService;
+    private ProdutoService produtoService;
 
     @Autowired
     private ProdutoAssembler produtoAssembler;
@@ -55,6 +56,18 @@ public class ProdutoController {
         Produto produtoCriado = service.adicionar(produto);
         ProdutoDto produtoDto = produtoAssembler.toModel(produtoCriado);
         return ResponseEntity.status(HttpStatus.CREATED).body(produtoDto);
+    }
+
+    @PutMapping(value = "/{produtoId}")
+    public ResponseEntity<ProdutoDto> alterar(@RequestBody @Valid ProdutoInput produtoInput, @PathVariable Long produtoId) {
+        try {
+            Produto produto = service.buscarPorId(produtoId);
+            produtoDissembler.copyToDomainObject(produtoInput, produto);
+            ProdutoDto produtoDto = produtoAssembler.toModel(service.adicionar(produto));
+            return ResponseEntity.status(HttpStatus.CREATED).body(produtoDto);
+        }catch(ProdutoNaoEncontradoException e) {
+            throw new NegocioException(e.getMessage(), e);
+        }
     }
 
     @DeleteMapping("/{produtoId}")

@@ -26,6 +26,10 @@ public class Cliente {
     private String observacao;
     private Integer diasRetorno;
 
+    @ManyToOne
+    @JoinColumn(name = "ultimo_profissional_id")
+    private Profissional ultimoProfissional;
+
     @Embedded
     private Endereco endereco;
 }

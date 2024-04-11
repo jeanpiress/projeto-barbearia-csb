@@ -4,6 +4,8 @@ import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.ClienteAssembler;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.ClienteInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.ClienteDto;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.ClienteInput;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ClienteNaoEncontradoException;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.NegocioException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbaria.domain.services.ClienteService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ClienteRepository;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController()
@@ -29,11 +32,14 @@ public class ClienteController {
     private ClienteAssembler clienteAssembler;
 
     @Autowired
-    private ClienteInputDissembler clienteInputDissembler;
+    private ClienteInputDissembler clienteDissembler;
 
     @GetMapping
-    public ResponseEntity<List<ClienteDto>> listar(){
-       List<Cliente> clienteList = repository.findAll();
+    public ResponseEntity<List<ClienteDto>> listar(@RequestParam(required = false) String nome){
+        List<Cliente> clienteList = (nome != null && !nome.isEmpty())
+                ? repository.findByNome(nome)
+                : repository.findAll();
+
        List<ClienteDto> clientesDto = clienteAssembler.collectionToModel(clienteList);
        return ResponseEntity.ok(clientesDto);
     }
@@ -47,10 +53,22 @@ public class ClienteController {
 
     @PostMapping
     public ResponseEntity<ClienteDto> adicionar(@RequestBody @Valid ClienteInput clienteInput) {
-        Cliente cliente = clienteInputDissembler.toDomainObject(clienteInput);
+        Cliente cliente = clienteDissembler.toDomainObject(clienteInput);
         Cliente clienteCriado = service.adicionar(cliente);
         ClienteDto clienteDto = clienteAssembler.toModel(clienteCriado);
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteDto);
+    }
+
+    @PutMapping(value = "/{clienteId}")
+    public ResponseEntity<ClienteDto> alterar(@RequestBody @Valid ClienteInput clienteInput, @PathVariable Long clienteId) {
+        try {
+            Cliente cliente = service.buscarPorId(clienteId);
+            clienteDissembler.copyToDomainObject(clienteInput, cliente);
+            ClienteDto clienteDto = clienteAssembler.toModel(service.adicionar(cliente));
+            return ResponseEntity.status(HttpStatus.CREATED).body(clienteDto);
+        }catch(ClienteNaoEncontradoException e) {
+            throw new NegocioException(e.getMessage(), e);
+        }
     }
 
     @DeleteMapping("/{clienteId}")

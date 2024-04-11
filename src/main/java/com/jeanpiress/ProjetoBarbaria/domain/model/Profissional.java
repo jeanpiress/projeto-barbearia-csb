@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -26,6 +27,7 @@ public class Profissional {
     private BigDecimal salarioFixo;
     private Integer diaPagamento;
     private boolean ativo;
+
 
     @Embedded
     private Endereco endereco;

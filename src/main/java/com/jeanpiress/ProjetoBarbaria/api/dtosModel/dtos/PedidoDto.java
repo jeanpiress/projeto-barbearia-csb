@@ -1,5 +1,7 @@
 package com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos;
 
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.ClienteResumo;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.ProfissionalResumo;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPedido;
@@ -24,8 +26,10 @@ public class PedidoDto {
     private StatusPagamento statusPagamento;
     private FormaPagamento formaPagamento;
     private StatusPedido statusPedido;
-    private Cliente cliente;
-    private Profissional profissional;
+    private ClienteResumo cliente;
+    private ProfissionalResumo profissional;
     private BigDecimal comissaoGerada;
+    private BigDecimal valorTotal;
+    private Boolean caixaAberto;
 
 }

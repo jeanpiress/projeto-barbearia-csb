@@ -7,5 +7,7 @@ public enum FormaPagamento {
     CREDITO,
     DEBITO,
     PONTO,
+    VOUCHER,
     AGUARDANDO_PAGAMENTO;
+
 }

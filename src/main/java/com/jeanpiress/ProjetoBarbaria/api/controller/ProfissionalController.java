@@ -4,6 +4,8 @@ import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.ProfissionalAssem
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.ProfissionalInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.ProfissionalDto;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.ProfissionalInput;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ProfissionalNaoEncontradoException;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.NegocioException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Profissional;
 import com.jeanpiress.ProjetoBarbaria.domain.services.ProfissionalService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ProfissionalRepository;
@@ -51,6 +53,18 @@ public class ProfissionalController {
         Profissional profissionalCriado = service.adicionar(profissional);
         ProfissionalDto profissionalDto = profissionalAssembler.toModel(profissionalCriado);
         return ResponseEntity.status(HttpStatus.CREATED).body(profissionalDto);
+    }
+
+    @PutMapping(value = "/{profissionalId}")
+    public ResponseEntity<ProfissionalDto> alterar(@RequestBody @Valid ProfissionalInput profissionalInput, @PathVariable Long profissionalId) {
+        try {
+            Profissional profissional = service.buscarPorId(profissionalId);
+            profissionalDissembler.copyToDomainObject(profissionalInput, profissional);
+            ProfissionalDto profissionalDto = profissionalAssembler.toModel(service.adicionar(profissional));
+            return ResponseEntity.status(HttpStatus.CREATED).body(profissionalDto);
+        }catch(ProfissionalNaoEncontradoException e) {
+            throw new NegocioException(e.getMessage(), e);
+        }
     }
 
     @DeleteMapping("/{profissionalId}")

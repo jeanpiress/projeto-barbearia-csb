@@ -25,22 +25,23 @@ insert into categoria (id, nome) values (1, 'cabelo');
 insert into categoria (id, nome) values (2, 'barba');
 insert into categoria (id, nome) values (3, 'produto');
 
-insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, endereco_bairro, endereco_cep, endereco_complemento, endereco_logradouro, endereco_numero, dias_retorno) values (1, 'jean', '34999708382', utc_timestamp, utc_timestamp, 100, utc_timestamp, 'sem obs','morumbi', '38407381', 'casa', 'rua grupiara', '313', 30);
-insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno) values (2, 'Kirk', '34999708385', utc_timestamp, utc_timestamp, 50, utc_timestamp, 'sem obs', 30);
+insert into profissional (id, nome, nome_exibicao, celular, cpf, data_nascimento, salario_fixo, dia_pagamento, ativo) values (1, 'Jean Carlo', 'jean', '34999708382', '10158594614', utc_timestamp, 0, 5, true);
+
+insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id, endereco_bairro, endereco_cep, endereco_complemento, endereco_logradouro, endereco_numero) values (1, 'jean', '34999708382', utc_timestamp, utc_timestamp, 100, utc_timestamp, 'sem obs' , 30, 1,'morumbi', '38407381', 'casa', 'rua grupiara', '313');
+insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id) values (2, 'Kirk', '34999708385', utc_timestamp, utc_timestamp, 50, utc_timestamp, 'sem obs', 30, 1);
 
 insert into produto (id, nome, preco, ativo, tem_estoque, estoque, vendido_por_ponto, peso_pontuacao_cliente, peso_pontuacao_profissional, preco_em_pontos, comissao_base, categoria_id) values (1, 'corte', 45.00, true, false, 0, false, 1, 1, 0, 50.00, 1);
 
 insert into produto (id, nome, preco, ativo, tem_estoque, estoque, vendido_por_ponto, peso_pontuacao_cliente, peso_pontuacao_profissional, preco_em_pontos, comissao_base, categoria_id) values (2, 'barba', 45.00, true, false, 0, false, 1, 1, 0, 50.00, 1);
 
-insert into profissional (id, nome, nome_exibicao, celular, cpf, data_nascimento, salario_fixo, dia_pagamento, ativo) values (1, 'Jean Carlo', 'jean', '34999708382', '10158594614', utc_timestamp, 0, 5, true);
-
 insert into comissao (id, profissional_id, produto_id, porcentagem_comissao) values (1, 1, 1, 50.00);
 
 insert into comissao (id, profissional_id, produto_id, porcentagem_comissao) values (2, 1, 2, 50.00);
 
-insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada) values(1, utc_timestamp, 1, 1, 1, 1, 1, 0);
+insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada, caixa_aberto, valor_total) values(1, utc_timestamp, 1, 0, 1, 1, 1, 22.50, true, 45.00);
+insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada, caixa_aberto, valor_total) values(2, utc_timestamp, 1, 1, 1, 1, 1, 22.50, true, 45.00);
 
-insert into item_pedido (id, preco_unitario, preco_total, quantidade, pedido_id, produto_id) values (1, 45.00, 45.00, 1, null, 1);
+insert into item_pedido (id, preco_unitario, preco_total, quantidade, pedido_id, produto_id) values (1, 45.00, 45.00, 1, 1, 1);
 
-insert into item_pedido (id, preco_unitario, preco_total, quantidade, pedido_id, produto_id) values (2, 45.00, 45.00, 1,  null, 2);
+insert into item_pedido (id, preco_unitario, preco_total, quantidade, pedido_id, produto_id) values (2, 45.00, 45.00, 1,  2, 2);
 

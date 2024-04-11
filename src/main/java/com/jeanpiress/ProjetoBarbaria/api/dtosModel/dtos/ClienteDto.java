@@ -1,6 +1,8 @@
 package com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos;
 
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.ProfissionalNome;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Endereco;
+import com.jeanpiress.ProjetoBarbaria.domain.model.Profissional;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +22,7 @@ public class ClienteDto {
     private OffsetDateTime previsaoRetorno;
     private String observacao;
     private Integer diasRetorno;
+    private ProfissionalNome profissional;
 
     @Embedded
     private Endereco endereco;

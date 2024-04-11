@@ -1,5 +1,6 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.FormaPagamentoStr;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPedido;
@@ -41,7 +42,7 @@ public class PedidoService {
                 orElseThrow(() -> new PedidoNaoEncontradoException(pedidoId));
     }
 
-    public Pedido adicionar(Pedido pedido) {
+    public Pedido criar(Pedido pedido) {
         Cliente cliente = clienteService.buscarPorId(pedido.getCliente().getId());
         Profissional profissional = profissionalService.buscarPorId(pedido.getProfissional().getId());
         pedido.setCliente(cliente);
@@ -74,6 +75,8 @@ public class PedidoService {
             BigDecimal comissaoGerada = comissaoPorItem(profissionalId, itemPedido);
             BigDecimal comissaoPedido = pedido.getComissaoGerada().add(comissaoGerada);
             pedido.setComissaoGerada(comissaoPedido);
+            BigDecimal valorTotal = pedido.getValorTotal().add(itemPedido.getPrecoTotal());
+            pedido.setValorTotal(valorTotal);
         }
         return repository.save(pedido);
     }
@@ -109,6 +112,30 @@ public class PedidoService {
         pedido.setStatusPedido(StatusPedido.AGENDADO);
         pedido.setFormaPagamento(FormaPagamento.AGUARDANDO_PAGAMENTO);
         pedido.setStatusPagamento(StatusPagamento.AGUARDANDO_PAGAMENTO);
+        pedido.setComissaoGerada(BigDecimal.ZERO);
+        pedido.setValorTotal(BigDecimal.ZERO);
 
+    }
+
+    public void adicionarFormaPagamento(FormaPagamentoStr formaPagamento, Pedido pedido) {
+
+        if(formaPagamento.getFormaPagamento().equals("dinheiro")){
+            pedido.setFormaPagamento(FormaPagamento.DINHEIRO);
+        }
+        if(formaPagamento.getFormaPagamento().equals("pix")){
+            pedido.setFormaPagamento(FormaPagamento.PIX);
+        }
+        if(formaPagamento.getFormaPagamento().equals("debito")){
+            pedido.setFormaPagamento(FormaPagamento.DEBITO);
+        }
+        if(formaPagamento.getFormaPagamento().equals("credito")){
+            pedido.setFormaPagamento(FormaPagamento.CREDITO);
+        }
+        if(formaPagamento.getFormaPagamento().equals("voucher")){
+            pedido.setFormaPagamento(FormaPagamento.VOUCHER);
+        }
+        if(formaPagamento.getFormaPagamento().equals("pontos")){
+            pedido.setFormaPagamento(FormaPagamento.PONTO);
+        }
     }
 }

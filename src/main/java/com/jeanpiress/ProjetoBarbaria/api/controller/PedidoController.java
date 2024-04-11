@@ -4,6 +4,11 @@ import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.PedidoAssembler;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.PedidoInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.PedidoDto;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.PedidoInput;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.FormaPagamentoStr;
+import com.jeanpiress.ProjetoBarbaria.domain.Enuns.FormaPagamento;
+import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPagamento;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.PedidoNaoEncontradoException;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.NegocioException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Pedido;
 import com.jeanpiress.ProjetoBarbaria.domain.services.PedidoService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.PedidoRepository;
@@ -30,10 +35,12 @@ public class PedidoController {
 
     @Autowired
     private PedidoInputDissembler pedidoDissembler;
+    @Autowired
+    private PedidoService pedidoService;
 
     @GetMapping
     public ResponseEntity<List<PedidoDto>> listar(){
-        List<Pedido> pedidos = repository.findAll();
+        List<Pedido> pedidos = repository.findByPagoAndCaixaAberto();
         List<PedidoDto> pedidosDto = pedidoAssembler.collectionToModel(pedidos);
         return ResponseEntity.ok(pedidosDto);
     }
@@ -49,7 +56,7 @@ public class PedidoController {
     @PostMapping
     public ResponseEntity<PedidoDto> adicionar(@RequestBody @Valid PedidoInput pedidoInput) {
         Pedido pedido = pedidoDissembler.toDomainObject(pedidoInput);
-        Pedido pedidoCriado = service.adicionar(pedido);
+        Pedido pedidoCriado = service.criar(pedido);
         PedidoDto pedidoDto = pedidoAssembler.toModel(pedidoCriado);
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDto);
 
@@ -62,15 +69,43 @@ public class PedidoController {
 
     }
     @PutMapping("/{pedidoId}/add-item/{itemPedidoId}")
-    public ResponseEntity<Pedido> adicionarItemPedido(@PathVariable Long pedidoId, @PathVariable Long itemPedidoId){
+    public ResponseEntity<PedidoDto> adicionarItemPedido(@PathVariable Long pedidoId, @PathVariable Long itemPedidoId){
         Pedido pedido = service.adicionarItemPedido(pedidoId, itemPedidoId);
-        return ResponseEntity.ok(pedido);
+        PedidoDto pedidoDto = pedidoAssembler.toModel(pedido);
+        return ResponseEntity.ok(pedidoDto);
+    }
+
+    @PutMapping(value = "/{pedidoId}")
+    public ResponseEntity<PedidoDto> alterar(@RequestBody @Valid PedidoInput pedidoInput, @PathVariable Long pedidoId) {
+        try {
+            Pedido pedido = service.buscarPorId(pedidoId);
+            pedidoDissembler.copyToDomainObject(pedidoInput, pedido);
+            PedidoDto pedidoDto = pedidoAssembler.toModel(repository.save(pedido));
+            return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDto);
+        }catch(PedidoNaoEncontradoException e) {
+            throw new NegocioException(e.getMessage(), e);
+        }
     }
 
     @DeleteMapping("/{pedidoId}/remove-item/{itemPedidoId}")
-    public ResponseEntity<Pedido> removerItemPedido(@PathVariable Long pedidoId, @PathVariable Long itemPedidoId){
+    public ResponseEntity<PedidoDto> removerItemPedido(@PathVariable Long pedidoId, @PathVariable Long itemPedidoId){
         Pedido pedido = service.removerItemPedido(pedidoId, itemPedidoId);
-        return ResponseEntity.ok(pedido);
+        PedidoDto pedidoDto = pedidoAssembler.toModel(pedido);
+        return ResponseEntity.ok(pedidoDto);
+    }
+
+    @PutMapping(value = "/{pedidoId}/pagar")
+    public ResponseEntity<PedidoDto> efetuarPagamento(@RequestBody @Valid FormaPagamentoStr formaPagamento, @PathVariable @Valid Long pedidoId) {
+        try {
+            Pedido pedido = service.buscarPorId(pedidoId);
+            pedidoService.adicionarFormaPagamento(formaPagamento, pedido);
+            pedido.setStatusPagamento(StatusPagamento.PAGO);
+            Pedido pedidoSalvo = repository.save(pedido);
+            PedidoDto pedidoDto = pedidoAssembler.toModel(pedidoSalvo);
+            return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDto);
+        }catch(PedidoNaoEncontradoException e) {
+            throw new NegocioException(e.getMessage(), e);
+        }
     }
 
 }

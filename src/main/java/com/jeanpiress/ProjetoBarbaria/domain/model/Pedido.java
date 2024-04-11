@@ -11,7 +11,8 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -41,6 +42,9 @@ public class Pedido {
 
     private BigDecimal comissaoGerada;
 
+    private boolean caixaAberto = true;
+
+    private BigDecimal valorTotal;
 
     public void adicionarItemPedido(ItemPedido itemPedido){
         itemPedidos.add(itemPedido);

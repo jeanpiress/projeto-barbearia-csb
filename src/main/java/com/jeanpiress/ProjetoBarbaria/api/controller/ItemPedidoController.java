@@ -4,6 +4,8 @@ import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.ItemPedidoAssembl
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.ItemPedidoInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.ItemPedidoDto;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.ItemPedidoInput;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ItemPedidoNaoEncontradoException;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.NegocioException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.ItemPedido;
 import com.jeanpiress.ProjetoBarbaria.domain.services.ItemPedidoService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ItemPedidoRepository;
@@ -51,6 +53,18 @@ public class ItemPedidoController {
         ItemPedido itemPedidoCriado = service.adicionar(itemPedido);
         ItemPedidoDto itemPedidoDto = itemPedidoAssembler.toModel(itemPedidoCriado);
         return ResponseEntity.status(HttpStatus.CREATED).body(itemPedidoDto);
+    }
+
+    @PutMapping(value = "/{itemPedidoId}")
+    public ResponseEntity<ItemPedidoDto> alterar(@RequestBody @Valid ItemPedidoInput itemPedidoInput, @PathVariable Long itemPedidoId) {
+        try {
+            ItemPedido itemPedido = service.buscarPorId(itemPedidoId);
+            itemPedidoDissembler.copyToDomainObject(itemPedidoInput, itemPedido);
+            ItemPedidoDto itemPedidoDto = itemPedidoAssembler.toModel(service.adicionar(itemPedido));
+            return ResponseEntity.status(HttpStatus.CREATED).body(itemPedidoDto);
+        }catch(ItemPedidoNaoEncontradoException e) {
+            throw new NegocioException(e.getMessage(), e);
+        }
     }
 
     @DeleteMapping("/{itemPedidoId}")
