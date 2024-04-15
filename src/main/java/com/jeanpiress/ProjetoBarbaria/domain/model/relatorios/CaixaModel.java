@@ -1,4 +1,4 @@
-package com.jeanpiress.ProjetoBarbaria.domain.model;
+package com.jeanpiress.ProjetoBarbaria.domain.model.relatorios;
 
 import lombok.*;
 
@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CaixaDiario {
+public class CaixaModel {
 
     private BigDecimal dinheiro;
     private BigDecimal pix;

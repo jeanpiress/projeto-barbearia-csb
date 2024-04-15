@@ -4,8 +4,7 @@ import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.PedidoAssembler;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.PedidoInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.PedidoDto;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.PedidoInput;
-import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.FormaPagamentoStr;
-import com.jeanpiress.ProjetoBarbaria.domain.Enuns.FormaPagamento;
+import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.FormaPagamentoJson;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.PedidoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.NegocioException;
@@ -95,7 +94,7 @@ public class PedidoController {
     }
 
     @PutMapping(value = "/{pedidoId}/pagar")
-    public ResponseEntity<PedidoDto> efetuarPagamento(@RequestBody @Valid FormaPagamentoStr formaPagamento, @PathVariable @Valid Long pedidoId) {
+    public ResponseEntity<PedidoDto> efetuarPagamento(@RequestBody @Valid FormaPagamentoJson formaPagamento, @PathVariable @Valid Long pedidoId) {
         try {
             Pedido pedido = service.buscarPorId(pedidoId);
             pedidoService.adicionarFormaPagamento(formaPagamento, pedido);

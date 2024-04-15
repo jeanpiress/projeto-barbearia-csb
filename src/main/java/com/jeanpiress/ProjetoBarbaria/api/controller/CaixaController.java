@@ -1,8 +1,7 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
-import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.PedidoDto;
-import com.jeanpiress.ProjetoBarbaria.domain.model.CaixaDiario;
-import com.jeanpiress.ProjetoBarbaria.domain.services.CaixaDiarioService;
+import com.jeanpiress.ProjetoBarbaria.domain.model.relatorios.CaixaModel;
+import com.jeanpiress.ProjetoBarbaria.domain.services.CaixaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +12,11 @@ import org.springframework.web.bind.annotation.*;
 public class CaixaController {
 
     @Autowired
-    private CaixaDiarioService caixaDiarioService;
+    private CaixaService caixaDiarioService;
 
     @GetMapping
-    public ResponseEntity<CaixaDiario> buscarCaixaDiario(){
-        CaixaDiario caixaDiario = caixaDiarioService.gerarCaixa();
+    public ResponseEntity<CaixaModel> buscarCaixaDiario(){
+        CaixaModel caixaDiario = caixaDiarioService.gerarCaixaDiario();
         return ResponseEntity.ok(caixaDiario);
     }
 
@@ -26,8 +25,6 @@ public class CaixaController {
     public void fecharCaixa(){
         caixaDiarioService.fecharCaixa();
     }
-
-
 
 
 }

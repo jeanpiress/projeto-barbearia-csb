@@ -1,10 +1,9 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
-import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.FormaPagamentoStr;
+import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.FormaPagamentoJson;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPedido;
-import com.jeanpiress.ProjetoBarbaria.domain.exceptions.CategoriaNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.PedidoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.*;
@@ -14,8 +13,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 @Service
 public class PedidoService {
@@ -77,6 +76,8 @@ public class PedidoService {
             pedido.setComissaoGerada(comissaoPedido);
             BigDecimal valorTotal = pedido.getValorTotal().add(itemPedido.getPrecoTotal());
             pedido.setValorTotal(valorTotal);
+            BigDecimal pontuacao = pedido.getPontuacaoGerada().add(gerarPontuacao(itemPedido));
+            pedido.setPontuacaoGerada(pontuacao);
         }
         return repository.save(pedido);
     }
@@ -107,6 +108,15 @@ public class PedidoService {
         return  comissaoProdutoFinal;
     }
 
+    public BigDecimal gerarPontuacao(ItemPedido itemPedido){
+        BigDecimal pesoPontuacao = itemPedido.getProduto().getPesoPontuacaoProfissional();
+        BigDecimal valorProduto = itemPedido.getProduto().getPreco();
+        BigDecimal pontuacaProduto = valorProduto.multiply(pesoPontuacao);
+        BigDecimal pontuacaoItem = pontuacaProduto.multiply(BigDecimal.valueOf(itemPedido.getQuantidade()));
+
+        return  pontuacaoItem;
+    }
+
 
     public void preencherPedido(Pedido pedido){
         pedido.setStatusPedido(StatusPedido.AGENDADO);
@@ -117,7 +127,7 @@ public class PedidoService {
 
     }
 
-    public void adicionarFormaPagamento(FormaPagamentoStr formaPagamento, Pedido pedido) {
+    public void adicionarFormaPagamento(FormaPagamentoJson formaPagamento, Pedido pedido) {
 
         if(formaPagamento.getFormaPagamento().equals("dinheiro")){
             pedido.setFormaPagamento(FormaPagamento.DINHEIRO);
@@ -137,5 +147,6 @@ public class PedidoService {
         if(formaPagamento.getFormaPagamento().equals("pontos")){
             pedido.setFormaPagamento(FormaPagamento.PONTO);
         }
+        pedido.setDataPagamento(OffsetDateTime.now());
     }
 }

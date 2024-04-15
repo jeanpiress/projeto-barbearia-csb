@@ -40,7 +40,4 @@ public class ProfissionalService {
         }
     }
 
-    public Set<Long> buscarIdProfissionaisAtivos(){
-       return repository.buscarIdProfissionaisAtivos();
-    }
 }

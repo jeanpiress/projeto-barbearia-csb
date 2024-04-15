@@ -42,9 +42,13 @@ public class Pedido {
 
     private BigDecimal comissaoGerada;
 
+    private BigDecimal pontuacaoGerada;
+
     private boolean caixaAberto = true;
 
     private BigDecimal valorTotal;
+
+    private OffsetDateTime dataPagamento;
 
     public void adicionarItemPedido(ItemPedido itemPedido){
         itemPedidos.add(itemPedido);

@@ -1,27 +1,27 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.FormaPagamento;
-import com.jeanpiress.ProjetoBarbaria.domain.model.CaixaDiario;
+import com.jeanpiress.ProjetoBarbaria.domain.model.relatorios.CaixaModel;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Pedido;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
 
 @Service
-public class CaixaDiarioService {
+public class CaixaService {
 
     @Autowired
     private PedidoRepository pedidoRepository;
     @Autowired
     private PedidoService pedidoService;
 
-    public CaixaDiario gerarCaixa(){
-        CaixaDiario caixaDiario;
+
+    public CaixaModel gerarCaixa(List<Pedido> pedidos){
+        CaixaModel caixaDiario;
 
         BigDecimal dinheiro = BigDecimal.ZERO;
         BigDecimal pix = BigDecimal.ZERO;
@@ -30,8 +30,6 @@ public class CaixaDiarioService {
         BigDecimal voucher = BigDecimal.ZERO;
         BigDecimal pontos = BigDecimal.ZERO;
         BigDecimal total = BigDecimal.ZERO;
-
-        List<Pedido> pedidos = pedidoRepository.findByPagoAndCaixaAberto();
 
         for(Pedido pedido : pedidos){
             if(pedido.getFormaPagamento().equals(FormaPagamento.DINHEIRO)){
@@ -56,7 +54,7 @@ public class CaixaDiarioService {
         }
 
         total = total.add(dinheiro).add(pix).add(debito).add(credito);
-        caixaDiario = CaixaDiario.builder()
+        caixaDiario = CaixaModel.builder()
                 .dinheiro(dinheiro)
                 .pix(pix)
                 .debito(debito)
@@ -69,6 +67,10 @@ public class CaixaDiarioService {
         return caixaDiario;
     }
 
+    public CaixaModel gerarCaixaDiario(){
+        List<Pedido> pedidos = pedidoRepository.findByPagoAndCaixaAberto();
+        return gerarCaixa(pedidos);
+    }
 
     public void fecharCaixa() {
         List<Pedido> pedidos = pedidoRepository.findByPagoAndCaixaAberto();
@@ -76,4 +78,6 @@ public class CaixaDiarioService {
         pedidoRepository.saveAll(pedidos);
         
     }
+
+
 }

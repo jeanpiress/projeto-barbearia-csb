@@ -7,6 +7,7 @@ import com.jeanpiress.ProjetoBarbaria.domain.model.Comissao;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Produto;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Profissional;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ComissaoRepository;
+import com.jeanpiress.ProjetoBarbaria.domain.repositories.ProfissionalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -31,6 +32,9 @@ public class ComissaoService {
 
     @Autowired
     private ProfissionalService profissionalService;
+
+    @Autowired
+    private ProfissionalRepository profissionalRepository;
 
     public Comissao buscarPorId(Long comissaoId){
         return repository.findById(comissaoId).
@@ -74,10 +78,9 @@ public class ComissaoService {
     @EventListener
     public void criarComissaoBase(ProdutoCriadoEvento produtoEvento){
         Produto produto = produtoEvento.getProduto();
-        Set<Long> profissionaisIds = profissionalService.buscarIdProfissionaisAtivos();
+        Set<Profissional> profissionais = profissionalRepository.buscarProfissionaisAtivos();
         Comissao comissao = new Comissao();
-        for(Long id: profissionaisIds){
-            Profissional profissional = profissionalService.buscarPorId(id);
+        for(Profissional profissional: profissionais){
             comissao.setProduto(produto);
             comissao.setProfissional(profissional);
             comissao.setPorcentagemComissao(produto.getComissaoBase());

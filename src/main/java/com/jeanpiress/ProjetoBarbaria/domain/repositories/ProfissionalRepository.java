@@ -10,7 +10,7 @@ import java.util.Set;
 @Repository
 public interface ProfissionalRepository extends JpaRepository<Profissional, Long> {
 
-    @Query("SELECT p.id FROM Profissional p WHERE p.ativo = true ")
-    Set<Long> buscarIdProfissionaisAtivos();
+    @Query("SELECT p FROM Profissional p WHERE p.ativo = true ")
+    Set<Profissional> buscarProfissionaisAtivos();
 
 }

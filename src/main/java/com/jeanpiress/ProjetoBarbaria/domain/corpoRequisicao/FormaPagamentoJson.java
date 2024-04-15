@@ -1,11 +1,11 @@
-package com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo;
+package com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class FormaPagamentoStr {
+public class FormaPagamentoJson {
 
     private String formaPagamento;
 }
