@@ -1,5 +1,6 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
+import com.jeanpiress.ProjetoBarbaria.api.controller.openapi.ComissaoControllerOpenApi;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.ComissaoAssembler;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.ComissaoInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.ComissaoDto;
@@ -11,6 +12,7 @@ import com.jeanpiress.ProjetoBarbaria.domain.services.ComissaoService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ComissaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +20,8 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController()
-@RequestMapping("/comissoes")
-public class ComissaoController {
+@RequestMapping(path ="/comissoes", produces = MediaType.APPLICATION_JSON_VALUE)
+public class ComissaoController implements ComissaoControllerOpenApi {
 
     @Autowired
     private ComissaoRepository repository;

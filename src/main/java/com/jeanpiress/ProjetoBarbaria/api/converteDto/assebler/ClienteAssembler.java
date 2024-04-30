@@ -1,6 +1,7 @@
 package com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler;
 
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.ClienteDto;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.ClienteResumo;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,5 +24,9 @@ public class ClienteAssembler {
     public List<ClienteDto> collectionToModel(List<Cliente> clientes){
          return clientes.stream().map(cliente -> toModel(cliente))
                 .collect(Collectors.toList());
+    }
+
+    public ClienteResumo toClienteResumo(Cliente cliente){
+        return modelMapper.map(cliente, ClienteResumo.class);
     }
 }

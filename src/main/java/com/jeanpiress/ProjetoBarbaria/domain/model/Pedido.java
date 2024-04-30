@@ -50,6 +50,31 @@ public class Pedido {
 
     private OffsetDateTime dataPagamento;
 
+    @ManyToOne
+    @JoinColumn(name = "criado_por")
+    private Usuario criadoPor;
+
+    @ManyToOne
+    @JoinColumn(name = "alterado_por")
+    private Usuario alteradoPor;
+
+    @ManyToOne
+    @JoinColumn(name = "recebido_por")
+    private Usuario recibidoPor;
+
+    @Column(name = "criado_as")
+    private OffsetDateTime criadoAs;
+
+    @Column(name = "modificado_as")
+    private OffsetDateTime modificadoAs;
+
+    @ManyToOne
+    @JoinColumn(name = "cancelado_por")
+    private Usuario canceladoPor;
+
+    @Column(name = "cancelado_as")
+    private OffsetDateTime canceladoAs;
+
     public void adicionarItemPedido(ItemPedido itemPedido){
         itemPedidos.add(itemPedido);
     }

@@ -1,5 +1,6 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
+import com.jeanpiress.ProjetoBarbaria.api.controller.openapi.CategoriaControllerOpenApi;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.CategoriaAssembler;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.CategoriaInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.CategoriaDto;
@@ -11,6 +12,7 @@ import com.jeanpiress.ProjetoBarbaria.domain.services.CategoriaService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.CategoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +20,8 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController()
-@RequestMapping("/categorias")
-public class CategoriaController {
+@RequestMapping(path ="/categorias", produces = MediaType.APPLICATION_JSON_VALUE)
+public class CategoriaController implements CategoriaControllerOpenApi {
 
     @Autowired
     private CategoriaRepository repository;

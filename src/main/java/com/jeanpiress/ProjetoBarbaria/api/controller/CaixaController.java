@@ -1,29 +1,35 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
-import com.jeanpiress.ProjetoBarbaria.domain.model.relatorios.CaixaModel;
+import com.jeanpiress.ProjetoBarbaria.api.controller.openapi.CaixaControllerOpenApi;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.relatorios.CaixaModel;
 import com.jeanpiress.ProjetoBarbaria.domain.services.CaixaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController()
-@RequestMapping("/caixa")
-public class CaixaController {
+@RequestMapping(path = "/caixa", produces = MediaType.APPLICATION_JSON_VALUE)
+public class CaixaController implements CaixaControllerOpenApi {
 
     @Autowired
-    private CaixaService caixaDiarioService;
+    private CaixaService caixaService;
 
+
+
+    @PreAuthorize("hasAuthority('RECEPCAO')")
     @GetMapping
     public ResponseEntity<CaixaModel> buscarCaixaDiario(){
-        CaixaModel caixaDiario = caixaDiarioService.gerarCaixaDiario();
+        CaixaModel caixaDiario = caixaService.gerarCaixaDiario();
         return ResponseEntity.ok(caixaDiario);
     }
-
+    @PreAuthorize("hasAuthority('RECEPCAO')")
     @DeleteMapping("/fechar")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void fecharCaixa(){
-        caixaDiarioService.fecharCaixa();
+        caixaService.fecharCaixa();
     }
 
 

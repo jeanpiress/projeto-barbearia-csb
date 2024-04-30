@@ -1,5 +1,6 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
+import com.jeanpiress.ProjetoBarbaria.api.controller.openapi.ProfissionalControllerOpenApi;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.ProfissionalAssembler;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.ProfissionalInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.ProfissionalDto;
@@ -11,6 +12,7 @@ import com.jeanpiress.ProjetoBarbaria.domain.services.ProfissionalService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ProfissionalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +20,8 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController()
-@RequestMapping("/profissionais")
-public class ProfissionalController {
+@RequestMapping(path = "/profissionais", produces = MediaType.APPLICATION_JSON_VALUE)
+public class ProfissionalController implements ProfissionalControllerOpenApi {
 
     @Autowired
     private ProfissionalRepository repository;

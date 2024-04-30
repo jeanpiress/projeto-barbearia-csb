@@ -1,13 +1,15 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.FormaPagamento;
-import com.jeanpiress.ProjetoBarbaria.domain.model.relatorios.CaixaModel;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.relatorios.CaixaModel;
+import com.jeanpiress.ProjetoBarbaria.domain.model.ItemPedido;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Pedido;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -16,8 +18,6 @@ public class CaixaService {
 
     @Autowired
     private PedidoRepository pedidoRepository;
-    @Autowired
-    private PedidoService pedidoService;
 
 
     public CaixaModel gerarCaixa(List<Pedido> pedidos){
@@ -30,6 +30,9 @@ public class CaixaService {
         BigDecimal voucher = BigDecimal.ZERO;
         BigDecimal pontos = BigDecimal.ZERO;
         BigDecimal total = BigDecimal.ZERO;
+        Integer clientesAtendidos = 0;
+        Integer produtosVendidos = 0;
+        List<ItemPedido> itens = new ArrayList<>();
 
         for(Pedido pedido : pedidos){
             if(pedido.getFormaPagamento().equals(FormaPagamento.DINHEIRO)){
@@ -49,6 +52,14 @@ public class CaixaService {
             }
             if(pedido.getFormaPagamento().equals(FormaPagamento.PONTO)){
                 pontos = pontos.add(pedido.getValorTotal());
+            }
+
+            clientesAtendidos ++;
+
+            itens = pedido.getItemPedidos();
+
+            for(ItemPedido itemPedido : itens){
+                produtosVendidos += itemPedido.getQuantidade();
             }
 
         }

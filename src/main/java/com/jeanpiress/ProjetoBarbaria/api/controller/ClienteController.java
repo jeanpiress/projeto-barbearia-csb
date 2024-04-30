@@ -1,5 +1,6 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
+import com.jeanpiress.ProjetoBarbaria.api.controller.openapi.ClienteControllerOpenApi;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.ClienteAssembler;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.ClienteInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.ClienteDto;
@@ -11,16 +12,17 @@ import com.jeanpiress.ProjetoBarbaria.domain.services.ClienteService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
+
 @RestController()
-@RequestMapping("/clientes")
-public class ClienteController {
+@RequestMapping(path = "/clientes", produces = MediaType.APPLICATION_JSON_VALUE)
+public class ClienteController implements ClienteControllerOpenApi {
 
     @Autowired
     private ClienteRepository repository;
@@ -51,6 +53,7 @@ public class ClienteController {
         return ResponseEntity.ok(clienteDto);
     }
 
+
     @PostMapping
     public ResponseEntity<ClienteDto> adicionar(@RequestBody @Valid ClienteInput clienteInput) {
         Cliente cliente = clienteDissembler.toDomainObject(clienteInput);
@@ -58,6 +61,7 @@ public class ClienteController {
         ClienteDto clienteDto = clienteAssembler.toModel(clienteCriado);
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteDto);
     }
+
 
     @PutMapping(value = "/{clienteId}")
     public ResponseEntity<ClienteDto> alterar(@RequestBody @Valid ClienteInput clienteInput, @PathVariable Long clienteId) {
@@ -70,6 +74,7 @@ public class ClienteController {
             throw new NegocioException(e.getMessage(), e);
         }
     }
+
 
     @DeleteMapping("/{clienteId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

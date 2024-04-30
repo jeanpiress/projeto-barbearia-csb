@@ -4,11 +4,14 @@ import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.FormaPagamentoJson;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPedido;
+import com.jeanpiress.ProjetoBarbaria.domain.eventos.ClienteAtendidoEvento;
+import com.jeanpiress.ProjetoBarbaria.domain.eventos.ProdutoCriadoEvento;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.PedidoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.*;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,10 @@ public class PedidoService {
     @Autowired
     private ComissaoService comissaoService;
 
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+
 
     public Pedido buscarPorId(Long pedidoId){
         return repository.findById(pedidoId).
@@ -46,6 +53,7 @@ public class PedidoService {
         Profissional profissional = profissionalService.buscarPorId(pedido.getProfissional().getId());
         pedido.setCliente(cliente);
         pedido.setProfissional(profissional);
+        pedido.setPontuacaoGerada(BigDecimal.ZERO);
         preencherPedido(pedido);
         return repository.save(pedido);
     }
@@ -127,7 +135,8 @@ public class PedidoService {
 
     }
 
-    public void adicionarFormaPagamento(FormaPagamentoJson formaPagamento, Pedido pedido) {
+    public Pedido realizarPagamento(FormaPagamentoJson formaPagamento, Long pedidoId) {
+        Pedido pedido = buscarPorId(pedidoId);
 
         if(formaPagamento.getFormaPagamento().equals("dinheiro")){
             pedido.setFormaPagamento(FormaPagamento.DINHEIRO);
@@ -148,5 +157,12 @@ public class PedidoService {
             pedido.setFormaPagamento(FormaPagamento.PONTO);
         }
         pedido.setDataPagamento(OffsetDateTime.now());
+
+        pedido.setStatusPagamento(StatusPagamento.PAGO);
+
+        eventPublisher.publishEvent(new ClienteAtendidoEvento(pedido.getCliente()));
+
+        return repository.save(pedido);
     }
+
 }

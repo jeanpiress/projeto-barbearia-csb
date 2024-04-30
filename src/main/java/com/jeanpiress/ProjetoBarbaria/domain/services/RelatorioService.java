@@ -1,26 +1,28 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
+import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.ClienteAssembler;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.ClienteResumo;
 import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.DataPagamentoInicioFim;
 import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.DataPagamentoJson;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.FormatoDataException;
+import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Profissional;
-import com.jeanpiress.ProjetoBarbaria.domain.model.relatorios.CaixaModel;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.relatorios.CaixaModel;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Pedido;
-import com.jeanpiress.ProjetoBarbaria.domain.model.relatorios.RelatorioComissao;
-import com.jeanpiress.ProjetoBarbaria.domain.model.relatorios.RelatorioFaturamento;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.relatorios.ClientesRetorno;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.relatorios.RelatorioComissao;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.relatorios.RelatorioFaturamento;
+import com.jeanpiress.ProjetoBarbaria.domain.repositories.ClienteRepository;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.PedidoRepository;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ProfissionalRepository;
-import com.sun.xml.bind.v2.TODO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 
 @Service
@@ -35,6 +37,12 @@ public class RelatorioService {
     @Autowired
     private ProfissionalRepository profissionalRepository;
 
+    @Autowired
+    private ClienteRepository clienteRepository;
+
+    @Autowired
+    private ClienteAssembler clienteAssembler;
+
 
 
 
@@ -48,6 +56,8 @@ public class RelatorioService {
                 .debito(cm.getDebito())
                 .credito(cm.getCredito())
                 .tkmLoja(gerarTkmLoja(pedidos, cm))
+                .clientesAtendidos(cm.getClientesAtendidos())
+                .quantidadeProdutosVendidos(cm.getQuantidadeProdutosVendidos())
                 .build();
     }
 
@@ -74,6 +84,33 @@ public class RelatorioService {
         }
 
         return relatoriosComissoes;
+    }
+
+    public List<ClientesRetorno> buscarClientesParaRetornarHoje(Integer quantidadeDias){
+        OffsetDateTime dataAtual = OffsetDateTime.now();
+        OffsetDateTime dataInicial = dataAtual.minusDays(quantidadeDias).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        OffsetDateTime dataFinal = dataAtual.plusDays(quantidadeDias).withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+        List<Cliente> clientes = clienteRepository.findByClientesRetornoEmDias(dataInicial, dataFinal);
+        List<ClientesRetorno> clientesRetorno = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        for(Cliente cliente: clientes){
+            ClienteResumo clienteResumo = clienteAssembler.toClienteResumo(cliente);
+            long diferencaDias = ChronoUnit.DAYS.between(dataAtual, cliente.getPrevisaoRetorno());
+            if(dataAtual.isAfter(cliente.getPrevisaoRetorno())){ diferencaDias -= 1;}
+            String dataFormatada = formatter.format(cliente.getPrevisaoRetorno());
+
+            ClientesRetorno cr = ClientesRetorno.builder()
+                    .cliente(clienteResumo)
+                    .diasPassados(diferencaDias)
+                    .previsaoRetorno(dataFormatada)
+                    .build();
+
+            clientesRetorno.add(cr);
+        }
+        clientesRetorno.sort(Comparator.comparingLong(c -> c.getDiasPassados()));
+
+        return clientesRetorno;
     }
 
     private List<RelatorioComissao> relatoriosComissoesZeradosComProfissionais(Set<Profissional> profissionais){

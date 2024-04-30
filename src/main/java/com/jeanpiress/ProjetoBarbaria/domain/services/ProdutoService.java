@@ -26,9 +26,6 @@ public class ProdutoService {
     private CategoriaService categoriaService;
 
     @Autowired
-    private ComissaoService comissaoService;
-
-    @Autowired
     private ApplicationEventPublisher eventPublisher;
 
     public Produto buscarPorId(Long produtoId){

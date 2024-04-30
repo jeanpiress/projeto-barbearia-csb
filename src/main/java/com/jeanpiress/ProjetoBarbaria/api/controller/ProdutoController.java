@@ -1,5 +1,6 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
+import com.jeanpiress.ProjetoBarbaria.api.controller.openapi.ProdutoControllerOpenApi;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.ProdutoAssembler;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.ProdutoInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.ProdutoDto;
@@ -11,6 +12,7 @@ import com.jeanpiress.ProjetoBarbaria.domain.services.ProdutoService;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,17 +20,14 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController()
-@RequestMapping("/produtos")
-public class ProdutoController {
+@RequestMapping(path ="/produtos", produces = MediaType.APPLICATION_JSON_VALUE)
+public class ProdutoController implements ProdutoControllerOpenApi {
 
     @Autowired
     private ProdutoRepository repository;
 
     @Autowired
     private ProdutoService service;
-
-    @Autowired
-    private ProdutoService produtoService;
 
     @Autowired
     private ProdutoAssembler produtoAssembler;
