@@ -11,6 +11,14 @@ delete from profissional;
 delete from usuario;
 delete from permissao;
 delete from usuario_permissao;
+delete from pacote;
+delete from pacote_item_ativo;
+delete from pacote_item_consumido;
+delete from item_pacote;
+delete from pacote_pronto;
+delete from pacote_pronto_item;
+delete from item_pacote;
+
 
 set foreign_key_checks = 1;
 SET sql_safe_updates = 1;
@@ -22,6 +30,11 @@ alter table item_pedido auto_increment = 1;
 alter table pedido auto_increment = 1;
 alter table produto auto_increment = 1;
 alter table profissional auto_increment = 1;
+alter table permissao auto_increment = 1;
+alter table pacote auto_increment = 1;
+alter table item_pacote auto_increment =1;
+alter table pacote_pronto auto_increment=1;
+alter table item_pacote auto_increment=1;
 
 
 insert into categoria (id, nome) values (1, 'cabelo');
@@ -76,3 +89,17 @@ insert into usuario_permissao(usuario_id, permissao_id) values (1, 1);
 insert into usuario_permissao(usuario_id, permissao_id) values (1, 2);
 insert into usuario_permissao(usuario_id, permissao_id) values (1, 3);
 insert into usuario_permissao(usuario_id, permissao_id) values (1, 4);
+
+insert into item_pacote(id, item_pedido_id, profissional_id, data_consumo) values(1, 1, null, null);
+insert into item_pacote(id, item_pedido_id, profissional_id, data_consumo) values(2, 1, null, null);
+insert into item_pacote(id, item_pedido_id, profissional_id, data_consumo) values(3, 1, null, null);
+
+insert into pacote(id, nome, descricao, cliente_id, data_compra, validade, data_vencimento) values (1, '4 barbas', null, 1, timestamp('2024-04-19 14:30:45.12'), 31, timestamp('2024-05-19 23:59:59.00'));
+insert into pacote(id, nome, descricao, cliente_id, data_compra, validade, data_vencimento) values (2, '3 cortes', null, 2, timestamp('2024-04-19 14:30:45.12'), 31, timestamp('2024-05-19 23:59:59.00'));
+
+insert into pacote_item_ativo(pacote_id, item_id) values (1, 1);
+insert into pacote_item_ativo(pacote_id, item_id) values (1, 2);
+insert into pacote_item_consumido(pacote_id, item_id) values (1, 3);
+insert into pacote_item_ativo(pacote_id, item_id) values (2, 2);
+insert into pacote_item_ativo(pacote_id, item_id) values (2, 1);
+

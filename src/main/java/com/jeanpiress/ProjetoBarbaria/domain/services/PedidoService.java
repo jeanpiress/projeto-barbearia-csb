@@ -5,7 +5,6 @@ import com.jeanpiress.ProjetoBarbaria.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPedido;
 import com.jeanpiress.ProjetoBarbaria.domain.eventos.ClienteAtendidoEvento;
-import com.jeanpiress.ProjetoBarbaria.domain.eventos.ProdutoCriadoEvento;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.PedidoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.*;

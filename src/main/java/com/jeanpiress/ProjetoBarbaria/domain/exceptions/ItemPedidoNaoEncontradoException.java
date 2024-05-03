@@ -5,7 +5,7 @@ public class ItemPedidoNaoEncontradoException extends EntidadeNaoEncontradaExcep
         super(mensagem);
     }
 
-    public ItemPedidoNaoEncontradoException(Long categoriaID) {
-        this(String.format("Não existe um cadastro de item com codigo %d", categoriaID));
+    public ItemPedidoNaoEncontradoException(Long itemPedidoId) {
+        this(String.format("Não existe um cadastro de item com codigo %d", itemPedidoId));
     }
 }
