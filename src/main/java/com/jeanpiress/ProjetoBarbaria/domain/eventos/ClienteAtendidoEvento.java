@@ -5,14 +5,14 @@ import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
 
 public class ClienteAtendidoEvento {
 
-    private Cliente Cliente;
+    private Cliente cliente;
 
-    public ClienteAtendidoEvento(Cliente Cliente) {
+    public ClienteAtendidoEvento(Cliente cliente) {
         super();
-        this.Cliente = Cliente;
+        this.cliente = cliente;
     }
 
     public Cliente getCliente() {
-        return Cliente;
+        return cliente;
     }
 }

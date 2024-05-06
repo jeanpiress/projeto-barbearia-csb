@@ -20,9 +20,6 @@ public class ItemPedidoService {
     private ItemPedidoRepository repository;
 
     @Autowired
-    private PedidoService pedidoService;
-
-    @Autowired
     private ProdutoService produtoService;
 
 

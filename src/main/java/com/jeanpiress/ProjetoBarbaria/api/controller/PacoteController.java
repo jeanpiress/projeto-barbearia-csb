@@ -4,6 +4,7 @@ import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.PacoteAssembler;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.PacoteInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.PacoteDto;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.PacoteInput;
+import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.RealiazacaoItemPacote;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Pacote;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.PacoteRepository;
 import com.jeanpiress.ProjetoBarbaria.domain.services.PacoteService;
@@ -54,6 +55,13 @@ public class PacoteController {
     public ResponseEntity<PacoteDto> criarPacoteFinal(@RequestBody @Valid PacoteInput pacoteInput){
         Pacote pacoteSalvo = pacoteService.criarPacoteFinal(pacoteInput);
         return ResponseEntity.ok(pacoteAssembler.toModel(pacoteSalvo));
+    }
+
+    @PutMapping("/receber-pacote")
+    public ResponseEntity<PacoteDto> receberPacote(@RequestBody @Valid RealiazacaoItemPacote realizacaoItemPacote){
+        Pacote pacote = pacoteService.receberPacote(realizacaoItemPacote);
+
+        return ResponseEntity.ok(pacoteAssembler.toModel(pacote));
     }
 
 

@@ -1,7 +1,11 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.PacoteInput;
+import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.RealiazacaoItemPacote;
+import com.jeanpiress.ProjetoBarbaria.domain.eventos.ClienteAtendidoEvento;
+import com.jeanpiress.ProjetoBarbaria.domain.eventos.PacoteRealizadoEvento;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ClienteNaoEncontradoException;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ItemPacoteNaoEncontradoEmItemAtivoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.PacoteNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.*;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ClienteRepository;
@@ -9,6 +13,7 @@ import com.jeanpiress.ProjetoBarbaria.domain.repositories.ItemPacoteRepository;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ItemPedidoRepository;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.PacoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -24,13 +29,14 @@ public class PacoteService {
     private PacoteRepository pacoteRepository;
 
     @Autowired
-    private ItemPedidoRepository itemPedidoRepository;
-
-    @Autowired
     private ClienteRepository clienteRepository;
 
     @Autowired
     private ItemPacoteRepository itemPacoteRepository;
+
+    @Autowired
+    private ItemPacoteService itemPacoteService;
+
     @Autowired
     private ItemPedidoService itemPedidoService;
 
@@ -39,6 +45,15 @@ public class PacoteService {
 
     @Autowired
     private PacoteProntoService pacoteProntoService;
+
+    @Autowired
+    private PacoteService pacoteService;
+
+    @Autowired
+    private ProfissionalService profissionalService;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
 
     public Pacote buscarPorId(Long pacoteId) {
@@ -115,6 +130,39 @@ public class PacoteService {
         return dataVencimento;
     }
 
+
+    public Pacote receberPacote(RealiazacaoItemPacote realizacaoItemPacote) {
+        Long itemPacoteId = realizacaoItemPacote.getItemPacote().getId();
+        Long pacoteId = realizacaoItemPacote.getPacote().getId();
+        Long profissionalId = realizacaoItemPacote.getProfissional().getId();
+
+        if(!pacoteRepository.existsByIdAndItensAtivosId(pacoteId, itemPacoteId)) {
+            throw new ItemPacoteNaoEncontradoEmItemAtivoException(itemPacoteId);
+        }
+
+        Pacote pacote = pacoteService.buscarPorId(pacoteId);
+        Profissional profissional = profissionalService.buscarPorId(profissionalId);
+
+        List<ItemPacote> itensAtivos = pacote.getItensAtivos();
+        List<ItemPacote> itensConsumidos = pacote.getItensConsumidos();
+
+        ItemPacote itemAtivo =  itensAtivos.stream().filter(ativo -> ativo.getId().equals(itemPacoteId)).findFirst().get();
+        itemAtivo.setDataConsumo(OffsetDateTime.now());
+        itemAtivo.setProfissional(profissional);
+
+        itensAtivos.remove(itemAtivo);
+        pacote.setItensAtivos(itensAtivos);
+
+        itensConsumidos.add(itemAtivo);
+        pacote.setItensConsumidos(itensConsumidos);
+
+        pacote.getItensConsumidos();
+
+
+        eventPublisher.publishEvent(new PacoteRealizadoEvento(pacote));
+
+        return pacote;
+    }
 
 
 }

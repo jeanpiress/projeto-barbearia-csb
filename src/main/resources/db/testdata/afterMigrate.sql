@@ -18,6 +18,8 @@ delete from item_pacote;
 delete from pacote_pronto;
 delete from pacote_pronto_item;
 delete from item_pacote;
+delete from pacote_item_ativo;
+delete from pacote_item_consumido;
 
 
 set foreign_key_checks = 1;
@@ -35,6 +37,7 @@ alter table pacote auto_increment = 1;
 alter table item_pacote auto_increment =1;
 alter table pacote_pronto auto_increment=1;
 alter table item_pacote auto_increment=1;
+
 
 
 insert into categoria (id, nome) values (1, 'cabelo');
@@ -92,7 +95,7 @@ insert into usuario_permissao(usuario_id, permissao_id) values (1, 4);
 
 insert into item_pacote(id, item_pedido_id, profissional_id, data_consumo) values(1, 1, null, null);
 insert into item_pacote(id, item_pedido_id, profissional_id, data_consumo) values(2, 1, null, null);
-insert into item_pacote(id, item_pedido_id, profissional_id, data_consumo) values(3, 1, null, null);
+insert into item_pacote(id, item_pedido_id, profissional_id, data_consumo) values(3, 1, 1, timestamp('2024-04-19 14:30:45.12'));
 
 insert into pacote(id, nome, descricao, cliente_id, data_compra, validade, data_vencimento) values (1, '4 barbas', null, 1, timestamp('2024-04-19 14:30:45.12'), 31, timestamp('2024-05-19 23:59:59.00'));
 insert into pacote(id, nome, descricao, cliente_id, data_compra, validade, data_vencimento) values (2, '3 cortes', null, 2, timestamp('2024-04-19 14:30:45.12'), 31, timestamp('2024-05-19 23:59:59.00'));
