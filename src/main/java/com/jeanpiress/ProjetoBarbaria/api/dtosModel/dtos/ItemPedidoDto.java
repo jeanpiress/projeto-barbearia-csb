@@ -1,5 +1,6 @@
 package com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos;
 
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.ProdutoResumo;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Produto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -25,5 +26,5 @@ public class ItemPedidoDto {
     @ApiModelProperty(value = "Corte de cabelo", example = "5")
     private String observacao;
 
-    private Produto produto;
+    private ProdutoResumo produto;
 }

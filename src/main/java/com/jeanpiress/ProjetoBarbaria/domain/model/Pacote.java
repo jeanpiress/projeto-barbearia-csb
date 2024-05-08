@@ -39,4 +39,9 @@ public class Pacote {
     @JoinTable(name = "pacote_item_consumido", joinColumns = @JoinColumn(name = "pacote_id"),
             inverseJoinColumns = @JoinColumn(name = "item_id"))
     private List<ItemPacote> itensConsumidos;
+
+    @ManyToMany
+    @JoinTable(name = "pacote_item_expirados", joinColumns = @JoinColumn(name = "pacote_id"),
+            inverseJoinColumns = @JoinColumn(name = "item_id"))
+    private List<ItemPacote> itensExpirados;
 }

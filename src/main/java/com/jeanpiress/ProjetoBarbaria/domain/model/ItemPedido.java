@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Data
@@ -22,10 +23,8 @@ public class ItemPedido {
     private BigDecimal precoTotal;
     private Integer quantidade;
 
-    @ManyToOne
-    @JoinColumn(name = "pedido_id")
-    @JsonIgnore
-    private Pedido pedido;
+    @ManyToMany(mappedBy = "itemPedidos")
+    private List<Pedido> pedidos;
 
     @ManyToOne
     @JoinColumn(name = "produto_id")

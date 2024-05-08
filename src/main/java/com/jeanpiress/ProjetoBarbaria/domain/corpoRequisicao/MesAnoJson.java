@@ -7,10 +7,9 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
-public class DataPagamentoJson {
+public class MesAnoJson {
 
     @NotBlank
-    private String inicio;
-    @NotBlank
-    private String fim;
+    private String mesAno;
+
 }

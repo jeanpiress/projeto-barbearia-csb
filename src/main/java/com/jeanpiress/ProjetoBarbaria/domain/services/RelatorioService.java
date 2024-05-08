@@ -1,20 +1,23 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.ClienteAssembler;
+import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.PedidoAssembler;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.relatorios.*;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.ClienteResumo;
-import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.DataPagamentoInicioFim;
-import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.DataPagamentoJson;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.ProfissionalIdNome;
+import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.DataInicioFim;
+import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.DataInicioFimMes;
+import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.DataJson;
+import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.MesAnoJson;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.FormatoDataException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Cliente;
+import com.jeanpiress.ProjetoBarbaria.domain.model.ComparacaoMes;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Profissional;
-import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.relatorios.CaixaModel;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Pedido;
-import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.relatorios.ClientesRetorno;
-import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.relatorios.RelatorioComissao;
-import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.relatorios.RelatorioFaturamento;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ClienteRepository;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.PedidoRepository;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.ProfissionalRepository;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-
+@Log4j2
 @Service
 public class RelatorioService {
 
@@ -38,38 +41,54 @@ public class RelatorioService {
     private ProfissionalRepository profissionalRepository;
 
     @Autowired
+    private ProfissionalService profissionalService;
+
+    @Autowired
     private ClienteRepository clienteRepository;
 
     @Autowired
     private ClienteAssembler clienteAssembler;
 
+    @Autowired
+    private PedidoAssembler pedidoAssembler;
 
 
 
-    public RelatorioFaturamento buscarFaturamento(DataPagamentoJson dataInicioFim){
-       List<Pedido> pedidos = buscarPedidosPorData(dataInicioFim);
-       CaixaModel cm = caixaService.gerarCaixa(pedidos);
-
-        return RelatorioFaturamento.builder()
-                .dinheiro(cm.getDinheiro())
-                .pix(cm.getPix())
-                .debito(cm.getDebito())
-                .credito(cm.getCredito())
-                .tkmLoja(gerarTkmLoja(pedidos, cm))
-                .clientesAtendidos(cm.getClientesAtendidos())
-                .quantidadeProdutosVendidos(cm.getQuantidadeProdutosVendidos())
-                .build();
+    public RelatorioFaturamento buscarFaturamentoDataJson(DataJson dataJson){
+        List<Pedido> pedidos = buscarPedidosPorDataJson(dataJson);
+        return buscarFaturamento(pedidos);
     }
 
 
-    public List<RelatorioComissao> buscarComissoes(DataPagamentoJson dataInicioFim){
-        List<Pedido> pedidos = buscarPedidosPorData(dataInicioFim);
+    public RelatorioComissaoDetalhada buscarComissaoPorProfissional(DataJson dataInicioFim, Long profissionalId){
+        List<Pedido> pedidos = buscarPedidosPorDataEProfissional(dataInicioFim, profissionalId);
+        Profissional profissional = profissionalService.buscarPorId(profissionalId);
+        RelatorioComissaoDetalhada relatorio = relatorioComissaoZerado(profissional);
+
+        for (Pedido pedido : pedidos) {
+             relatorio.setTotalComissao(relatorio.getTotalComissao().add(pedido.getComissaoGerada()));
+             relatorio.setTotalpontos(relatorio.getTotalpontos().add(pedido.getPontuacaoGerada()));
+             relatorio.setTotalVendas(relatorio.getTotalVendas().add(pedido.getValorTotal()));
+             relatorio.setClienteAtendidos(relatorio.getClienteAtendidos() + 1);
+
+        }
+        BigDecimal tkm = relatorio.getTotalVendas().divide(BigDecimal.valueOf(relatorio.getClienteAtendidos()));
+        relatorio.setTkm(tkm);
+        relatorio.setPedidos(pedidoAssembler.collectionToModelResumo(pedidos));
+
+        return relatorio;
+    }
+
+
+
+    public List<RelatorioComissao> buscarTodasComissoes(DataJson dataInicioFim){
+        List<Pedido> pedidos = buscarPedidosPorDataJson(dataInicioFim);
         Set<Profissional> profissionais = profissionalRepository.buscarProfissionaisAtivos();
         List<RelatorioComissao> relatoriosComissoes = relatoriosComissoesZeradosComProfissionais(profissionais);
 
         for(Pedido pedido : pedidos){
             for(RelatorioComissao relatorioComissao: relatoriosComissoes) {
-                if (pedido.getProfissional().equals(relatorioComissao.getProfissional())){
+                if (pedido.getProfissional().getId().equals(relatorioComissao.getProfissional().getId())){
                     relatorioComissao.setTotalComissao(relatorioComissao.getTotalComissao().add(pedido.getComissaoGerada()));
                     relatorioComissao.setTotalpontos(relatorioComissao.getTotalpontos().add(pedido.getPontuacaoGerada()));
                     relatorioComissao.setTotalVendas(relatorioComissao.getTotalVendas().add(pedido.getValorTotal()));
@@ -78,9 +97,11 @@ public class RelatorioService {
             }
         }
         for(RelatorioComissao relatorioComissao: relatoriosComissoes){
-            BigDecimal tkm = relatorioComissao.getTotalVendas()
-                    .divide(BigDecimal.valueOf(relatorioComissao.getClienteAtendidos()));
-            relatorioComissao.setTkm(tkm);
+            if(!relatorioComissao.getTotalVendas().equals(BigDecimal.ZERO)) {
+                BigDecimal tkm = relatorioComissao.getTotalVendas().
+                        divide(BigDecimal.valueOf(relatorioComissao.getClienteAtendidos()));
+                relatorioComissao.setTkm(tkm);
+            }else relatorioComissao.setTkm(BigDecimal.ZERO);
         }
 
         return relatoriosComissoes;
@@ -113,11 +134,65 @@ public class RelatorioService {
         return clientesRetorno;
     }
 
+    public ComparacaoMes compararMes(DataJson dataJson){
+        DataInicioFimMes dataMes = gerarDatasParaComparar(dataJson);
+        List<Pedido> pedidosPrimeiroMes = pedidoRepository.findByDataPagamento(dataMes.getInicioPrimeiroMes(), dataMes.getFimPrimeiroMes());
+        List<Pedido> pedidosSegundoMes = pedidoRepository.findByDataPagamento(dataMes.getInicioSegundoMes(), dataMes.getFimSegundoMes());
+
+        ComparacaoMes comparacaoMes = compararFaturamentos(pedidosPrimeiroMes, pedidosSegundoMes);
+        comparacaoMes.setDataInicio(dataMes.getInicioPrimeiroMes());
+        comparacaoMes.setDataFim(dataMes.getFimSegundoMes());
+
+        return comparacaoMes;
+    }
+
+    public ComparacaoMes compararPorPeriodoMes(MesAnoJson mesAnoJson){
+        OffsetDateTime dataAtual = OffsetDateTime.now();
+        OffsetDateTime dataFonecida = converterMesAnoJson(mesAnoJson);
+        OffsetDateTime dataPesquisa = dataFonecida.withDayOfMonth(dataAtual.getDayOfMonth());
+
+        List<Pedido> pedidosMesAtual = pedidoRepository.findByDataPagamento(dataAtual.withDayOfMonth(1), dataAtual);
+        List<Pedido> pedidosMesPesquisa = pedidoRepository.findByDataPagamento(dataPesquisa.withDayOfMonth(1), dataPesquisa);
+
+        ComparacaoMes comparacaoMes = compararFaturamentos(pedidosMesPesquisa, pedidosMesAtual);
+        comparacaoMes.setDataInicio(dataAtual);
+        comparacaoMes.setDataFim(dataPesquisa);
+
+        return comparacaoMes;
+
+    }
+
+
+    private DataInicioFimMes gerarDatasParaComparar(DataJson dataJson) {
+        DataInicioFim inicioFim = converterDataJson(dataJson);
+
+        OffsetDateTime inicioPrimeiroMes = inicioFim.getInicio().withDayOfMonth(1);
+
+        OffsetDateTime fimPrimeiroMes = inicioPrimeiroMes.plusMonths(1).minusDays(1)
+                .withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+
+        OffsetDateTime inicioSegundoMes = inicioFim.getFim().withDayOfMonth(1);
+
+        OffsetDateTime fimSegundoMes = inicioSegundoMes.plusMonths(1).minusDays(1)
+                .withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+
+
+
+        return DataInicioFimMes.builder()
+                .inicioPrimeiroMes(inicioPrimeiroMes)
+                .fimPrimeiroMes(fimPrimeiroMes)
+                .inicioSegundoMes(inicioSegundoMes)
+                .fimSegundoMes(fimSegundoMes)
+                .build();
+
+    }
+
+
     private List<RelatorioComissao> relatoriosComissoesZeradosComProfissionais(Set<Profissional> profissionais){
         List<RelatorioComissao> relatoriosComissoes = new ArrayList<>();
          for(Profissional profissional : profissionais){
             RelatorioComissao relatorioComissao = RelatorioComissao.builder()
-                    .profissional(profissional)
+                    .profissional(converterProfissional(profissional))
                     .totalComissao(BigDecimal.ZERO)
                     .totalpontos(BigDecimal.ZERO)
                     .totalVendas(BigDecimal.ZERO)
@@ -128,23 +203,53 @@ public class RelatorioService {
         return relatoriosComissoes;
     }
 
-    private List<Pedido> buscarPedidosPorData(DataPagamentoJson dataInicioFim){
-        DataPagamentoInicioFim InicioFim = converterData(dataInicioFim);
+    private ProfissionalIdNome converterProfissional(Profissional profissional) {
+        return ProfissionalIdNome.builder()
+                .id(profissional.getId())
+                .nome(profissional.getNome())
+                .build();
+    }
+
+    private RelatorioComissaoDetalhada relatorioComissaoZerado(Profissional profissional){
+        return  RelatorioComissaoDetalhada.builder()
+                    .profissional(converterProfissional(profissional))
+                    .totalComissao(BigDecimal.ZERO)
+                    .totalpontos(BigDecimal.ZERO)
+                    .totalVendas(BigDecimal.ZERO)
+                    .clienteAtendidos(0)
+                .build();
+
+        }
+
+
+    private List<Pedido> buscarPedidosPorDataJson(DataJson dataInicioFim){
+        DataInicioFim InicioFim = converterDataJson(dataInicioFim);
         OffsetDateTime inicio = InicioFim.getInicio();
         OffsetDateTime fim = InicioFim.getFim();
-        List<com.jeanpiress.ProjetoBarbaria.domain.model.Pedido> pedidos = pedidoRepository.findByDataPagamento(inicio, fim);
-        return pedidos;
+        return pedidoRepository.findByDataPagamento(inicio, fim);
+    }
+
+
+
+    private List<Pedido> buscarPedidosPorDataEProfissional(DataJson dataInicioFim, Long profissionalId){
+        DataInicioFim InicioFim = converterDataJson(dataInicioFim);
+        OffsetDateTime inicio = InicioFim.getInicio();
+        OffsetDateTime fim = InicioFim.getFim();
+        return pedidoRepository.findByDataPagamentoAndProfissionalId(inicio, fim, profissionalId);
     }
 
     private BigDecimal gerarTkmLoja(List<Pedido> pedidos, CaixaModel cd) {
         Integer quantidadePedidos = pedidos.size();
         BigDecimal faturamento = cd.getTotal();
-        BigDecimal tkm = faturamento.divide(BigDecimal.valueOf(quantidadePedidos));
+        BigDecimal tkm = BigDecimal.ZERO;
+        if(!faturamento.equals(BigDecimal.ZERO) && quantidadePedidos > 0){
+            tkm = faturamento.divide(BigDecimal.valueOf(quantidadePedidos));
+        }
 
         return tkm;
     }
 
-    private DataPagamentoInicioFim converterData(DataPagamentoJson dataInicioFim) {
+    private DataInicioFim converterDataJson(DataJson dataInicioFim) {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -154,7 +259,7 @@ public class RelatorioService {
             OffsetDateTime dataInicio = inicio.atOffset(ZoneOffset.UTC);
             OffsetDateTime dataFim = fim.atOffset(ZoneOffset.UTC);
 
-            return DataPagamentoInicioFim.builder()
+            return DataInicioFim.builder()
                     .inicio(dataInicio)
                     .fim(dataFim)
                     .build();
@@ -162,4 +267,64 @@ public class RelatorioService {
             throw new FormatoDataException("Formato de data incorreto, use: aaaa-mm-dd");
         }
     }
+
+    private OffsetDateTime converterMesAnoJson (MesAnoJson mesAnoJson){
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            OffsetDateTime horaAtua = OffsetDateTime.now();
+
+            LocalDateTime data = LocalDate.parse(mesAnoJson.getMesAno(), formatter).atTime(
+                    horaAtua.getHour(), horaAtua.getMinute(), horaAtua.getSecond()
+            );
+
+            return data.atOffset(ZoneOffset.UTC);
+
+        }catch (DateTimeException e){
+            throw new FormatoDataException("Formato de data incorreto, use: aaaa-mm-dd");
+        }
+    }
+
+    private OffsetDateTime definirfimDia(OffsetDateTime data){
+        return data.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+    }
+
+    private ComparacaoMes compararFaturamentos(List<Pedido> pedidosPrimeiroMes, List<Pedido> pedidosSegundoMes){
+        RelatorioFaturamento primeiroMes = buscarFaturamento(pedidosPrimeiroMes);
+        RelatorioFaturamento segundoMes = buscarFaturamento(pedidosSegundoMes);
+
+        BigDecimal diferencaFaturamento = segundoMes.getTotal().subtract(primeiroMes.getTotal());
+        BigDecimal diferencaTkm = segundoMes.getTkmLoja().subtract(primeiroMes.getTkmLoja());
+        int diferencaClientes = segundoMes.getClientesAtendidos() - primeiroMes.getClientesAtendidos();
+
+        return ComparacaoMes.builder()
+                .faturamentoPrimeiroMes(primeiroMes.getTotal())
+                .faturamentoSegundoMes(segundoMes.getTotal())
+                .diferencaFaturamento(diferencaFaturamento)
+                .clientesAtendidosPrimeiroMes(primeiroMes.getClientesAtendidos())
+                .clientesAtendidosSegundoMes(segundoMes.getClientesAtendidos())
+                .diferencaClientesAtendidos(diferencaClientes)
+                .tkmPrimeiroMes(primeiroMes.getTkmLoja())
+                .tkmSegundoMes(segundoMes.getTkmLoja())
+                .diferencaTkm(diferencaTkm)
+                .build();
+    }
+
+    private RelatorioFaturamento buscarFaturamento(List<Pedido> pedidos){
+        CaixaModel cm = caixaService.gerarCaixa(pedidos);
+
+        return RelatorioFaturamento.builder()
+                .dinheiro(cm.getDinheiro())
+                .pix(cm.getPix())
+                .debito(cm.getDebito())
+                .credito(cm.getCredito())
+                .voucher(cm.getVoucher())
+                .pontos(cm.getPontos())
+                .total(cm.getTotal())
+                .tkmLoja(gerarTkmLoja(pedidos, cm))
+                .clientesAtendidos(cm.getClientesAtendidos())
+                .quantidadeProdutosVendidos(cm.getQuantidadeProdutosVendidos())
+                .build();
+    }
+
+
 }

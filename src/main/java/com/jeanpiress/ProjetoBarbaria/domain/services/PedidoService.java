@@ -4,8 +4,11 @@ import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.FormaPagamentoJson;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPedido;
+import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.RealiazacaoItemPacote;
 import com.jeanpiress.ProjetoBarbaria.domain.eventos.ClienteAtendidoEvento;
 import com.jeanpiress.ProjetoBarbaria.domain.eventos.PacoteRealizadoEvento;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ClienteNaoEncontradoException;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ClientesDiferentesException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.PedidoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.*;
@@ -48,6 +51,10 @@ public class PedidoService {
     @Autowired
     private PacoteRepository pacoteRepository;
 
+    @Autowired
+    private PacoteService pacoteService;
+    @Autowired
+    private ItemPacoteService itemPacoteService;
 
 
     public Pedido buscarPorId(Long pedidoId){
@@ -101,9 +108,7 @@ public class PedidoService {
         Long profissionalId = pedido.getProfissional().getId();
         ItemPedido itemPedido = itemPedidoService.buscarPorId(itemPedidoId);
         if(!pedido.getItemPedidos().contains(itemPedido)) {
-            itemPedido.setPedido(pedido);
-            itemPedidoService.adicionar(itemPedido);
-            pedido.adicionarItemPedido(itemPedido);
+            pedido.getItemPedidos().add(itemPedido);
             BigDecimal comissaoGerada = comissaoPorItem(profissionalId, itemPedido);
             BigDecimal comissaoPedido = pedido.getComissaoGerada().add(comissaoGerada);
             pedido.setComissaoGerada(comissaoPedido);
@@ -160,6 +165,32 @@ public class PedidoService {
 
     }
 
+
+    public Pedido realizarPagamentoComPacote(RealiazacaoItemPacote realizacaoItemPacote, Long pedidoId) {
+        Pedido pedido = buscarPorId(pedidoId);
+        Pacote pacote = pacoteService.buscarPorId(realizacaoItemPacote.getPacote().getId());
+
+        Cliente clientePedido = pedido.getCliente();
+        Cliente clientePacote = pacote.getCliente();
+        if(!clientePacote.equals(clientePedido)){
+            throw new ClientesDiferentesException("Cliente do pedido não é o titular do pacote");
+        }
+
+        Long itemPacoteId = realizacaoItemPacote.getItemPacote().getId();
+        ItemPacote itemPacote = itemPacoteService.buscarPorId(realizacaoItemPacote.getItemPacote().getId());
+        Profissional profissional = profissionalService.buscarPorId(realizacaoItemPacote.getProfissional().getId());
+
+        pedido.setProfissional(profissional);
+        pedido.setPontuacaoGerada(gerarPontuacao(itemPacote.getItemPedido()));
+        preencherPedidoPorPacote(pedido, itemPacote);
+        pacoteService.alterarArtivoParaConsumido(pacote, profissional, itemPacoteId);
+
+        repository.save(pedido);
+        pacoteRepository.save(pacote);
+
+        return pedido;
+    }
+
     public void preencherPedidoPorPacote(Pedido pedido, ItemPacote ultimoItemConsumido){
         List<ItemPedido> itensPedidos = pedido.getItemPedidos();
         ItemPedido itemPedido = ultimoItemConsumido.getItemPedido();
@@ -170,6 +201,7 @@ public class PedidoService {
         pedido.setStatusPagamento(StatusPagamento.PAGO);
         pedido.setComissaoGerada(comissaoPorItem(pedido.getProfissional().getId(), itemPedido));
         pedido.setValorTotal(itemPedido.getPrecoTotal());
+        pedido.setDataPagamento(OffsetDateTime.now());
 
     }
 

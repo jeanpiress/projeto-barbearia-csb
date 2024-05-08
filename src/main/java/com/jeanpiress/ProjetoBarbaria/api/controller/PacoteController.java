@@ -45,6 +45,18 @@ public class PacoteController {
         return ResponseEntity.ok(pacoteAssembler.toModel(pacote));
     }
 
+    @GetMapping(value = "/ativos")
+    public ResponseEntity<List<PacoteDto>> buscarPacotesAtivos(){
+        List<Pacote> pacotes = pacoteService.buscarPacotesComItensAtivos();
+        return ResponseEntity.ok(pacoteAssembler.collectionToModel(pacotes));
+    }
+
+    @GetMapping(value = "/expirados")
+    public ResponseEntity<List<PacoteDto>> buscarPacotesExpirados(){
+        List<Pacote> pacotes = pacoteService.buscarPacotesComItensExpirados();
+        return ResponseEntity.ok(pacoteAssembler.collectionToModel(pacotes));
+    }
+
     @GetMapping(value = "/cliente/{clienteId}")
     public ResponseEntity<List<PacoteDto>> buscarPorCliente(@PathVariable Long clienteId){
         List<Pacote> pacotes = pacoteService.buscarPorClinte(clienteId);
@@ -63,6 +75,7 @@ public class PacoteController {
 
         return ResponseEntity.ok(pacoteAssembler.toModel(pacote));
     }
+
 
 
 

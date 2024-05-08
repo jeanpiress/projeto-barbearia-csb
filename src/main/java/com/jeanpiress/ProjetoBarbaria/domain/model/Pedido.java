@@ -26,8 +26,11 @@ public class Pedido {
     private Long id;
     private OffsetDateTime horario;
 
-    @OneToMany(mappedBy = "pedido")
+    @ManyToMany
+    @JoinTable(name = "pedido_item_pedido", joinColumns = @JoinColumn(name = "pedido_id"),
+            inverseJoinColumns = @JoinColumn(name = "item_pedido_id"))
     private List<ItemPedido> itemPedidos = new ArrayList<>();
+
     private StatusPagamento statusPagamento;
     private FormaPagamento formaPagamento;
     private StatusPedido statusPedido;

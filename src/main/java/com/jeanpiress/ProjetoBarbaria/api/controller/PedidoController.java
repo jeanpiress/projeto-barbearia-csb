@@ -8,6 +8,7 @@ import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.PedidoInput;
 import com.jeanpiress.ProjetoBarbaria.core.security.CsbSecurity;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPedido;
 import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.FormaPagamentoJson;
+import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.RealiazacaoItemPacote;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.PedidoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.NegocioException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Pedido;
@@ -132,6 +133,20 @@ public class PedidoController implements PedidoControllerOpenApi {
     public ResponseEntity<PedidoDto> efetuarPagamento(@RequestBody @Valid FormaPagamentoJson formaPagamento, @PathVariable @Valid Long pedidoId) {
         try {
             Pedido pedido = service.realizarPagamento(formaPagamento, pedidoId);
+            Usuario usuario = usuarioService.buscarUsuarioPorId(security.getUsuarioId());
+            pedido.setRecibidoPor(usuario);
+            PedidoDto pedidoDto = pedidoAssembler.toModel(pedido);
+            return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDto);
+        }catch(PedidoNaoEncontradoException e) {
+            throw new NegocioException(e.getMessage(), e);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('RECEPCAO')")
+    @PutMapping(value = "/{pedidoId}/pagar/pacote")
+    public ResponseEntity<PedidoDto> efetuarPagamentoComPacote(@RequestBody @Valid RealiazacaoItemPacote realizacaoItemPacote, @PathVariable @Valid Long pedidoId) {
+        try {
+            Pedido pedido = service.realizarPagamentoComPacote(realizacaoItemPacote, pedidoId);
             Usuario usuario = usuarioService.buscarUsuarioPorId(security.getUsuarioId());
             pedido.setRecibidoPor(usuario);
             PedidoDto pedidoDto = pedidoAssembler.toModel(pedido);

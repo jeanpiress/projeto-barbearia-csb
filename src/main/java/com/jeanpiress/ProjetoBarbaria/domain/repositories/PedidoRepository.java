@@ -19,4 +19,8 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     @Query("SELECT p FROM Pedido p WHERE p.dataPagamento > :inicio AND p.dataPagamento < :fim")
     List<Pedido> findByDataPagamento(@Param("inicio") OffsetDateTime inicio, @Param("fim") OffsetDateTime fim);
 
+    @Query("SELECT p FROM Pedido p WHERE p.dataPagamento > :inicio AND p.dataPagamento < :fim AND p.profissional.id = :profissionalId")
+    List<Pedido> findByDataPagamentoAndProfissionalId(@Param("inicio") OffsetDateTime inicio, @Param("fim") OffsetDateTime fim, @Param("profissionalId") Long profissionalId);
+
+
 }

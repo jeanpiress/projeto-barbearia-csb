@@ -6,15 +6,10 @@ import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.UsuarioResumo;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPedido;
-import com.jeanpiress.ProjetoBarbaria.domain.model.ItemPedido;
-import com.jeanpiress.ProjetoBarbaria.domain.model.Usuario;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -30,7 +25,7 @@ public class PedidoDto {
     @ApiModelProperty(example = "2024-01-25T14:30:00-03:00")
     private OffsetDateTime horario;
 
-    private List<ItemPedido> itemPedidos = new ArrayList<>();
+    private List<ItemPedidoDto> itemPedidos = new ArrayList<>();
 
     @ApiModelProperty(example = "PAGO")
     private StatusPagamento statusPagamento;

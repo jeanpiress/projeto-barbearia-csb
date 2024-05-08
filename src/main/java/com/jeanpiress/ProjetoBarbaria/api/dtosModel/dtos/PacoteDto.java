@@ -19,6 +19,7 @@ public class PacoteDto {
     private OffsetDateTime dataVencimento;
     private List<ItemPacoteResumo> itensAtivos;
     private List<ItemPacoteResumo> itensConsumidos;
+    private List<ItemPacoteResumo> itensExpirados;
 
 
 }

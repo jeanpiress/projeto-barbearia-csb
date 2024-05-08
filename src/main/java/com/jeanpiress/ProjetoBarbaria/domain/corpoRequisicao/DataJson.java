@@ -1,17 +1,16 @@
 package com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
-import java.time.OffsetDateTime;
 
-@Builder
 @Getter
 @Setter
-public class DataPagamentoInicioFim {
+public class DataJson {
 
-    private OffsetDateTime inicio;
-    private OffsetDateTime fim;
+    @NotBlank
+    private String inicio;
+    @NotBlank
+    private String fim;
 }

@@ -30,8 +30,8 @@ public class CaixaService {
         BigDecimal voucher = BigDecimal.ZERO;
         BigDecimal pontos = BigDecimal.ZERO;
         BigDecimal total = BigDecimal.ZERO;
-        Integer clientesAtendidos = 0;
-        Integer produtosVendidos = 0;
+        int clientesAtendidos = 0;
+        int produtosVendidos = 0;
         List<ItemPedido> itens = new ArrayList<>();
 
         for(Pedido pedido : pedidos){
@@ -73,6 +73,8 @@ public class CaixaService {
                 .voucher(voucher)
                 .pontos(pontos)
                 .total(total)
+                .clientesAtendidos(clientesAtendidos)
+                .quantidadeProdutosVendidos(produtosVendidos)
                 .build();
 
         return caixaDiario;

@@ -1,18 +1,20 @@
 package com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.relatorios;
 
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.PedidoResumo;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.ProfissionalIdNome;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Profissional;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RelatorioComissao {
+public class RelatorioComissaoDetalhada {
 
 
     private ProfissionalIdNome profissional;
@@ -32,4 +34,5 @@ public class RelatorioComissao {
     @ApiModelProperty(example = "10")
     private Integer clienteAtendidos;
 
+    private List<PedidoResumo> pedidos;
 }
