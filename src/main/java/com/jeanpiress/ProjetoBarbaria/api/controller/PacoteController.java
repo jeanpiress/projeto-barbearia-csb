@@ -1,7 +1,7 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
+import com.jeanpiress.ProjetoBarbaria.api.controller.openapi.PacoteControllerOpenApi;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.PacoteAssembler;
-import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.PacoteInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.PacoteDto;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.PacoteInput;
 import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.RealiazacaoItemPacote;
@@ -9,6 +9,7 @@ import com.jeanpiress.ProjetoBarbaria.domain.model.Pacote;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.PacoteRepository;
 import com.jeanpiress.ProjetoBarbaria.domain.services.PacoteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ import java.util.List;
 
 @RestController()
 @RequestMapping(path = "/pacotes", produces = MediaType.APPLICATION_JSON_VALUE)
-public class PacoteController {
+public class PacoteController implements PacoteControllerOpenApi {
 
     @Autowired
     private PacoteRepository pacoteRepository;
@@ -30,8 +31,6 @@ public class PacoteController {
     @Autowired
     private PacoteAssembler pacoteAssembler;
 
-    @Autowired
-    private PacoteInputDissembler pacoteDissembler;
 
     @GetMapping
     public ResponseEntity<List<PacoteDto>> listar(){
@@ -66,7 +65,7 @@ public class PacoteController {
     @PostMapping
     public ResponseEntity<PacoteDto> criarPacoteFinal(@RequestBody @Valid PacoteInput pacoteInput){
         Pacote pacoteSalvo = pacoteService.criarPacoteFinal(pacoteInput);
-        return ResponseEntity.ok(pacoteAssembler.toModel(pacoteSalvo));
+        return ResponseEntity.status(HttpStatus.CREATED).body(pacoteAssembler.toModel(pacoteSalvo));
     }
 
     @PutMapping("/receber-pacote")

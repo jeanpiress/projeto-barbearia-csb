@@ -53,14 +53,18 @@ public class PedidoDto {
     private BigDecimal pontuacaoGerada;
 
     private UsuarioResumo criadoPor;
+    @ApiModelProperty(value ="Pedido criado no horario:", example = "2024-01-25T14:30:00-03:00")
     private OffsetDateTime criadoAs;
 
     private UsuarioResumo alteradoPor;
+    @ApiModelProperty(value ="Pedido modificado no horario:", example = "2024-01-25T14:30:00-03:00")
     private OffsetDateTime modificadoAs;
 
     private UsuarioResumo recibidoPor;
+    @ApiModelProperty(value ="Pedido pago no horario:", example = "2024-01-25T14:30:00-03:00")
     private OffsetDateTime dataPagamento;
 
     private UsuarioResumo canceladoPor;
+    @ApiModelProperty(value ="Pedido cancelado no horario:", example = "2024-01-25T14:30:00-03:00")
     private OffsetDateTime canceladoAs;
 }

@@ -48,6 +48,5 @@ public class ProdutoInput {
 
     @NotNull
     @Valid
-    @ApiModelProperty(value = "ID da categoria", example = "1", required = true)
     private CategoriaID categoria;
 }

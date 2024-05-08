@@ -15,7 +15,7 @@ import java.time.OffsetDateTime;
 public class PedidoInput {
 
     @NotNull
-    @ApiModelProperty(example = "2024-04-19T14:30:00:00-03:00", required = true)
+    @ApiModelProperty(example = "2024-04-19T14:30:00-03:00", required = true)
     private OffsetDateTime horario;
 
     @NotNull

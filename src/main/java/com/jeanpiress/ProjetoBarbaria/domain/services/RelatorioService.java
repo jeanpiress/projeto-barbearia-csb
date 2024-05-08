@@ -148,8 +148,19 @@ public class RelatorioService {
 
     public ComparacaoMes compararPorPeriodoMes(MesAnoJson mesAnoJson){
         OffsetDateTime dataAtual = OffsetDateTime.now();
-        OffsetDateTime dataFonecida = converterMesAnoJson(mesAnoJson);
-        OffsetDateTime dataPesquisa = dataFonecida.withDayOfMonth(dataAtual.getDayOfMonth());
+        OffsetDateTime dataFornecida = converterMesAnoJson(mesAnoJson);
+        List<Month> mesesComTrintaDias = Arrays.asList(Month.APRIL, Month.JUNE, Month.SEPTEMBER, Month.NOVEMBER);
+        List<Integer> maisDeVinteNoveDias = Arrays.asList(29, 30, 31);
+        OffsetDateTime dataPesquisa;
+
+        if(mesesComTrintaDias.contains(dataFornecida.getMonth()) && dataAtual.getDayOfMonth() == 31
+                && !dataFornecida.getMonth().equals(Month.FEBRUARY)){
+            dataPesquisa = dataFornecida.withDayOfMonth(30);
+        }else if(dataFornecida.getMonth().equals(Month.FEBRUARY) && maisDeVinteNoveDias.contains(dataAtual.getDayOfMonth())){
+            dataPesquisa = dataFornecida.withDayOfMonth(28);
+        }else {
+            dataPesquisa = dataFornecida.withDayOfMonth(dataAtual.getDayOfMonth());
+        }
 
         List<Pedido> pedidosMesAtual = pedidoRepository.findByDataPagamento(dataAtual.withDayOfMonth(1), dataAtual);
         List<Pedido> pedidosMesPesquisa = pedidoRepository.findByDataPagamento(dataPesquisa.withDayOfMonth(1), dataPesquisa);

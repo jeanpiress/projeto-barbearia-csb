@@ -27,9 +27,7 @@ public interface ClienteControllerOpenApi {
 
     @ApiOperation("Cria um novo cliente")
     @ApiResponses({
-            @ApiResponse(code = 201, message = "Cliente cadastrado"),
-            @ApiResponse(code = 400, message = "Id do cliente inválido", response = Problem.class),
-            @ApiResponse(code = 404, message = "cliente não encontrado", response = Problem.class)
+            @ApiResponse(code = 201, message = "Cliente cadastrado")
     })
     public ResponseEntity<ClienteDto> adicionar(@ApiParam(name = "Corpo", value = "Representação de um novo cliente")
                                                     ClienteInput clienteInput);

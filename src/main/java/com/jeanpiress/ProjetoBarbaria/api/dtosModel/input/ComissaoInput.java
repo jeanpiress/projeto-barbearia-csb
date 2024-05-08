@@ -15,12 +15,13 @@ import java.math.BigDecimal;
 public class ComissaoInput {
 
 
+    @Valid
     @NotNull
     @ApiModelProperty(value = "ID do produto", example = "Corte", required = true)
     private ProdutoId produto;
 
-    @NotNull
     @Valid
+    @NotNull
     @ApiModelProperty(value = "ID do profissional", example = "1", required = true)
     private ProfissionalId profissional;
 

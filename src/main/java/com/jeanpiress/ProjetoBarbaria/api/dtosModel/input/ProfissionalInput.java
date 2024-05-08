@@ -28,7 +28,7 @@ public class ProfissionalInput {
     @ApiModelProperty(example = "111.111.111-11")
     private String cpf;
 
-    @ApiModelProperty(example = "1991-12-25")
+    @ApiModelProperty(example = "1991-11-13T00:00:00Z")
     private OffsetDateTime dataNascimento;
 
     @ApiModelProperty(value = "Salario fixo", example = "0.00")
