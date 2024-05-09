@@ -39,6 +39,7 @@ alter table pacote auto_increment = 1;
 alter table item_pacote auto_increment =1;
 alter table pacote_pronto auto_increment=1;
 alter table item_pacote auto_increment=1;
+alter table usuario auto_increment=1;
 
 
 
@@ -49,9 +50,9 @@ insert into categoria (id, nome) values (3, 'produto');
 insert into profissional (id, nome, nome_exibicao, celular, cpf, data_nascimento, salario_fixo, dia_pagamento, ativo) values (1, 'Jean Carlo', 'jean', '34999708382', '10158594614', utc_timestamp, 0, 5, true);
 insert into profissional (id, nome, nome_exibicao, celular, cpf, data_nascimento, salario_fixo, dia_pagamento, ativo) values (2, 'Mc Victor', 'Mono', '34924242424', '10158594614', utc_timestamp, 0, 5, true);
 
-insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id, endereco_bairro, endereco_cep, endereco_complemento, endereco_logradouro, endereco_numero) values (1, 'jean', '34999708382', utc_timestamp, utc_timestamp, 100, timestamp('2024-04-12 14:30:45.12'), 'sem obs' , 30, 1,'morumbi', '38407381', 'casa', 'rua grupiara', '313');
-insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id) values (2, 'Kirk', '34999708385', utc_timestamp, utc_timestamp, 50, timestamp('2024-04-19 14:30:45.12'), 'sem obs', 30, 1);
-insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id) values (3, 'Carol', '34999708385', utc_timestamp, utc_timestamp, 50, timestamp('2024-04-17 14:30:45.12'), 'sem obs', 30, 2);
+insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id, endereco_bairro, endereco_cep, endereco_complemento, endereco_logradouro, endereco_numero) values (1, 'jean', '34999708382', utc_timestamp, utc_timestamp, 100.00, timestamp('2024-04-12 14:30:45.12'), 'sem obs' , 30, 1,'morumbi', '38407381', 'casa', 'rua grupiara', '313');
+insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id) values (2, 'Kirk', '34999708385', utc_timestamp, utc_timestamp, 50.00, timestamp('2024-04-19 14:30:45.12'), 'sem obs', 30, 1);
+insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id) values (3, 'Carol', '34999708385', utc_timestamp, utc_timestamp, 50.00, timestamp('2024-04-17 14:30:45.12'), 'sem obs', 30, 2);
 
 insert into produto (id, nome, preco, ativo, tem_estoque, estoque, vendido_por_ponto, peso_pontuacao_cliente, peso_pontuacao_profissional, preco_em_pontos, comissao_base, categoria_id) values (1, 'corte', 45.00, true, false, 0, false, 1, 1, 0, 50.00, 1);
 insert into produto (id, nome, preco, ativo, tem_estoque, estoque, vendido_por_ponto, peso_pontuacao_cliente, peso_pontuacao_profissional, preco_em_pontos, comissao_base, categoria_id) values (2, 'barba', 45.00, true, false, 0, false, 1, 1, 0, 50.00, 1);

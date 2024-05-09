@@ -13,6 +13,9 @@ import java.util.Set;
 @Setter
 public class UsuarioDto {
 
+    @ApiModelProperty(example = "1")
+    private Long id;
+
     @ApiModelProperty(example = "joao@csb.com.br")
     private String email;
 

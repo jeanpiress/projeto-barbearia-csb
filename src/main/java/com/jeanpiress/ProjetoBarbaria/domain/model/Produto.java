@@ -19,10 +19,10 @@ public class Produto {
     private Long id;
     private String nome;
     private BigDecimal preco;
-    private boolean ativo;
+    private boolean ativo = true;
     private boolean temEstoque;
     private Integer estoque;
-    private boolean vendidoPorPonto = false;
+    private boolean vendidoPorPonto;
     private BigDecimal pesoPontuacaoCliente;
     private BigDecimal pesoPontuacaoProfissional;
     private BigDecimal precoEmPontos;
@@ -31,6 +31,10 @@ public class Produto {
     @ManyToOne
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
+
+    @ManyToOne
+    @JoinColumn(name = "pacote_pronto_id")
+    private PacotePronto pacotePronto;
 
 
 }

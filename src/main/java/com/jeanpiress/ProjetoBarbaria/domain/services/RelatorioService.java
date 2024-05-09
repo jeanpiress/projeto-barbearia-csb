@@ -72,7 +72,11 @@ public class RelatorioService {
              relatorio.setClienteAtendidos(relatorio.getClienteAtendidos() + 1);
 
         }
-        BigDecimal tkm = relatorio.getTotalVendas().divide(BigDecimal.valueOf(relatorio.getClienteAtendidos()));
+
+        BigDecimal tkm = BigDecimal.ZERO;
+        if(!relatorio.getTotalVendas().equals(BigDecimal.ZERO) || !BigDecimal.valueOf(relatorio.getClienteAtendidos()).equals(BigDecimal.ZERO)) {
+            tkm = relatorio.getTotalVendas().divide(BigDecimal.valueOf(relatorio.getClienteAtendidos()));
+        }
         relatorio.setTkm(tkm);
         relatorio.setPedidos(pedidoAssembler.collectionToModelResumo(pedidos));
 

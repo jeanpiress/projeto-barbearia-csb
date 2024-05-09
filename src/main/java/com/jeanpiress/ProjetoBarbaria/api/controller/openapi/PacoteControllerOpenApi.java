@@ -25,7 +25,7 @@ public interface PacoteControllerOpenApi {
             @ApiResponse(code = 404, message = "pacote não encontrado", response = Problem.class)
     })
     public ResponseEntity<PacoteDto> buscarPorId(@ApiParam(value = "ID de um pacote", example = "1")
-                                                     @PathVariable Long pacoteId);
+                                                     Long pacoteId);
 
     @ApiOperation("Busca pacotes ativos")
     public ResponseEntity<List<PacoteDto>> buscarPacotesAtivos();
@@ -38,18 +38,12 @@ public interface PacoteControllerOpenApi {
             @ApiResponse(code = 400, message = "Id do cliente inválido", response = Problem.class)
     })
     public ResponseEntity<List<PacoteDto>> buscarPorCliente(@ApiParam(value = "ID de um cliente", example = "1")
-                                                                @PathVariable Long clienteId);
+                                                                Long clienteId);
 
-    @ApiOperation("Criar pacote")
-    @ApiResponses({
-            @ApiResponse(code = 201, message = "Pacote criado", response = Problem.class)
-    })
-    public ResponseEntity<PacoteDto> criarPacoteFinal(@ApiParam(name = "Corpo", value = "Representação de um novo pacote")
-                                                          @RequestBody @Valid PacoteInput pacoteInput);
 
     @ApiOperation("Faz pagamento por pacote")
     public ResponseEntity<PacoteDto> receberPacote(@ApiParam(name = "Corpo", value = "Representação de um pagamento por pacote")
-                                                         @RequestBody @Valid RealiazacaoItemPacote realizacaoItemPacote);
+                                                         RealiazacaoItemPacote realizacaoItemPacote);
 
 
 }

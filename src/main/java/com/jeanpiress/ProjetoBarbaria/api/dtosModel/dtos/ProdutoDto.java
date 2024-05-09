@@ -1,5 +1,6 @@
 package com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos;
 
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.PacoteProntoIdNome;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Categoria;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -39,4 +40,6 @@ public class ProdutoDto {
     private BigDecimal comissaoBase;
 
     private Categoria categoria;
+
+    private PacoteProntoIdNome pacotePronto;
 }

@@ -1,11 +1,13 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller.openapi;
 
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.PedidoDto;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.PedidoAlteracaoInput;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.PedidoInput;
 import com.jeanpiress.ProjetoBarbaria.api.exceptionHandlers.Problem;
 import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.FormaPagamentoJson;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -37,8 +39,8 @@ public interface PedidoControllerOpenApi {
             @ApiResponse(code = 404, message = "Pedido não encontrado", response = Problem.class)
     })
     public ResponseEntity<PedidoDto> alterar(@ApiParam(name = "Corpo", value = "Representação de um novo pedido com novos dados")
-                                                     PedidoInput pedidoInput,
-                                                 @ApiParam(value = "ID de um pedido", example = "1")
+                                                 PedidoAlteracaoInput pedidoInput,
+                                             @ApiParam(value = "ID de um pedido", example = "1")
                                                      Long pedidoId);
 
     @ApiOperation("Cancelar um Pedido")
@@ -51,24 +53,39 @@ public interface PedidoControllerOpenApi {
 
 
     @ApiOperation("Adiciona um ItemPedido")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "Pedido não encontrado", response = Problem.class)
+    })
     public ResponseEntity<PedidoDto> adicionarItemPedido(@ApiParam(value = "ID de um pedido", example = "1")
                                                              Long pedidoId,
                                                          @ApiParam(value = "ID de um ItemPedido", example = "1")
                                                              Long itemPedidoId);
 
     @ApiOperation("Remove um ItemPedido")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "Pedido não encontrado", response = Problem.class)
+    })
     public ResponseEntity<PedidoDto> removerItemPedido(@ApiParam(value = "ID de um pedido", example = "1")
                                                            Long pedidoId,
                                                        @ApiParam(value = "ID de um ItemPedido", example = "1")
                                                            Long itemPedidoId);
 
     @ApiOperation("Efetua o pagamento de um pedido")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "Pedido não encontrado", response = Problem.class)
+    })
     public ResponseEntity<PedidoDto> efetuarPagamento(@ApiParam(name = "Corpo", value = "Representação de uma nova forma de pagamento")
                                                           FormaPagamentoJson formaPagamento,
                                                       @ApiParam(value = "ID de um pedido", example = "1")
                                                           Long pedidoId);
 
 
+    @ApiOperation("Confirma um pedido")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "Pedido não encontrado", response = Problem.class)
+    })
+    public void confirmarPedido(@ApiParam(value = "ID de um pedido", example = "1")
+                                    @PathVariable Long pedidoId);
 }
 
 

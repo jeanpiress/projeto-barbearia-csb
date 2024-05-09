@@ -131,7 +131,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
 			return handlePropertyBindingException((PropertyBindingException) rootCause, headers, status, request);
 		}
 
-		ProblemType problemType = ProblemType.MENSAGEM_IMCOMPEENSIVEL;
+		ProblemType problemType = ProblemType.MENSAGEM_INCOMPEENSIVEL;
 		String detail = "O corpo da requisição esta invalido, verifique erro de sintaxe";
 
 		Problem problem = createProblemBuilder(status, problemType, detail).build();
@@ -251,7 +251,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
 
 	private ResponseEntity<Object> handlePropertyBindingException(PropertyBindingException ex,
 																  HttpHeaders headers, HttpStatus status, WebRequest request) {
-		ProblemType problemType = ProblemType.MENSAGEM_IMCOMPEENSIVEL;
+		ProblemType problemType = ProblemType.MENSAGEM_INCOMPEENSIVEL;
 
 		String path = joinPath(ex.getPath());
 
@@ -267,7 +267,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
 	private ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException ex,
 																HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-		ProblemType problemType = ProblemType.MENSAGEM_IMCOMPEENSIVEL;
+		ProblemType problemType = ProblemType.MENSAGEM_INCOMPEENSIVEL;
 
 		String path = joinPath(ex.getPath());
 

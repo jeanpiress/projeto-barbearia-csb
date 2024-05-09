@@ -4,13 +4,16 @@ import com.jeanpiress.ProjetoBarbaria.api.controller.openapi.PedidoControllerOpe
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.PedidoAssembler;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.PedidoInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.PedidoDto;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.PedidoAlteracaoInput;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.PedidoInput;
 import com.jeanpiress.ProjetoBarbaria.core.security.CsbSecurity;
+import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPedido;
 import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.FormaPagamentoJson;
 import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.RealiazacaoItemPacote;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.PedidoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbaria.domain.exceptions.NegocioException;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.PedidoNaoPodeSerCanceladoException;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Pedido;
 import com.jeanpiress.ProjetoBarbaria.domain.model.Usuario;
 import com.jeanpiress.ProjetoBarbaria.domain.services.PedidoService;
@@ -50,6 +53,8 @@ public class PedidoController implements PedidoControllerOpenApi {
     private CsbSecurity security;
     @Autowired
     private PedidoRepository pedidoRepository;
+    @Autowired
+    private PedidoService pedidoService;
 
     @PreAuthorize("hasAuthority('RECEPCAO')")
     @GetMapping
@@ -86,9 +91,14 @@ public class PedidoController implements PedidoControllerOpenApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancelar(@PathVariable Long pedidoId){
         Pedido pedido = service.buscarPorId(pedidoId);
-        pedido.setStatusPedido(StatusPedido.CANCELADO);
-        pedido.setCanceladoAs(OffsetDateTime.now());
         Usuario usuario = usuarioService.buscarUsuarioPorId(security.getUsuarioId());
+        boolean isGerente = usuario.getPermissoes().stream().anyMatch(permissao -> permissao.getId().equals(1L));
+        if(pedido.getStatusPagamento().equals(StatusPagamento.PAGO) && !isGerente){
+            throw new PedidoNaoPodeSerCanceladoException("Apenas os gerentes do sistema pode cancelar pedidos pagos");
+        }
+        pedido.setStatusPedido(StatusPedido.CANCELADO);
+        pedido.setStatusPagamento(StatusPagamento.CANCELADO);
+        pedido.setCanceladoAs(OffsetDateTime.now());
         pedido.setCanceladoPor(usuario);
         pedidoRepository.save(pedido);
 
@@ -104,10 +114,10 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     @PreAuthorize("hasAuthority('RECEPCAO')")
     @PutMapping(value = "/{pedidoId}")
-    public ResponseEntity<PedidoDto> alterar(@RequestBody @Valid PedidoInput pedidoInput, @PathVariable Long pedidoId) {
+    public ResponseEntity<PedidoDto> alterar(@RequestBody @Valid PedidoAlteracaoInput pedidoAlteracaoInput, @PathVariable Long pedidoId) {
         try {
             Pedido pedido = service.buscarPorId(pedidoId);
-            pedidoDissembler.copyToDomainObject(pedidoInput, pedido);
+            pedidoService.alterarProfissionalPedido(pedidoAlteracaoInput, pedidoId);
             Usuario usuario = usuarioService.buscarUsuarioPorId(security.getUsuarioId());
             pedido.setAlteradoPor(usuario);
             pedido.setModificadoAs(OffsetDateTime.now());
@@ -156,6 +166,12 @@ public class PedidoController implements PedidoControllerOpenApi {
         }
     }
 
+    @PreAuthorize("hasAuthority('PROFISSIONAL')")
+    @PutMapping(value = "/{pedidoId}/confirmar")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void confirmarPedido(@PathVariable Long pedidoId){
+        pedidoService.confirmarPedido(pedidoId);
+    }
 
 
 }

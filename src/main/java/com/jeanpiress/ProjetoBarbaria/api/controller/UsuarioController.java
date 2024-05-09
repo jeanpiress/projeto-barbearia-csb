@@ -1,5 +1,6 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
+import com.jeanpiress.ProjetoBarbaria.api.controller.openapi.UsuarioControllerOpenApi;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.UsuarioAssembler;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.UsuarioInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.UsuarioDto;
@@ -14,6 +15,7 @@ import com.jeanpiress.ProjetoBarbaria.domain.repositories.UsuarioRepository;
 import com.jeanpiress.ProjetoBarbaria.domain.services.PermissaoService;
 import com.jeanpiress.ProjetoBarbaria.domain.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,7 +27,7 @@ import java.util.Set;
 
 @RestController()
 @RequestMapping(path = "/usuarios", produces = MediaType.APPLICATION_JSON_VALUE)
-public class UsuarioController{
+public class UsuarioController implements UsuarioControllerOpenApi {
 
    @Autowired
    private UsuarioService usuarioService;
@@ -70,7 +72,7 @@ public class UsuarioController{
         usuario.setPermissoes(permissoes);
         Usuario usuarioNovo = usuarioService.criarUsuarioClienteExistente(usuario, clienteId);
 
-        return ResponseEntity.ok(usuarioAssembler.toModel(usuarioNovo));
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioAssembler.toModel(usuarioNovo));
     }
 
     @PreAuthorize("hasAuthority('GERENTE')")
@@ -85,7 +87,7 @@ public class UsuarioController{
         usuario.setPermissoes(permissoes);
         Usuario usuarioNovo = usuarioService.criarUsuario(usuario);
 
-        return ResponseEntity.ok(usuarioAssembler.toModel(usuarioNovo));
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioAssembler.toModel(usuarioNovo));
     }
 
     @PreAuthorize("hasAuthority('RECEPCAO')")
@@ -100,14 +102,21 @@ public class UsuarioController{
         usuario.setPermissoes(permissoes);
         Usuario usuarioNovo = usuarioService.criarUsuarioProfissionalExistente(usuario, profissionalId);
 
-        return ResponseEntity.ok(usuarioAssembler.toModel(usuarioNovo));
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioAssembler.toModel(usuarioNovo));
     }
 
 
     @PutMapping(value = "/alterar-senha")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void alterarSenha(@RequestBody @Valid UsuarioNovaSenhaInput novaSenha){
         Usuario usuarioConferido = usuarioService.conferirSenha(novaSenha);
 
+    }
+    @PreAuthorize("hasAuthority('GERENTE')")
+    @PutMapping(value = "/{usuarioId}/alterar-permissao/{permissaoId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void alterarPermissaoUsuario(@PathVariable Long usuarioId, @PathVariable Long permissaoId){
+       usuarioService.alterarPermissao(usuarioId, permissaoId);
     }
 
 

@@ -3,6 +3,7 @@ package com.jeanpiress.ProjetoBarbaria.domain.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -21,7 +22,7 @@ public class Cliente {
     private String celular;
     private OffsetDateTime dataNascimento;
     private OffsetDateTime ultimaVisita;
-    private Integer pontos;
+    private BigDecimal pontos;
     private OffsetDateTime previsaoRetorno;
     private String observacao;
     private Integer diasRetorno;

@@ -13,10 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 
 @Service
@@ -109,5 +106,12 @@ public class UsuarioService {
 
         usuario.setPermissao(permissaoComMenorId.get().getNome());
 
+    }
+
+    public void alterarPermissao(Long usuarioId, Long permissaoId) {
+        Usuario usuario = buscarUsuarioPorId(usuarioId);
+        Set<Permissao> permissoes = permissoesInferiores(permissaoId);
+        usuario.setPermissoes(permissoes);
+        usuarioRepository.save(usuario);
     }
 }

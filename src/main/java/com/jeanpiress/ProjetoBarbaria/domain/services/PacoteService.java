@@ -74,9 +74,9 @@ public class PacoteService {
 
     }
 
-    public Pacote criarPacoteFinal(PacoteInput pacoteinput) {
-        Cliente cliente = clienteService.buscarPorId(pacoteinput.getCliente().getId());
-        PacotePronto pacotePronto = pacoteProntoService.buscarPorId(pacoteinput.getPacotePronto().getId());
+    public Pacote criarPacoteFinal(Long clienteId, Long pacoteProntoId) {
+        Cliente cliente = clienteService.buscarPorId(clienteId);
+        PacotePronto pacotePronto = pacoteProntoService.buscarPorId(pacoteProntoId);
         List<ItemPacote> itensPacote = criarNovosItensPacote(pacotePronto);
 
         Pacote pacote = Pacote.builder()

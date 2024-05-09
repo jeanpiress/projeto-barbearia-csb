@@ -1,5 +1,8 @@
 package com.jeanpiress.ProjetoBarbaria.domain.services;
 
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.PedidoAlteracaoInput;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.input.PedidoInput;
+import com.jeanpiress.ProjetoBarbaria.api.dtosModel.resumo.ItemPacoteId;
 import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.FormaPagamentoJson;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPagamento;
@@ -7,11 +10,9 @@ import com.jeanpiress.ProjetoBarbaria.domain.Enuns.StatusPedido;
 import com.jeanpiress.ProjetoBarbaria.domain.corpoRequisicao.RealiazacaoItemPacote;
 import com.jeanpiress.ProjetoBarbaria.domain.eventos.ClienteAtendidoEvento;
 import com.jeanpiress.ProjetoBarbaria.domain.eventos.PacoteRealizadoEvento;
-import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ClienteNaoEncontradoException;
-import com.jeanpiress.ProjetoBarbaria.domain.exceptions.ClientesDiferentesException;
-import com.jeanpiress.ProjetoBarbaria.domain.exceptions.PedidoNaoEncontradoException;
-import com.jeanpiress.ProjetoBarbaria.domain.exceptions.EntidadeEmUsoException;
+import com.jeanpiress.ProjetoBarbaria.domain.exceptions.*;
 import com.jeanpiress.ProjetoBarbaria.domain.model.*;
+import com.jeanpiress.ProjetoBarbaria.domain.repositories.ItemPacoteRepository;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.PacoteRepository;
 import com.jeanpiress.ProjetoBarbaria.domain.repositories.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class PedidoService {
@@ -53,8 +53,12 @@ public class PedidoService {
 
     @Autowired
     private PacoteService pacoteService;
+
+
     @Autowired
     private ItemPacoteService itemPacoteService;
+    @Autowired
+    private PedidoRepository pedidoRepository;
 
 
     public Pedido buscarPorId(Long pedidoId){
@@ -117,6 +121,11 @@ public class PedidoService {
             BigDecimal pontuacao = pedido.getPontuacaoGerada().add(gerarPontuacao(itemPedido));
             pedido.setPontuacaoGerada(pontuacao);
         }
+        if(itemPedido.getProduto().getPacotePronto() != null){
+           pacoteService.criarPacoteFinal(pedido.getCliente().getId(),
+                   itemPedido.getProduto().getPacotePronto().getId());
+        }
+
         return repository.save(pedido);
     }
 
@@ -168,16 +177,32 @@ public class PedidoService {
 
     public Pedido realizarPagamentoComPacote(RealiazacaoItemPacote realizacaoItemPacote, Long pedidoId) {
         Pedido pedido = buscarPorId(pedidoId);
+        if(pedido.getStatusPagamento() == StatusPagamento.PAGO){
+            throw new PedidoJaFoiPagoException(pedidoId);
+        }
+
         Pacote pacote = pacoteService.buscarPorId(realizacaoItemPacote.getPacote().getId());
+
+        if(pacote.getDataVencimento().isBefore(OffsetDateTime.now())){
+            throw new PacoteVencidoException(realizacaoItemPacote.getPacote().getId());
+        }
 
         Cliente clientePedido = pedido.getCliente();
         Cliente clientePacote = pacote.getCliente();
         if(!clientePacote.equals(clientePedido)){
             throw new ClientesDiferentesException("Cliente do pedido não é o titular do pacote");
         }
-
         Long itemPacoteId = realizacaoItemPacote.getItemPacote().getId();
-        ItemPacote itemPacote = itemPacoteService.buscarPorId(realizacaoItemPacote.getItemPacote().getId());
+        ItemPacote itemPacote = itemPacoteService.buscarPorId(itemPacoteId);
+
+        if(!pacote.getItensAtivos().contains(itemPacote) && pacote.getItensConsumidos().contains(itemPacote)){
+            throw new ItemPacoteNaoEncontradoEmItemAtivoException(String.format("O item de codigo %d já foi utlizado", itemPacoteId));
+        }
+
+        if(!pacote.getItensAtivos().contains(itemPacote) && !pacote.getItensConsumidos().contains(itemPacote)){
+            throw new ItemPacoteNaoEncontradoEmItemAtivoException(itemPacoteId);
+        }
+
         Profissional profissional = profissionalService.buscarPorId(realizacaoItemPacote.getProfissional().getId());
 
         pedido.setProfissional(profissional);
@@ -191,7 +216,7 @@ public class PedidoService {
         return pedido;
     }
 
-    public void preencherPedidoPorPacote(Pedido pedido, ItemPacote ultimoItemConsumido){
+    private void preencherPedidoPorPacote(Pedido pedido, ItemPacote ultimoItemConsumido){
         List<ItemPedido> itensPedidos = pedido.getItemPedidos();
         ItemPedido itemPedido = ultimoItemConsumido.getItemPedido();
         itensPedidos.add(itemPedido);
@@ -204,6 +229,7 @@ public class PedidoService {
         pedido.setDataPagamento(OffsetDateTime.now());
 
     }
+
 
     public Pedido realizarPagamento(FormaPagamentoJson formaPagamento, Long pedidoId) {
         Pedido pedido = buscarPorId(pedidoId);
@@ -235,4 +261,23 @@ public class PedidoService {
         return repository.save(pedido);
     }
 
+    public void alterarProfissionalPedido(PedidoAlteracaoInput pedidoAlteracaoInput, Long pedidoId) {
+        Pedido pedido = buscarPorId(pedidoId);
+        if(pedido.getStatusPagamento().equals(StatusPagamento.PAGO)){
+            throw new PedidoJaFoiPagoException("Não é permitido alterar profissional de pedido já recebido");
+        }
+        Profissional profissional = profissionalService.buscarPorId(pedidoAlteracaoInput.getProfissional().getId());
+        pedido.setProfissional(profissional);
+        pedido.setHorario(pedidoAlteracaoInput.getHorario());
+
+    }
+
+    public void confirmarPedido(Long pedidoId) {
+        Pedido pedido = buscarPorId(pedidoId);
+        if(pedido.getStatusPedido().equals(StatusPedido.AGENDADO)){
+            pedido.setStatusPedido(StatusPedido.CONFIRMADO);
+        }else{
+            throw new PedidoNaoPodeSerConfirmadoException(pedidoId);
+        }
+    }
 }

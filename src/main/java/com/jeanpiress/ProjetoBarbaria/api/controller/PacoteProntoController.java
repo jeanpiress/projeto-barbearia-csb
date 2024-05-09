@@ -1,5 +1,6 @@
 package com.jeanpiress.ProjetoBarbaria.api.controller;
 
+import com.jeanpiress.ProjetoBarbaria.api.controller.openapi.PacoteProntoControllerOpenApi;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.assebler.PacoteProntoAssembler;
 import com.jeanpiress.ProjetoBarbaria.api.converteDto.dissembler.PacoteProntoInputDissembler;
 import com.jeanpiress.ProjetoBarbaria.api.dtosModel.dtos.PacoteProntoDto;
@@ -17,7 +18,7 @@ import java.util.List;
 
 @RestController()
 @RequestMapping(path = "/pacotes-prontos", produces = MediaType.APPLICATION_JSON_VALUE)
-public class PacoteProntoController {
+public class PacoteProntoController implements PacoteProntoControllerOpenApi {
 
     @Autowired
     private PacoteProntoRepository pacoteRepository;
@@ -40,6 +41,11 @@ public class PacoteProntoController {
     @GetMapping(value = "/ativo")
     public ResponseEntity<List<PacoteProntoDto>> listarAtivos(){
         return ResponseEntity.ok(pacoteProntoAssembler.collectionToModel(pacoteRepository.buscarPacoteProntoAtivo()));
+    }
+
+    @GetMapping(value = "/{pacoteProntoId}")
+    public ResponseEntity<PacoteProntoDto> pacoteProntoPorId(@PathVariable Long pacoteProntoId){
+        return ResponseEntity.ok(pacoteProntoAssembler.toModel(pacoteProntoService.buscarPorId(pacoteProntoId)));
     }
 
     @PostMapping
