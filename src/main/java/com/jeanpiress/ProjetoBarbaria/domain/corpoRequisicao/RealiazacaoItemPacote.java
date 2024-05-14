@@ -16,8 +16,10 @@ import javax.validation.constraints.NotNull;
 public class RealiazacaoItemPacote {
 
     @NotNull
+    @Valid
     private ProfissionalId profissional;
     @NotNull
+    @Valid
     private PacoteId pacote;
     @NotNull
     @Valid

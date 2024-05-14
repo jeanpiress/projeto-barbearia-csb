@@ -12,8 +12,8 @@ CREATE TABLE usuario_permissao (
 )engine=InnoDB default charset=utf8;
 
 alter table usuario_permissao add constraint fk_usuario_permissao_usuario
-FOREIGN KEY (usuario_id) REFERENCES Usuario(id);
+FOREIGN KEY (usuario_id) REFERENCES usuario(id);
 
 alter table usuario_permissao add constraint fk_usuario_permissao_permissao
-FOREIGN KEY (permissao_id) REFERENCES Permissao(id);
+FOREIGN KEY (permissao_id) REFERENCES permissao(id);
 
