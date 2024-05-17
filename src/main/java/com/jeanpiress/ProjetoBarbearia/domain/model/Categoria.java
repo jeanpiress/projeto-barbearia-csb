@@ -1,6 +1,6 @@
 package com.jeanpiress.ProjetoBarbearia.domain.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.persistence.*;
@@ -16,9 +16,9 @@ public class Categoria {
     @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(example = "1")
+    @Schema(example = "1")
     private Long id;
-    @ApiModelProperty(example = "Produtos")
+    @Schema(example = "Produtos")
     private String nome;
 
 

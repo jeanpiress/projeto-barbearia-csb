@@ -1,10 +1,5 @@
 package com.jeanpiress.ProjetoBarbearia.api.dtosModel.input;
 
-import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.ClienteId;
-import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.ProfissionalId;
-import com.jeanpiress.ProjetoBarbearia.domain.model.Cliente;
-import com.jeanpiress.ProjetoBarbearia.domain.model.Profissional;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 

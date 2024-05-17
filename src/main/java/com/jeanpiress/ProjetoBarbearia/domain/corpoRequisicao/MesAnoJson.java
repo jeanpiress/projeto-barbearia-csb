@@ -1,6 +1,6 @@
 package com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 public class MesAnoJson {
 
     @NotBlank
-    @ApiModelProperty(example = "2024-05-06", required = true)
+    @Schema(example = "2024-05-06", required = true)
     private String mesAno;
 
 }

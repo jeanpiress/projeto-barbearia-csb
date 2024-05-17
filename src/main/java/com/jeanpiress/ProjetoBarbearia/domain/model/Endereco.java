@@ -1,6 +1,6 @@
 package com.jeanpiress.ProjetoBarbearia.domain.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -10,23 +10,23 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class Endereco {
 
-    @ApiModelProperty(example = "23.456.789")
+    @Schema(example = "23.456.789")
     @Column(name = "endereco_cep")
     private String cep;
 
-    @ApiModelProperty(example = "Rua Canção")
+    @Schema(example = "Rua Canção")
     @Column(name = "endereco_logradouro")
     private String logradouro;
 
-    @ApiModelProperty(example = "123")
+    @Schema(example = "123")
     @Column(name = "endereco_numero")
     private String numero;
 
-    @ApiModelProperty(example = "ape 456")
+    @Schema(example = "ape 456")
     @Column(name = "endereco_complemento")
     private String complemento;
 
-    @ApiModelProperty(example = "Morumbi")
+    @Schema(example = "Morumbi")
     @Column(name = "endereco_bairro")
     private String bairro;
 }

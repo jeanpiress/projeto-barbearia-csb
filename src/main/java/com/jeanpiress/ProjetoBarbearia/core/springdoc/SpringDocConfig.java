@@ -17,7 +17,6 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.spi.service.contexts.Defaults;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +52,7 @@ public class SpringDocConfig {
 
 
     @Bean
-    public OpenApiCustomiser openApiCustomiser(Defaults defaults) {
+    public OpenApiCustomiser openApiCustomiser() {
         return openApi -> {
             openApi.getPaths()
                     .values()
