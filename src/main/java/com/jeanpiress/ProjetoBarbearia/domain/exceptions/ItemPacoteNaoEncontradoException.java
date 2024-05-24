@@ -6,6 +6,6 @@ public class ItemPacoteNaoEncontradoException extends EntidadeNaoEncontradaExcep
     }
 
     public ItemPacoteNaoEncontradoException(Long itemPacoteId) {
-        this(String.format("Não existe um cadastro de item com codigo %d", itemPacoteId));
+        this(String.format("Não existe um cadastro de itemPacote com codigo %d", itemPacoteId));
     }
 }

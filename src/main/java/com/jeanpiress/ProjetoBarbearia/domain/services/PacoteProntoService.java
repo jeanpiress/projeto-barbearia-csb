@@ -1,15 +1,15 @@
 package com.jeanpiress.ProjetoBarbearia.domain.services;
 
+import com.jeanpiress.ProjetoBarbearia.domain.eventos.PacoteProntoCriadoEvento;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.PacoteNaoEncontradoException;
-import com.jeanpiress.ProjetoBarbearia.domain.model.Categoria;
-import com.jeanpiress.ProjetoBarbearia.domain.model.ItemPacote;
-import com.jeanpiress.ProjetoBarbearia.domain.model.PacotePronto;
-import com.jeanpiress.ProjetoBarbearia.domain.model.Produto;
+import com.jeanpiress.ProjetoBarbearia.domain.model.*;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.PacoteProntoRepository;
+import com.jeanpiress.ProjetoBarbearia.domain.repositories.PacoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 
@@ -23,10 +23,16 @@ public class PacoteProntoService {
     private PacoteService pacoteService;
 
     @Autowired
-    private CategoriaService categoriaService;
+    private PacoteRepository pacoteRepository;
 
     @Autowired
-    private ProdutoService produtoService;
+    private ClienteService clienteService;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    private ItemPacoteService itemPacoteService;
 
 
     public PacotePronto buscarPorId(Long pacoteProntoId) {
@@ -41,31 +47,38 @@ public class PacoteProntoService {
 
 
     public PacotePronto criarPacotePronto(PacotePronto pacotePronto) {
-       pacotePronto.setItensAtivos(pacoteService.criarItensPacote(pacotePronto.getItensAtivos()));
-        Categoria categoria = categoriaService.buscarPorId(pacotePronto.getCategoria().getId());
-       Produto produto = Produto.builder()
-               .nome(pacotePronto.getNome())
-               .preco(calcularPrecoPacotePronto(pacotePronto))
-               .pacotePronto(pacotePronto)
-               .pesoPontuacaoCliente(pacotePronto.getPesoPontuacaoCliente())
-               .pesoPontuacaoProfissional(pacotePronto.getPesoPontuacaoProfissional())
-               .comissaoBase(pacotePronto.getComissaoBase())
-               .categoria(categoria)
-               .build();
-
+       pacotePronto.setItensAtivos(itemPacoteService.criarNovosItensPacoteRecebendoListaItemPacote(pacotePronto.getItensAtivos()));
        PacotePronto pacoteProntoSalvo = pacoteProntoRepository.save(pacotePronto);
-        produtoService.adicionar(produto);
-        return pacoteProntoSalvo;
+       eventPublisher.publishEvent(new PacoteProntoCriadoEvento(pacoteProntoSalvo));
+       return pacoteProntoSalvo;
     }
 
-    private BigDecimal calcularPrecoPacotePronto(PacotePronto pacotePronto) {
-        List<ItemPacote> itemPacotes = pacotePronto.getItensAtivos();
-        BigDecimal valorPacotePronto = BigDecimal.ZERO;
-        for(ItemPacote itemPacote : itemPacotes) {
-            valorPacotePronto = valorPacotePronto.add(itemPacote.getItemPedido().getProduto().getPreco());
-        }
-        return valorPacotePronto;
+
+
+    public Pacote criarPacoteFinal(Long clienteId, Long pacoteProntoId) {
+        Cliente cliente = clienteService.buscarPorId(clienteId);
+        PacotePronto pacotePronto = buscarPorId(pacoteProntoId);
+        List<ItemPacote> itensPacote = itemPacoteService.criarNovosItensPacoteRecebendoPacotePronto(pacotePronto);
+
+        Pacote pacote = Pacote.builder()
+                .cliente(cliente)
+                .dataCompra(OffsetDateTime.now())
+                .dataVencimento(calcularVencimentoPacote(pacotePronto.getValidade()))
+                .itensAtivos(itensPacote)
+                .validade(pacotePronto.getValidade())
+                .nome(pacotePronto.getNome())
+                .descricao(pacotePronto.getDescricao())
+                .build();
+
+        return pacoteRepository.save(pacote);
     }
 
+    private OffsetDateTime calcularVencimentoPacote(Integer validade) {
+        OffsetDateTime dataAtual = OffsetDateTime.now();
+        OffsetDateTime dataVencimento = dataAtual.plusDays(validade);
+        dataVencimento = dataVencimento.withHour(23).withMinute(59).withSecond(59).withNano(0);
+
+        return dataVencimento;
+    }
 
 }

@@ -18,13 +18,11 @@ public class PedidoInput {
     @Schema(example = "2024-04-19T14:30:00-03:00", required = true)
     private OffsetDateTime horario;
 
-    @NotNull
-    @Valid
-    @Schema(description = "ID do cliente", example = "1", required = true)
+    @Schema(description = "ID do Profissional", example = "1", required = true)
     private ClienteId cliente;
 
     @NotNull
     @Valid
-    @Schema(description = "ID do profissional", example = "1", required = true)
+    @Schema(description = "ID do Profissional", required = true)
     private ProfissionalId profissional;
 }

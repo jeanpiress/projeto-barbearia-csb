@@ -3,7 +3,7 @@ package com.jeanpiress.ProjetoBarbearia.api.controller;
 import com.jeanpiress.ProjetoBarbearia.api.controller.openapi.PacoteControllerOpenApi;
 import com.jeanpiress.ProjetoBarbearia.api.converteDto.assebler.PacoteAssembler;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.PacoteDto;
-import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealiazacaoItemPacote;
+import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealizacaoItemPacote;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Pacote;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.PacoteRepository;
 import com.jeanpiress.ProjetoBarbearia.domain.services.PacoteService;
@@ -62,8 +62,8 @@ public class PacoteController implements PacoteControllerOpenApi {
 
 
     @PutMapping("/receber-pacote")
-    public ResponseEntity<PacoteDto> receberPacote(@RequestBody @Valid RealiazacaoItemPacote realizacaoItemPacote){
-        Pacote pacote = pacoteService.receberPacote(realizacaoItemPacote);
+    public ResponseEntity<PacoteDto> receberPacote(@RequestBody @Valid RealizacaoItemPacote realizacaoItemPacote){
+        Pacote pacote = pacoteService.realizarUmItemDoPacote(realizacaoItemPacote);
 
         return ResponseEntity.ok(pacoteAssembler.toModel(pacote));
     }

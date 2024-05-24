@@ -62,27 +62,32 @@ insert into comissao (id, profissional_id, produto_id, porcentagem_comissao) val
 
 insert into comissao (id, profissional_id, produto_id, porcentagem_comissao) values (2, 1, 2, 50.00);
 
-insert into usuario(id, email, senha, cliente_id, profissional_id, permissao, nome) values (1, "jean.m.pires@gmail.com", "$2a$12$m3gxyIEulI0qxAiKsruEUeRX37lcYqoVeLsowdaAmut3.QGHh2ds.", null, 1, "GERENTE", "Jean");
+insert into usuario(id, email, senha, cliente_id, profissional_id, permissao, nome) values (1, "jean.m.pires@gmail.com",
+                    "$2a$12$m3gxyIEulI0qxAiKsruEUeRX37lcYqoVeLsowdaAmut3.QGHh2ds.", null, 1, "GERENTE", "Jean");
 
-insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada, caixa_aberto, valor_total,
-                    data_pagamento, pontuacao_gerada, criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as)
+insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada,
+                    caixa_aberto, valor_total, data_pagamento, pontuacao_profissional_gerada, pontuacao_cliente_gerada,
+                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as)
                     values(1, utc_timestamp, 1, 0, 1, 1, 1, 22.50, true, 45.00, timestamp('2024-05-02 14:30:45.12'), 45.00,
-                    1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null);
+                           45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null);
 
-insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada, caixa_aberto, valor_total,
-                    data_pagamento, pontuacao_gerada, criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as)
+insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada,
+                    caixa_aberto, valor_total, data_pagamento, pontuacao_profissional_gerada, pontuacao_cliente_gerada,
+                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as)
                     values(2, utc_timestamp, 1, 1, 1, 1, 1, 22.50, true, 45.00, timestamp('2024-05-01 14:30:45.12'), 45.00,
-                           1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null);
+                           45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null);
 
-insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada, caixa_aberto, valor_total,
-                    data_pagamento, pontuacao_gerada, criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as)
+insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada,
+                    caixa_aberto, valor_total, data_pagamento, pontuacao_profissional_gerada, pontuacao_cliente_gerada,
+                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as)
                     values(3, utc_timestamp, 1, 1, 1, 1, 2, 18.00, true, 180.00, timestamp('2024-04-06 14:30:45.12'), 1800.00,
-                           1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null);
+                           45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null);
 
-insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada, caixa_aberto, valor_total,
-                    data_pagamento, pontuacao_gerada, criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as)
+insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada,
+                    caixa_aberto, valor_total,data_pagamento, pontuacao_profissional_gerada, pontuacao_cliente_gerada,
+                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as)
                     values(4, utc_timestamp, 1, 1, 1, 1, 2, 18.00, true, 180.00, timestamp('2024-04-07 14:30:45.12'), 1800.00,
-                           1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null);
+                           45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null);
 
 insert into item_pedido (id, preco_unitario, preco_total, quantidade, produto_id) values (1, 45.00, 45.00, 1, 1);
 insert into item_pedido (id, preco_unitario, preco_total, quantidade, produto_id) values (2, 45.00, 45.00, 1, 2);

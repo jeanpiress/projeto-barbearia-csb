@@ -5,12 +5,11 @@ import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.FormaPagamentoJson
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPedido;
-import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealiazacaoItemPacote;
+import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealizacaoItemPacote;
 import com.jeanpiress.ProjetoBarbearia.domain.eventos.ClienteAtendidoEvento;
 import com.jeanpiress.ProjetoBarbearia.domain.eventos.PacoteRealizadoEvento;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.*;
 import com.jeanpiress.ProjetoBarbearia.domain.model.*;
-import com.jeanpiress.ProjetoBarbearia.domain.repositories.PacoteRepository;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -27,6 +26,7 @@ import java.util.*;
 public class PedidoService {
 
     private static final String MSG_PEDIDO_EM_USO = "Pedido de código %d não pode ser removido, pois esta em uso";
+
     @Autowired
     private PedidoRepository repository;
 
@@ -46,16 +46,10 @@ public class PedidoService {
     private ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    private PacoteRepository pacoteRepository;
-
-    @Autowired
     private PacoteService pacoteService;
-
 
     @Autowired
     private ItemPacoteService itemPacoteService;
-    @Autowired
-    private PedidoRepository pedidoRepository;
 
 
     public Pedido buscarPorId(Long pedidoId){
@@ -63,21 +57,30 @@ public class PedidoService {
                 orElseThrow(() -> new PedidoNaoEncontradoException(pedidoId));
     }
 
+    public Pedido adicionar(Pedido pedido){
+        return repository.save(pedido);
+    }
+
     @EventListener
     public void criarPedidoPorPacote(PacoteRealizadoEvento pacoteRealizado) {
         Pacote pacote = pacoteRealizado.getPacote();
         Cliente cliente = pacote.getCliente();
-        var itensConsumidos = pacote.getItensConsumidos();
+        List<ItemPacote> itensConsumidos = pacote.getItensConsumidos();
         ItemPacote ultimoItemConsumido = itensConsumidos.stream().max(Comparator.comparing(ItemPacote::getDataConsumo)).get();
         Profissional profissional = ultimoItemConsumido.getProfissional();
         Pedido pedido = new Pedido();
-
         pedido.setCliente(cliente);
         pedido.setProfissional(profissional);
-        pedido.setPontuacaoGerada(gerarPontuacao(ultimoItemConsumido.getItemPedido()));
-        preencherPedidoPorPacote(pedido, ultimoItemConsumido);
+        pedido.setPontuacaoProfissionalGerada(gerarPontuacaoProfissional(ultimoItemConsumido.getItemPedido()));
+        List<ItemPedido> itensPedidos = pedido.getItemPedidos();
+        ItemPedido itemPedido = ultimoItemConsumido.getItemPedido();
+        itensPedidos.add(itemPedido);
+        pedido.setItemPedidos(itensPedidos);
+        pedido.setComissaoGerada(comissaoPorItem(pedido.getProfissional().getId(), itemPedido));
+        pedido.setValorTotal(itemPedido.getPrecoTotal());
         repository.save(pedido);
-        pacoteRepository.save(pacote);
+
+        pacoteService.adicionar(pacote);
     }
 
     public Pedido criar(Pedido pedido) {
@@ -85,7 +88,8 @@ public class PedidoService {
         Profissional profissional = profissionalService.buscarPorId(pedido.getProfissional().getId());
         pedido.setCliente(cliente);
         pedido.setProfissional(profissional);
-        pedido.setPontuacaoGerada(BigDecimal.ZERO);
+        List<ItemPedido> itensPedidos = new ArrayList<>();
+        pedido.setItemPedidos(itensPedidos);
         preencherPedido(pedido);
 
         return repository.save(pedido);
@@ -108,21 +112,21 @@ public class PedidoService {
         Pedido pedido = buscarPorId(pedidoId);
         Long profissionalId = pedido.getProfissional().getId();
         ItemPedido itemPedido = itemPedidoService.buscarPorId(itemPedidoId);
-        if(!pedido.getItemPedidos().contains(itemPedido)) {
-            pedido.getItemPedidos().add(itemPedido);
-            BigDecimal comissaoGerada = comissaoPorItem(profissionalId, itemPedido);
-            BigDecimal comissaoPedido = pedido.getComissaoGerada().add(comissaoGerada);
-            pedido.setComissaoGerada(comissaoPedido);
-            BigDecimal valorTotal = pedido.getValorTotal().add(itemPedido.getPrecoTotal());
-            pedido.setValorTotal(valorTotal);
-            BigDecimal pontuacao = pedido.getPontuacaoGerada().add(gerarPontuacao(itemPedido));
-            pedido.setPontuacaoGerada(pontuacao);
-        }
-        if(itemPedido.getProduto().getPacotePronto() != null){
-           pacoteService.criarPacoteFinal(pedido.getCliente().getId(),
-                   itemPedido.getProduto().getPacotePronto().getId());
+
+        if(pedido.getItemPedidos().contains(itemPedido)) {
+            throw new ItemPedidoJaAdicionadoException(itemPedido.getId());
         }
 
+        pedido.getItemPedidos().add(itemPedido);
+        BigDecimal comissaoItemPedido = comissaoPorItem(profissionalId, itemPedido);
+        BigDecimal comissaoPedido = pedido.getComissaoGerada().add(comissaoItemPedido);
+        pedido.setComissaoGerada(comissaoPedido);
+        BigDecimal valorTotal = pedido.getValorTotal().add(itemPedido.getPrecoTotal());
+        pedido.setValorTotal(valorTotal);
+        BigDecimal pontuacaoProfissional = pedido.getPontuacaoProfissionalGerada().add(gerarPontuacaoProfissional(itemPedido));
+        pedido.setPontuacaoProfissionalGerada(pontuacaoProfissional);
+        BigDecimal pontuacaoCliente = pedido.getPontuacaoClienteGerada().add(gerarPontuacaoCliente(itemPedido));
+        pedido.setPontuacaoClienteGerada(pontuacaoCliente);
         return repository.save(pedido);
     }
 
@@ -152,8 +156,17 @@ public class PedidoService {
         return  comissaoProdutoFinal;
     }
 
-    public BigDecimal gerarPontuacao(ItemPedido itemPedido){
+    private BigDecimal gerarPontuacaoProfissional(ItemPedido itemPedido){
         BigDecimal pesoPontuacao = itemPedido.getProduto().getPesoPontuacaoProfissional();
+        return gerarPontuacao(pesoPontuacao, itemPedido);
+    }
+
+    private BigDecimal gerarPontuacaoCliente(ItemPedido itemPedido){
+        BigDecimal pesoPontuacao = itemPedido.getProduto().getPesoPontuacaoCliente();
+        return gerarPontuacao(pesoPontuacao, itemPedido);
+    }
+
+    private BigDecimal gerarPontuacao(BigDecimal pesoPontuacao, ItemPedido itemPedido){
         BigDecimal valorProduto = itemPedido.getProduto().getPreco();
         BigDecimal pontuacaProduto = valorProduto.multiply(pesoPontuacao);
         BigDecimal pontuacaoItem = pontuacaProduto.multiply(BigDecimal.valueOf(itemPedido.getQuantidade()));
@@ -162,17 +175,20 @@ public class PedidoService {
     }
 
 
-    public void preencherPedido(Pedido pedido){
+    private void preencherPedido(Pedido pedido){
         pedido.setStatusPedido(StatusPedido.AGENDADO);
         pedido.setFormaPagamento(FormaPagamento.AGUARDANDO_PAGAMENTO);
         pedido.setStatusPagamento(StatusPagamento.AGUARDANDO_PAGAMENTO);
         pedido.setComissaoGerada(BigDecimal.ZERO);
         pedido.setValorTotal(BigDecimal.ZERO);
+        pedido.setPontuacaoProfissionalGerada(BigDecimal.ZERO);
+        pedido.setPontuacaoClienteGerada(BigDecimal.ZERO);
+
 
     }
 
 
-    public Pedido realizarPagamentoComPacote(RealiazacaoItemPacote realizacaoItemPacote, Long pedidoId) {
+    public Pedido realizarPagamentoComPacote(RealizacaoItemPacote realizacaoItemPacote, Long pedidoId) {
         Pedido pedido = buscarPorId(pedidoId);
         if(pedido.getStatusPagamento() == StatusPagamento.PAGO){
             throw new PedidoJaFoiPagoException(pedidoId);
@@ -203,28 +219,19 @@ public class PedidoService {
         Profissional profissional = profissionalService.buscarPorId(realizacaoItemPacote.getProfissional().getId());
 
         pedido.setProfissional(profissional);
-        pedido.setPontuacaoGerada(gerarPontuacao(itemPacote.getItemPedido()));
-        preencherPedidoPorPacote(pedido, itemPacote);
-        pacoteService.alterarArtivoParaConsumido(pacote, profissional, itemPacoteId);
-
-        repository.save(pedido);
-        pacoteRepository.save(pacote);
-
-        return pedido;
-    }
-
-    private void preencherPedidoPorPacote(Pedido pedido, ItemPacote ultimoItemConsumido){
-        List<ItemPedido> itensPedidos = pedido.getItemPedidos();
-        ItemPedido itemPedido = ultimoItemConsumido.getItemPedido();
-        itensPedidos.add(itemPedido);
-        pedido.setItemPedidos(itensPedidos);
+        pedido.setPontuacaoProfissionalGerada(gerarPontuacaoProfissional(itemPacote.getItemPedido()));
         pedido.setStatusPedido(StatusPedido.FINALIZADO);
         pedido.setFormaPagamento(FormaPagamento.VOUCHER);
         pedido.setStatusPagamento(StatusPagamento.PAGO);
-        pedido.setComissaoGerada(comissaoPorItem(pedido.getProfissional().getId(), itemPedido));
-        pedido.setValorTotal(itemPedido.getPrecoTotal());
         pedido.setDataPagamento(OffsetDateTime.now());
+        pacoteService.alterarAtivoParaConsumido(pacote, profissional, itemPacoteId);
 
+        repository.save(pedido);
+        pacoteService.adicionar(pacote);
+
+        eventPublisher.publishEvent(new ClienteAtendidoEvento(pedido.getCliente()));
+
+        return pedido;
     }
 
 
@@ -253,9 +260,11 @@ public class PedidoService {
 
         pedido.setStatusPagamento(StatusPagamento.PAGO);
 
+        pedido = repository.save(pedido);
+
         eventPublisher.publishEvent(new ClienteAtendidoEvento(pedido.getCliente()));
 
-        return repository.save(pedido);
+        return pedido;
     }
 
     public void alterarProfissionalPedido(PedidoAlteracaoInput pedidoAlteracaoInput, Long pedidoId) {

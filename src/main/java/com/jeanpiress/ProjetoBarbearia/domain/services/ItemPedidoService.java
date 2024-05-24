@@ -11,11 +11,12 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class ItemPedidoService {
 
-    private static final String MSG_ITEM_EM_USO = "Item de código %d não pode ser removido, pois esta em uso";
+    private static final String MSG_ITEM_EM_USO = "ItemPedido de código %d não pode ser removido, pois esta em uso";
     @Autowired
     private ItemPedidoRepository repository;
 
@@ -26,6 +27,10 @@ public class ItemPedidoService {
     public ItemPedido buscarPorId(Long itemPedidoId){
         return repository.findById(itemPedidoId).
                 orElseThrow(() -> new ItemPedidoNaoEncontradoException(itemPedidoId));
+    }
+
+    public List<ItemPedido> buscarListaComIds(List<Long> itensPedidoIds){
+        return repository.findAllById(itensPedidoIds);
     }
 
     public ItemPedido adicionar(ItemPedido itemPedido) {

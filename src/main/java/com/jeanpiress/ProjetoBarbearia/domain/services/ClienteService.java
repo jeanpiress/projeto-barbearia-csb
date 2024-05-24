@@ -40,6 +40,7 @@ public class ClienteService {
         }
     }
 
+    //Escutando de PedidoService metodos realizarPagamentoComPacote e realizarPagamento
     @EventListener
     public void alterarPrevisaoRetorno(ClienteAtendidoEvento clienteAtendido){
         Cliente cliente = clienteAtendido.getCliente();

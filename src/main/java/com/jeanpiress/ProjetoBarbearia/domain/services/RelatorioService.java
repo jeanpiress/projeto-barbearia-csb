@@ -67,7 +67,7 @@ public class RelatorioService {
 
         for (Pedido pedido : pedidos) {
              relatorio.setTotalComissao(relatorio.getTotalComissao().add(pedido.getComissaoGerada()));
-             relatorio.setTotalpontos(relatorio.getTotalpontos().add(pedido.getPontuacaoGerada()));
+             relatorio.setTotalpontos(relatorio.getTotalpontos().add(pedido.getPontuacaoProfissionalGerada()));
              relatorio.setTotalVendas(relatorio.getTotalVendas().add(pedido.getValorTotal()));
              relatorio.setClienteAtendidos(relatorio.getClienteAtendidos() + 1);
 
@@ -94,7 +94,7 @@ public class RelatorioService {
             for(RelatorioComissao relatorioComissao: relatoriosComissoes) {
                 if (pedido.getProfissional().getId().equals(relatorioComissao.getProfissional().getId())){
                     relatorioComissao.setTotalComissao(relatorioComissao.getTotalComissao().add(pedido.getComissaoGerada()));
-                    relatorioComissao.setTotalpontos(relatorioComissao.getTotalpontos().add(pedido.getPontuacaoGerada()));
+                    relatorioComissao.setTotalpontos(relatorioComissao.getTotalpontos().add(pedido.getPontuacaoProfissionalGerada()));
                     relatorioComissao.setTotalVendas(relatorioComissao.getTotalVendas().add(pedido.getValorTotal()));
                     relatorioComissao.setClienteAtendidos(relatorioComissao.getClienteAtendidos() + 1);
                 }

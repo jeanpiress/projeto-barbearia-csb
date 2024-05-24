@@ -10,10 +10,11 @@ import com.jeanpiress.ProjetoBarbearia.core.security.CsbSecurity;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPedido;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.FormaPagamentoJson;
-import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealiazacaoItemPacote;
+import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealizacaoItemPacote;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.PedidoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.NegocioException;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.PedidoNaoPodeSerCanceladoException;
+import com.jeanpiress.ProjetoBarbearia.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Pedido;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Usuario;
 import com.jeanpiress.ProjetoBarbearia.domain.services.PedidoService;
@@ -154,7 +155,7 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     @PreAuthorize("hasAuthority('RECEPCAO')")
     @PutMapping(value = "/{pedidoId}/pagar/pacote")
-    public ResponseEntity<PedidoDto> efetuarPagamentoComPacote(@RequestBody @Valid RealiazacaoItemPacote realizacaoItemPacote, @PathVariable @Valid Long pedidoId) {
+    public ResponseEntity<PedidoDto> efetuarPagamentoComPacote(@RequestBody @Valid RealizacaoItemPacote realizacaoItemPacote, @PathVariable @Valid Long pedidoId) {
         try {
             Pedido pedido = service.realizarPagamentoComPacote(realizacaoItemPacote, pedidoId);
             Usuario usuario = usuarioService.buscarUsuarioPorId(security.getUsuarioId());

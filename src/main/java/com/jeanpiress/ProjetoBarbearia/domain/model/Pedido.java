@@ -45,7 +45,9 @@ public class Pedido {
 
     private BigDecimal comissaoGerada;
 
-    private BigDecimal pontuacaoGerada;
+    private BigDecimal pontuacaoProfissionalGerada;
+
+    private BigDecimal pontuacaoClienteGerada;
 
     private boolean caixaAberto = true;
 

@@ -1,16 +1,23 @@
 package com.jeanpiress.ProjetoBarbearia.domain.services;
 
+import com.jeanpiress.ProjetoBarbearia.domain.eventos.PacoteProntoCriadoEvento;
 import com.jeanpiress.ProjetoBarbearia.domain.eventos.ProdutoCriadoEvento;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.ProdutoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.EntidadeEmUsoException;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Categoria;
+import com.jeanpiress.ProjetoBarbearia.domain.model.ItemPacote;
+import com.jeanpiress.ProjetoBarbearia.domain.model.PacotePronto;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Produto;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class ProdutoService {
@@ -49,5 +56,32 @@ public class ProdutoService {
             throw new EntidadeEmUsoException(
                     String.format(MSG_PRODUTO_EM_USO, produtoId));
         }
+    }
+
+    //Escutando de PacoteProntoService metodo criarPacotePronto
+    @EventListener
+    public void transformaPacoteProntoEmProdutoNovo(PacoteProntoCriadoEvento pacoteProntoEvento) {
+        Categoria categoria = categoriaService.buscarPorId(pacoteProntoEvento.getPacotePronto().getCategoria().getId());
+        Produto produto = Produto.builder()
+                .nome(pacoteProntoEvento.getPacotePronto().getNome())
+                .preco(calcularPrecoPacotePronto(pacoteProntoEvento.getPacotePronto()))
+                .pacotePronto(pacoteProntoEvento.getPacotePronto())
+                .pesoPontuacaoCliente(pacoteProntoEvento.getPacotePronto().getPesoPontuacaoCliente())
+                .pesoPontuacaoProfissional(pacoteProntoEvento.getPacotePronto().getPesoPontuacaoProfissional())
+                .comissaoBase(pacoteProntoEvento.getPacotePronto().getComissaoBase())
+                .categoria(categoria)
+                .build();
+
+        adicionar(produto);
+
+    }
+
+    private BigDecimal calcularPrecoPacotePronto(PacotePronto pacotePronto) {
+        List<ItemPacote> itemPacotes = pacotePronto.getItensAtivos();
+        BigDecimal valorPacotePronto = BigDecimal.ZERO;
+        for(ItemPacote itemPacote : itemPacotes) {
+            valorPacotePronto = valorPacotePronto.add(itemPacote.getItemPedido().getProduto().getPreco());
+        }
+        return valorPacotePronto;
     }
 }

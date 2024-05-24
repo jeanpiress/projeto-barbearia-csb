@@ -1,6 +1,6 @@
 package com.jeanpiress.ProjetoBarbearia.domain.services;
 
-import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealiazacaoItemPacote;
+import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealizacaoItemPacote;
 import com.jeanpiress.ProjetoBarbearia.domain.eventos.PacoteRealizadoEvento;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.*;
 import com.jeanpiress.ProjetoBarbearia.domain.model.*;
@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -27,21 +26,6 @@ public class PacoteService {
 
     @Autowired
     private ClienteRepository clienteRepository;
-
-    @Autowired
-    private ItemPacoteRepository itemPacoteRepository;
-
-    @Autowired
-    private ItemPedidoService itemPedidoService;
-
-    @Autowired
-    private ClienteService clienteService;
-
-    @Autowired
-    private PacoteProntoService pacoteProntoService;
-
-    @Autowired
-    private PacoteService pacoteService;
 
     @Autowired
     private ProfissionalService profissionalService;
@@ -73,44 +57,12 @@ public class PacoteService {
 
     }
 
-    public Pacote criarPacoteFinal(Long clienteId, Long pacoteProntoId) {
-        Cliente cliente = clienteService.buscarPorId(clienteId);
-        PacotePronto pacotePronto = pacoteProntoService.buscarPorId(pacoteProntoId);
-        List<ItemPacote> itensPacote = criarNovosItensPacote(pacotePronto);
-
-        Pacote pacote = Pacote.builder()
-                .cliente(cliente)
-                .dataCompra(OffsetDateTime.now())
-                .dataVencimento(calcularVencimentoPacote(pacotePronto.getValidade()))
-                .itensAtivos(itensPacote)
-                .validade(pacotePronto.getValidade())
-                .nome(pacotePronto.getNome())
-                .descricao(pacotePronto.getDescricao())
-                .build();
-
+    public Pacote adicionar(Pacote pacote) {
         return pacoteRepository.save(pacote);
     }
 
-    public List<ItemPacote> criarItensPacote(List<ItemPacote> itensPacote) {
-        List<ItemPacote> itensPacoteSalvo= new ArrayList<>();
-        List<Long> itensPacoteId = itensPacote.stream()
-                .map(ItemPacote::getId).collect(Collectors.toList());
-
-        for(Long itemPacoteid : itensPacoteId){
-            ItemPedido itemPedido = itemPedidoService.buscarPorId(itemPacoteid);
-            ItemPacote itemPacote = ItemPacote.builder()
-                    .itemPedido(itemPedido)
-                    .build();
-            itemPacoteRepository.save(itemPacote);
-            itensPacoteSalvo.add(itemPacote);
-        }
-
-        return itensPacoteSalvo;
-    }
-
-
-
-    public Pacote receberPacote(RealiazacaoItemPacote realizacaoItemPacote) {
+    //O EventPublisher e escutado por  criarPedidoPorPacote em PedidoService, e lá ele atualiza o pacote
+    public Pacote realizarUmItemDoPacote(RealizacaoItemPacote realizacaoItemPacote) {
         Long itemPacoteId = realizacaoItemPacote.getItemPacote().getId();
         Long pacoteId = realizacaoItemPacote.getPacote().getId();
         Long profissionalId = realizacaoItemPacote.getProfissional().getId();
@@ -119,18 +71,17 @@ public class PacoteService {
             throw new ItemPacoteNaoEncontradoEmItemAtivoException(itemPacoteId);
         }
 
-        Pacote pacote = pacoteService.buscarPorId(pacoteId);
+        Pacote pacote = buscarPorId(pacoteId);
         Profissional profissional = profissionalService.buscarPorId(profissionalId);
 
-        alterarArtivoParaConsumido(pacote, profissional, itemPacoteId);
-
+        alterarAtivoParaConsumido(pacote, profissional, itemPacoteId);
 
         eventPublisher.publishEvent(new PacoteRealizadoEvento(pacote));
 
         return pacote;
     }
 
-    public void alterarArtivoParaConsumido(Pacote pacote, Profissional profissional, Long itemPacoteId){
+    public void alterarAtivoParaConsumido(Pacote pacote, Profissional profissional, Long itemPacoteId){
         List<ItemPacote> itensAtivos = pacote.getItensAtivos();
         List<ItemPacote> itensConsumidos = pacote.getItensConsumidos();
 
@@ -153,6 +104,7 @@ public class PacoteService {
     @Scheduled(cron = "0 0 0 * * ?") // Executa todos os dias à meia-noite
      public void verificarValidadePacote() {
         List<Pacote> pacotes = buscarPacotesComItensAtivos();
+
         for(Pacote pacote : pacotes){
             OffsetDateTime dataVencimento = pacote.getDataVencimento();
             if (dataVencimento.isBefore(OffsetDateTime.now())) {
@@ -170,31 +122,6 @@ public class PacoteService {
             }
         }
         pacoteRepository.saveAll(pacotes);
-    }
-
-    private OffsetDateTime calcularVencimentoPacote(Integer validade) {
-        OffsetDateTime dataAtual = OffsetDateTime.now();
-        OffsetDateTime dataVencimento = dataAtual.plusDays(validade);
-        dataVencimento = dataVencimento.withHour(23).withMinute(59).withSecond(59).withNano(0);
-
-        return dataVencimento;
-    }
-
-    private List<ItemPacote> criarNovosItensPacote(PacotePronto pacotePronto) {
-        List<ItemPacote> itensPacoteSalvo= new ArrayList<>();
-        List<ItemPacote> itensAtivos = pacotePronto.getItensAtivos();
-
-        for(ItemPacote itemAtivo : itensAtivos){
-            Long itemPacoteid = itemAtivo.getItemPedido().getId();
-            ItemPedido itemPedido = itemPedidoService.buscarPorId(itemPacoteid);
-            ItemPacote itemPacote = ItemPacote.builder()
-                    .itemPedido(itemPedido)
-                    .build();
-            itemPacoteRepository.save(itemPacote);
-            itensPacoteSalvo.add(itemPacote);
-        }
-
-        return itensPacoteSalvo;
     }
 
 }

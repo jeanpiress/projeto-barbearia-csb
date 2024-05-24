@@ -1,7 +1,7 @@
 package com.jeanpiress.ProjetoBarbearia.api.controller.openapi;
 
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.PacoteDto;
-import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealiazacaoItemPacote;
+import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealizacaoItemPacote;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,7 +40,7 @@ public interface PacoteControllerOpenApi {
 
     @Operation(summary ="Faz pagamento por pacote")
     public ResponseEntity<PacoteDto> receberPacote(@Parameter(description = "Representação de um pagamento por pacote")
-                                                         RealiazacaoItemPacote realizacaoItemPacote);
+                                                   RealizacaoItemPacote realizacaoItemPacote);
 
 
 }

@@ -15,6 +15,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -73,18 +75,20 @@ public class ComissaoService {
         return valorFinal;
     }
 
-
+    //Escutando ProdutoService no metodo criar
     @EventListener
     public void criarComissaoBase(ProdutoCriadoEvento produtoEvento){
         Produto produto = produtoEvento.getProduto();
         Set<Profissional> profissionais = profissionalRepository.buscarProfissionaisAtivos();
         Comissao comissao = new Comissao();
+        List<Comissao> comissoesCriadas = new ArrayList<>();
         for(Profissional profissional: profissionais){
             comissao.setProduto(produto);
             comissao.setProfissional(profissional);
             comissao.setPorcentagemComissao(produto.getComissaoBase());
-
-            repository.save(comissao);
+            comissoesCriadas.add(comissao);
         }
+        repository.saveAll(comissoesCriadas);
     }
+
 }
