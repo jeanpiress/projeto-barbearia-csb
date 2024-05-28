@@ -14,7 +14,6 @@ import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealizacaoItemPaco
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.PedidoNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.NegocioException;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.PedidoNaoPodeSerCanceladoException;
-import com.jeanpiress.ProjetoBarbearia.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Pedido;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Usuario;
 import com.jeanpiress.ProjetoBarbearia.domain.services.PedidoService;
@@ -118,7 +117,7 @@ public class PedidoController implements PedidoControllerOpenApi {
     public ResponseEntity<PedidoDto> alterar(@RequestBody @Valid PedidoAlteracaoInput pedidoAlteracaoInput, @PathVariable Long pedidoId) {
         try {
             Pedido pedido = service.buscarPorId(pedidoId);
-            pedidoService.alterarProfissionalPedido(pedidoAlteracaoInput, pedidoId);
+            pedidoService.alterarProfissionalOuHorarioPedido(pedidoAlteracaoInput, pedidoId);
             Usuario usuario = usuarioService.buscarUsuarioPorId(security.getUsuarioId());
             pedido.setAlteradoPor(usuario);
             pedido.setModificadoAs(OffsetDateTime.now());
@@ -157,7 +156,7 @@ public class PedidoController implements PedidoControllerOpenApi {
     @PutMapping(value = "/{pedidoId}/pagar/pacote")
     public ResponseEntity<PedidoDto> efetuarPagamentoComPacote(@RequestBody @Valid RealizacaoItemPacote realizacaoItemPacote, @PathVariable @Valid Long pedidoId) {
         try {
-            Pedido pedido = service.realizarPagamentoComPacote(realizacaoItemPacote, pedidoId);
+            Pedido pedido = service.realizarPagamentoComPedidoExistente(realizacaoItemPacote, pedidoId);
             Usuario usuario = usuarioService.buscarUsuarioPorId(security.getUsuarioId());
             pedido.setRecibidoPor(usuario);
             PedidoDto pedidoDto = pedidoAssembler.toModel(pedido);

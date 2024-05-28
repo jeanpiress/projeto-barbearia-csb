@@ -5,7 +5,6 @@ import com.jeanpiress.ProjetoBarbearia.domain.eventos.PacoteRealizadoEvento;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.*;
 import com.jeanpiress.ProjetoBarbearia.domain.model.*;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.ClienteRepository;
-import com.jeanpiress.ProjetoBarbearia.domain.repositories.ItemPacoteRepository;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.PacoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,6 +28,9 @@ public class PacoteService {
 
     @Autowired
     private ProfissionalService profissionalService;
+
+    @Autowired
+    private ItemPacoteService itemPacoteService;
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -67,11 +69,17 @@ public class PacoteService {
         Long pacoteId = realizacaoItemPacote.getPacote().getId();
         Long profissionalId = realizacaoItemPacote.getProfissional().getId();
 
-        if(!pacoteRepository.existsByIdAndItensAtivosId(pacoteId, itemPacoteId)) {
+        Pacote pacote = buscarPorId(pacoteId);
+        ItemPacote itemPacote = itemPacoteService.buscarPorId(itemPacoteId);
+
+        if(!pacote.getItensAtivos().contains(itemPacote)){
             throw new ItemPacoteNaoEncontradoEmItemAtivoException(itemPacoteId);
         }
 
-        Pacote pacote = buscarPorId(pacoteId);
+        if(pacote.getDataVencimento().isBefore(OffsetDateTime.now())){
+            throw new PacoteVencidoException(realizacaoItemPacote.getPacote().getId());
+        }
+
         Profissional profissional = profissionalService.buscarPorId(profissionalId);
 
         alterarAtivoParaConsumido(pacote, profissional, itemPacoteId);

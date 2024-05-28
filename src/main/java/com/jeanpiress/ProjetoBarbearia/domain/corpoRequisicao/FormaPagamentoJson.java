@@ -11,6 +11,6 @@ import javax.validation.constraints.NotBlank;
 public class FormaPagamentoJson {
 
     @NotBlank
-    @Schema(example = "2024-05-06", required = true)
+    @Schema(example = "dinheiro", required = true)
     private String formaPagamento;
 }

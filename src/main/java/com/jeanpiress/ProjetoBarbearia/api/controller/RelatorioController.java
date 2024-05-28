@@ -2,7 +2,7 @@ package com.jeanpiress.ProjetoBarbearia.api.controller;
 
 import com.jeanpiress.ProjetoBarbearia.api.controller.openapi.RelatorioControllerOpenApi;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios.RelatorioComissaoDetalhada;
-import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.DataJson;
+import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.DataJsonInicioFim;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios.ClientesRetorno;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios.RelatorioComissao;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios.RelatorioFaturamento;
@@ -27,20 +27,20 @@ public class RelatorioController implements RelatorioControllerOpenApi {
 
 
     @PostMapping("/faturamento-data")
-    public ResponseEntity<RelatorioFaturamento> buscarFaturamentoData(@RequestBody @Valid DataJson dataInicioFim){
+    public ResponseEntity<RelatorioFaturamento> buscarFaturamentoData(@RequestBody @Valid DataJsonInicioFim dataInicioFim){
         RelatorioFaturamento faturamentoPorData = relatorioService.buscarFaturamentoDataJson(dataInicioFim);
         return ResponseEntity.ok(faturamentoPorData);
     }
 
 
     @PostMapping("/comissoes-data")
-    public ResponseEntity<List<RelatorioComissao>> buscarRelatorioComissao(@RequestBody @Valid DataJson dataInicioFim){
+    public ResponseEntity<List<RelatorioComissao>> buscarRelatorioComissao(@RequestBody @Valid DataJsonInicioFim dataInicioFim){
         List<RelatorioComissao> relatoriosComissoes = relatorioService.buscarTodasComissoes(dataInicioFim);
         return ResponseEntity.ok(relatoriosComissoes);
     }
 
     @PostMapping("/comissao/{profissionalId}")
-    public ResponseEntity<RelatorioComissaoDetalhada> buscarRelatorioComissaoPorProfissional(@RequestBody @Valid DataJson dataInicioFim,
+    public ResponseEntity<RelatorioComissaoDetalhada> buscarRelatorioComissaoPorProfissional(@RequestBody @Valid DataJsonInicioFim dataInicioFim,
                                                                                              @PathVariable Long profissionalId){
         RelatorioComissaoDetalhada relatorioComissao = relatorioService.buscarComissaoPorProfissional(dataInicioFim, profissionalId);
         return ResponseEntity.ok(relatorioComissao);
@@ -53,7 +53,7 @@ public class RelatorioController implements RelatorioControllerOpenApi {
     }
 
     @PostMapping("/compara-mes")
-    public ResponseEntity<ComparacaoMes> comparacaoFaturamentoMesFechado(@RequestBody @Valid DataJson dataJson){
+    public ResponseEntity<ComparacaoMes> comparacaoFaturamentoMesFechado(@RequestBody @Valid DataJsonInicioFim dataJson){
         ComparacaoMes comparacaoMes = relatorioService.compararMes(dataJson);
 
         return ResponseEntity.ok(comparacaoMes);

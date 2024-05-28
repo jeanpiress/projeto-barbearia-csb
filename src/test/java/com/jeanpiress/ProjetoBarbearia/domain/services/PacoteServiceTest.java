@@ -5,10 +5,7 @@ import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.PacoteId;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.ProfissionalId;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealizacaoItemPacote;
 import com.jeanpiress.ProjetoBarbearia.domain.eventos.PacoteRealizadoEvento;
-import com.jeanpiress.ProjetoBarbearia.domain.exceptions.ClienteNaoEncontradoException;
-import com.jeanpiress.ProjetoBarbearia.domain.exceptions.ItemPacoteNaoEncontradoEmItemAtivoException;
-import com.jeanpiress.ProjetoBarbearia.domain.exceptions.PacoteNaoEncontradoException;
-import com.jeanpiress.ProjetoBarbearia.domain.exceptions.PacoteNaoPossuiItensAtivosException;
+import com.jeanpiress.ProjetoBarbearia.domain.exceptions.*;
 import com.jeanpiress.ProjetoBarbearia.domain.model.*;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.ClienteRepository;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.PacoteRepository;
@@ -46,6 +43,9 @@ class PacoteServiceTest {
 
     @Mock
     ProfissionalService profissionalService;
+
+    @Mock
+    ItemPacoteService itemPacoteService;
 
     @Mock
     ApplicationEventPublisher eventPublisher;
@@ -182,8 +182,8 @@ class PacoteServiceTest {
     @Test
     public void deveReceberUmItemDoPacote() {
         when(profissionalService.buscarPorId(1L)).thenReturn(profissional);
-        when(pacoteRepository.existsByIdAndItensAtivosId(1L, 1L)).thenReturn(true);
         doReturn(pacote).when(pacoteService).buscarPorId(1L);
+        when(itemPacoteService.buscarPorId(1L)).thenReturn(itemPacote);
 
         Pacote pacoteAlterado = pacoteService.realizarUmItemDoPacote(realizacaoItemPacote);
 
@@ -195,7 +195,6 @@ class PacoteServiceTest {
         assertTrue(pacoteAlterado.getItensConsumidos().contains(itemPacote));
         assertEquals(capturedEvent.getPacote(), pacoteAlterado);
 
-        verify(pacoteRepository).existsByIdAndItensAtivosId(1L, 1L);
         verify(profissionalService).buscarPorId(1L);
 
         verifyNoMoreInteractions(pacoteRepository, profissionalService, eventPublisher);
@@ -203,14 +202,28 @@ class PacoteServiceTest {
 
     @Test
     public void deveLancarItemPacoteNaoEncontradoEmItemAtivoExceptionSePacoteNaoPassuirItemPacoteInformado() {
-        when(pacoteRepository.existsByIdAndItensAtivosId(1L, 1L)).thenReturn(false);
+        doReturn(pacote).when(pacoteService).buscarPorId(1L);
 
         ItemPacoteNaoEncontradoEmItemAtivoException exception = Assertions.assertThrows(
                 ItemPacoteNaoEncontradoEmItemAtivoException.class, () -> {pacoteService.realizarUmItemDoPacote(realizacaoItemPacote);});
 
         assertEquals("Não existe um itemPacote de codigo 1 listado em itensAtivos", exception.getMessage());
 
-        verify(pacoteRepository).existsByIdAndItensAtivosId(1L, 1L);
+        verifyNoMoreInteractions(pacoteRepository);
+
+    }
+
+    @Test
+    public void deveLancarPacoteVencidoExceptionSePacoteEstiverVencido() {
+        realizacaoItemPacote.setPacote(PacoteId.builder().id(3L).build());
+        doReturn(pacoteExpirado).when(pacoteService).buscarPorId(3L);
+        when(itemPacoteService.buscarPorId(1L)).thenReturn(itemPacote);
+
+        PacoteVencidoException exception = Assertions.assertThrows(
+                PacoteVencidoException.class, () -> {pacoteService.realizarUmItemDoPacote(realizacaoItemPacote);});
+
+        assertEquals("O pacote de codigo 3 esta vencido", exception.getMessage());
+
         verifyNoMoreInteractions(pacoteRepository);
 
     }

@@ -61,18 +61,19 @@ public class ProdutoService {
     //Escutando de PacoteProntoService metodo criarPacotePronto
     @EventListener
     public void transformaPacoteProntoEmProdutoNovo(PacoteProntoCriadoEvento pacoteProntoEvento) {
-        Categoria categoria = categoriaService.buscarPorId(pacoteProntoEvento.getPacotePronto().getCategoria().getId());
+        PacotePronto pacotePronto = pacoteProntoEvento.getPacotePronto();
+        Categoria categoria = categoriaService.buscarPorId(pacotePronto.getCategoria().getId());
         Produto produto = Produto.builder()
-                .nome(pacoteProntoEvento.getPacotePronto().getNome())
-                .preco(calcularPrecoPacotePronto(pacoteProntoEvento.getPacotePronto()))
-                .pacotePronto(pacoteProntoEvento.getPacotePronto())
-                .pesoPontuacaoCliente(pacoteProntoEvento.getPacotePronto().getPesoPontuacaoCliente())
-                .pesoPontuacaoProfissional(pacoteProntoEvento.getPacotePronto().getPesoPontuacaoProfissional())
-                .comissaoBase(pacoteProntoEvento.getPacotePronto().getComissaoBase())
+                .nome(pacotePronto.getNome())
+                .preco(calcularPrecoPacotePronto(pacotePronto))
+                .pacotePronto(pacotePronto)
+                .pesoPontuacaoCliente(pacotePronto.getPesoPontuacaoCliente())
+                .pesoPontuacaoProfissional(pacotePronto.getPesoPontuacaoProfissional())
+                .comissaoBase(pacotePronto.getComissaoBase())
                 .categoria(categoria)
                 .build();
 
-        adicionar(produto);
+        repository.save(produto);
 
     }
 

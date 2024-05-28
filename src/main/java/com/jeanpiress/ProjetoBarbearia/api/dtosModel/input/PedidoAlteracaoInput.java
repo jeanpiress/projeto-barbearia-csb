@@ -2,6 +2,7 @@ package com.jeanpiress.ProjetoBarbearia.api.dtosModel.input;
 
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.ProfissionalId;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +12,7 @@ import java.time.OffsetDateTime;
 
 @Getter
 @Setter
+@Builder
 public class PedidoAlteracaoInput {
 
     @NotNull

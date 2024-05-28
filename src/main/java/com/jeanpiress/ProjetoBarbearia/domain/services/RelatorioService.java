@@ -7,7 +7,7 @@ import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.ClienteResumo;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.ProfissionalIdNome;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.DataInicioFim;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.DataInicioFimMes;
-import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.DataJson;
+import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.DataJsonInicioFim;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.MesAnoJson;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.FormatoDataException;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Cliente;
@@ -54,13 +54,13 @@ public class RelatorioService {
 
 
 
-    public RelatorioFaturamento buscarFaturamentoDataJson(DataJson dataJson){
+    public RelatorioFaturamento buscarFaturamentoDataJson(DataJsonInicioFim dataJson){
         List<Pedido> pedidos = buscarPedidosPorDataJson(dataJson);
         return buscarFaturamento(pedidos);
     }
 
 
-    public RelatorioComissaoDetalhada buscarComissaoPorProfissional(DataJson dataInicioFim, Long profissionalId){
+    public RelatorioComissaoDetalhada buscarComissaoPorProfissional(DataJsonInicioFim dataInicioFim, Long profissionalId){
         List<Pedido> pedidos = buscarPedidosPorDataEProfissional(dataInicioFim, profissionalId);
         Profissional profissional = profissionalService.buscarPorId(profissionalId);
         RelatorioComissaoDetalhada relatorio = relatorioComissaoZerado(profissional);
@@ -85,7 +85,7 @@ public class RelatorioService {
 
 
 
-    public List<RelatorioComissao> buscarTodasComissoes(DataJson dataInicioFim){
+    public List<RelatorioComissao> buscarTodasComissoes(DataJsonInicioFim dataInicioFim){
         List<Pedido> pedidos = buscarPedidosPorDataJson(dataInicioFim);
         Set<Profissional> profissionais = profissionalRepository.buscarProfissionaisAtivos();
         List<RelatorioComissao> relatoriosComissoes = relatoriosComissoesZeradosComProfissionais(profissionais);
@@ -138,7 +138,7 @@ public class RelatorioService {
         return clientesRetorno;
     }
 
-    public ComparacaoMes compararMes(DataJson dataJson){
+    public ComparacaoMes compararMes(DataJsonInicioFim dataJson){
         DataInicioFimMes dataMes = gerarDatasParaComparar(dataJson);
         List<Pedido> pedidosPrimeiroMes = pedidoRepository.findByDataPagamento(dataMes.getInicioPrimeiroMes(), dataMes.getFimPrimeiroMes());
         List<Pedido> pedidosSegundoMes = pedidoRepository.findByDataPagamento(dataMes.getInicioSegundoMes(), dataMes.getFimSegundoMes());
@@ -178,7 +178,7 @@ public class RelatorioService {
     }
 
 
-    private DataInicioFimMes gerarDatasParaComparar(DataJson dataJson) {
+    private DataInicioFimMes gerarDatasParaComparar(DataJsonInicioFim dataJson) {
         DataInicioFim inicioFim = converterDataJson(dataJson);
 
         OffsetDateTime inicioPrimeiroMes = inicioFim.getInicio().withDayOfMonth(1);
@@ -237,7 +237,7 @@ public class RelatorioService {
         }
 
 
-    private List<Pedido> buscarPedidosPorDataJson(DataJson dataInicioFim){
+    private List<Pedido> buscarPedidosPorDataJson(DataJsonInicioFim dataInicioFim){
         DataInicioFim InicioFim = converterDataJson(dataInicioFim);
         OffsetDateTime inicio = InicioFim.getInicio();
         OffsetDateTime fim = InicioFim.getFim();
@@ -246,7 +246,7 @@ public class RelatorioService {
 
 
 
-    private List<Pedido> buscarPedidosPorDataEProfissional(DataJson dataInicioFim, Long profissionalId){
+    private List<Pedido> buscarPedidosPorDataEProfissional(DataJsonInicioFim dataInicioFim, Long profissionalId){
         DataInicioFim InicioFim = converterDataJson(dataInicioFim);
         OffsetDateTime inicio = InicioFim.getInicio();
         OffsetDateTime fim = InicioFim.getFim();
@@ -264,7 +264,7 @@ public class RelatorioService {
         return tkm;
     }
 
-    private DataInicioFim converterDataJson(DataJson dataInicioFim) {
+    private DataInicioFim converterDataJson(DataJsonInicioFim dataInicioFim) {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -297,10 +297,6 @@ public class RelatorioService {
         }catch (DateTimeException e){
             throw new FormatoDataException("Formato de data incorreto, use: aaaa-mm-dd");
         }
-    }
-
-    private OffsetDateTime definirfimDia(OffsetDateTime data){
-        return data.withHour(23).withMinute(59).withSecond(59).withNano(999999999);
     }
 
     private ComparacaoMes compararFaturamentos(List<Pedido> pedidosPrimeiroMes, List<Pedido> pedidosSegundoMes){

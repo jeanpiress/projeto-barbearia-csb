@@ -6,6 +6,6 @@ public class PacoteVencidoException extends EntidadeNaoEncontradaException{
     }
 
     public PacoteVencidoException(Long pacoteId) {
-        this(String.format("O pacote de codigo %d não esta vencido", pacoteId));
+        this(String.format("O pacote de codigo %d esta vencido", pacoteId));
     }
 }

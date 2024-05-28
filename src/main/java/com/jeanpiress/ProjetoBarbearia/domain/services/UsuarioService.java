@@ -71,7 +71,7 @@ public class UsuarioService {
         Set<Permissao> permissoes = new HashSet<>();
 
         while(permissaoId <= 4){
-            Permissao permissao = permissaoService.buscarPermissaoPorid(permissaoId);
+            Permissao permissao = permissaoService.buscarPorId(permissaoId);
             permissoes.add(permissao);
             permissaoId++;
         }
