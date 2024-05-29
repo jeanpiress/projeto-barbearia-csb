@@ -19,7 +19,9 @@ public class PedidoResumo {
     @Schema(example = "22.50")
     private BigDecimal comissaoGerada;
     @Schema(example = "45.00")
-    private BigDecimal pontuacaoGerada;
+    private BigDecimal pontuacaoProfissionalGerada;
+    @Schema(example = "45.00")
+    private BigDecimal pontuacaoClienteGerada;
     @Schema(example = "45.00")
     private BigDecimal valorTotal;
     @Schema(example = "2024-04-01T00:00:00Z")
