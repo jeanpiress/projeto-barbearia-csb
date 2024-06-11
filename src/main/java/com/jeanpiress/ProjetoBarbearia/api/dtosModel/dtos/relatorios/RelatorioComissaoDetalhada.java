@@ -1,7 +1,7 @@
 package com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios;
 
-import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.PedidoResumo;
-import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.ProfissionalIdNome;
+import com.jeanpiress.ProjetoBarbearia.domain.model.Pedido;
+import com.jeanpiress.ProjetoBarbearia.domain.model.Profissional;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -16,7 +16,7 @@ import java.util.List;
 public class RelatorioComissaoDetalhada {
 
 
-    private ProfissionalIdNome profissional;
+    private Profissional profissional;
 
     @Schema(example = "1000.00")
     private BigDecimal totalVendas;
@@ -33,5 +33,5 @@ public class RelatorioComissaoDetalhada {
     @Schema(example = "10")
     private Integer clienteAtendidos;
 
-    private List<PedidoResumo> pedidos;
+    private List<Pedido> pedidos;
 }

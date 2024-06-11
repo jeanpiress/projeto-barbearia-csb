@@ -1,6 +1,6 @@
 package com.jeanpiress.ProjetoBarbearia.core.springdoc;
 
-import com.jeanpiress.ProjetoBarbearia.api.exceptionHandlers.Problem;
+import com.jeanpiress.ProjetoBarbearia.api.exceptionHandlers.Problema;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.OAuthFlow;
 import io.swagger.v3.oas.annotations.security.OAuthFlows;
@@ -41,9 +41,9 @@ public class SpringDocConfig {
     public OpenAPI openAPI() {
         Map<String, Schema> schemas = gerarSchemas();
         return new OpenAPI().info(new Info()
-                .title("CSB API")
-                .version("V1")
-                .description("REST API do CSB"))
+                        .title("CSB API")
+                        .version("V1")
+                        .description("REST API do CSB"))
                 .components(new Components()
                         .schemas(schemas)
                         .responses(gerarResponses()));
@@ -104,17 +104,17 @@ public class SpringDocConfig {
     }
 
     private Map<String, ApiResponse> gerarResponses() {
-       final Map<String, ApiResponse> apiResponseMap = new HashMap<>();
+        final Map<String, ApiResponse> apiResponseMap = new HashMap<>();
 
-       Content content = new Content().addMediaType(APPLICATION_JSON_VALUE,
-               new MediaType().schema(new Schema<Problem>().$ref("Problema")));
+        Content content = new Content().addMediaType(APPLICATION_JSON_VALUE,
+                new MediaType().schema(new Schema<Problema>().$ref("Problema")));
 
         apiResponseMap.put(badRequestResponse, new ApiResponse().description("Requisição invalida").content(content));
         apiResponseMap.put(noAcceptableResponse, new ApiResponse().description("Recurso não possui representação que " +
                 "poderia ser aceita pelo consumidor").content(content));
         apiResponseMap.put(internalServerError, new ApiResponse().description("Erro interno do servidor").content(content));
 
-       return apiResponseMap;
+        return apiResponseMap;
     }
 
 }

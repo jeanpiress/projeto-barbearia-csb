@@ -1,6 +1,7 @@
 package com.jeanpiress.ProjetoBarbearia.domain.services;
 
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoAlteracaoInput;
+import com.jeanpiress.ProjetoBarbearia.core.security.CsbSecurity;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.FormaPagamentoJson;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPagamento;
@@ -53,6 +54,12 @@ public class PedidoService {
     @Autowired
     private ItemPacoteService itemPacoteService;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private CsbSecurity security;
+
 
     public Pedido buscarPorId(Long pedidoId){
         return repository.findById(pedidoId).
@@ -71,6 +78,9 @@ public class PedidoService {
         List<ItemPedido> itensPedidos = new ArrayList<>();
         pedido.setItemPedidos(itensPedidos);
         preencherPedido(pedido);
+        pedido.setCriadoAs(OffsetDateTime.now());
+        Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
+        pedido.setCriadoPor(usuario);
 
         return repository.save(pedido);
     }
@@ -166,6 +176,8 @@ public class PedidoService {
         pedido.setDataPagamento(OffsetDateTime.now());
         pedido.setValorTotal(itemPacote.getItemPedido().getPrecoTotal());
         pacoteService.alterarAtivoParaConsumido(pacote, pedido.getProfissional(), itemPacoteId);
+        Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
+        pedido.setRecibidoPor(usuario);
 
         repository.save(pedido);
         pacoteService.adicionar(pacote);
@@ -212,12 +224,15 @@ public class PedidoService {
 
         log.info(pedido.getCliente().getNome());
 
+        Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
+        pedido.setRecibidoPor(usuario);
+
         eventPublisher.publishEvent(new ClienteAtendidoEvento(pedido.getCliente()));
 
         return pedido;
     }
 
-    public void alterarProfissionalOuHorarioPedido(PedidoAlteracaoInput pedidoAlteracaoInput, Long pedidoId) {
+    public Pedido alterarProfissionalOuHorarioPedido(PedidoAlteracaoInput pedidoAlteracaoInput, Long pedidoId) {
         Pedido pedido = buscarPorId(pedidoId);
         if(pedido.getStatusPagamento().equals(StatusPagamento.PAGO)){
             throw new PedidoJaFoiPagoException("Não é permitido alterar profissional de pedido já recebido");
@@ -228,7 +243,11 @@ public class PedidoService {
         Profissional profissional = profissionalService.buscarPorId(pedidoAlteracaoInput.getProfissional().getId());
         pedido.setProfissional(profissional);
         pedido.setHorario(pedidoAlteracaoInput.getHorario());
+        Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
+        pedido.setAlteradoPor(usuario);
+        pedido.setModificadoAs(OffsetDateTime.now());
 
+        return pedido;
     }
 
     public void confirmarPedido(Long pedidoId) {
@@ -238,6 +257,20 @@ public class PedidoService {
         }else{
             throw new PedidoNaoPodeSerConfirmadoException(pedidoId);
         }
+    }
+
+    public void cancelarPedido(Long pedidoId) {
+        Pedido pedido = buscarPorId(pedidoId);
+        Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
+        boolean isGerente = usuario.getPermissoes().stream().anyMatch(permissao -> permissao.getId().equals(1L));
+        if(pedido.getStatusPagamento().equals(StatusPagamento.PAGO) && !isGerente){
+            throw new PedidoNaoPodeSerCanceladoException("Apenas os gerentes do sistema pode cancelar pedidos pagos");
+        }
+        pedido.setStatusPedido(StatusPedido.CANCELADO);
+        pedido.setStatusPagamento(StatusPagamento.CANCELADO);
+        pedido.setCanceladoAs(OffsetDateTime.now());
+        pedido.setCanceladoPor(usuario);
+        repository.save(pedido);
     }
 
     private BigDecimal comissaoPorItem(Long profissionalId, ItemPedido itemPedido){

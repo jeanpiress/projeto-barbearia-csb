@@ -1,16 +1,19 @@
 package com.jeanpiress.ProjetoBarbearia.domain.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Embeddable
 public class Endereco {
 
-    @Schema(example = "23.456.789")
+    @Schema(example = "23456789")
     @Column(name = "endereco_cep")
     private String cep;
 

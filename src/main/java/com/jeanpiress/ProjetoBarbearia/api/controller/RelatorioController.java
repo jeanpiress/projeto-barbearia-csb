@@ -1,12 +1,12 @@
 package com.jeanpiress.ProjetoBarbearia.api.controller;
 
 import com.jeanpiress.ProjetoBarbearia.api.controller.openapi.RelatorioControllerOpenApi;
-import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios.RelatorioComissaoDetalhada;
-import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios.ClientesRetorno;
-import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios.RelatorioComissao;
-import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios.RelatorioFaturamento;
+import com.jeanpiress.ProjetoBarbearia.api.converteDto.assebler.ClientesRetornoAssembler;
+import com.jeanpiress.ProjetoBarbearia.api.converteDto.assebler.RelatorioComissaoAssembler;
+import com.jeanpiress.ProjetoBarbearia.api.converteDto.assebler.RelatorioComissaoDetalhadaAssembler;
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios.*;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.DataInicioFim;
-import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.MesAnoJson;
+import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.MesAno;
 import com.jeanpiress.ProjetoBarbearia.domain.model.ComparacaoMes;
 import com.jeanpiress.ProjetoBarbearia.domain.services.RelatorioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +24,15 @@ public class RelatorioController implements RelatorioControllerOpenApi {
     @Autowired
     private RelatorioService relatorioService;
 
+    @Autowired
+    private RelatorioComissaoDetalhadaAssembler relatorioComissaoDetalhadaAssembler;
+
+    @Autowired
+    private RelatorioComissaoAssembler relatorioComissaoAssembler;
+
+    @Autowired
+    private ClientesRetornoAssembler clientesRetornoAssembler;
+
 
 
     @PostMapping("/faturamento-data")
@@ -34,22 +43,23 @@ public class RelatorioController implements RelatorioControllerOpenApi {
 
 
     @PostMapping("/comissoes-data")
-    public ResponseEntity<List<RelatorioComissao>> buscarRelatorioComissao(@RequestBody @Valid DataInicioFim dataInicioFim){
+    public ResponseEntity<List<RelatorioComissaoDto>> buscarRelatorioComissao(@RequestBody @Valid DataInicioFim dataInicioFim){
         List<RelatorioComissao> relatoriosComissoes = relatorioService.buscarTodasComissoes(dataInicioFim);
-        return ResponseEntity.ok(relatoriosComissoes);
+        return ResponseEntity.ok(relatorioComissaoAssembler.collectionToModel(relatoriosComissoes));
     }
 
     @PostMapping("/comissao/{profissionalId}")
-    public ResponseEntity<RelatorioComissaoDetalhada> buscarRelatorioComissaoPorProfissional(@RequestBody @Valid DataInicioFim dataInicioFim,
-                                                                                             @PathVariable Long profissionalId){
+    public ResponseEntity<RelatorioComissaoDetalhadaDto> buscarRelatorioComissaoPorProfissional(@RequestBody @Valid DataInicioFim dataInicioFim,
+                                                                                                @PathVariable Long profissionalId){
         RelatorioComissaoDetalhada relatorioComissao = relatorioService.buscarComissaoPorProfissional(dataInicioFim, profissionalId);
-        return ResponseEntity.ok(relatorioComissao);
+
+        return ResponseEntity.ok(relatorioComissaoDetalhadaAssembler.toModel(relatorioComissao));
     }
 
     @GetMapping("/cliente-volta/{dias}")
-    public ResponseEntity<List<ClientesRetorno>> clientesParaVoltar(@PathVariable Integer dias){
+    public ResponseEntity<List<ClientesRetornoDto>> clientesParaVoltar(@PathVariable Integer dias){
         List<ClientesRetorno> clientes = relatorioService.buscarClientesParaRetornarHoje(dias);
-        return ResponseEntity.ok(clientes);
+        return ResponseEntity.ok(clientesRetornoAssembler.collectionToModel(clientes));
     }
 
     @PostMapping("/compara-mes")
@@ -60,8 +70,8 @@ public class RelatorioController implements RelatorioControllerOpenApi {
     }
 
     @PostMapping("/compara-data")
-    public ResponseEntity<ComparacaoMes> comparaDataAtualComMesFornecido(@RequestBody @Valid MesAnoJson mesAnoJson){
-        ComparacaoMes comparacaoDataAtual = relatorioService.compararMetricasPorPeriodoMes(mesAnoJson);
+    public ResponseEntity<ComparacaoMes> comparaDataAtualComMesFornecido(@RequestBody @Valid MesAno mesAnoJson){
+        ComparacaoMes comparacaoDataAtual = relatorioService.compararMetricasDataAtualMesmoPeriodoMesSelecionado(mesAnoJson);
         return ResponseEntity.ok(comparacaoDataAtual);
     }
 }

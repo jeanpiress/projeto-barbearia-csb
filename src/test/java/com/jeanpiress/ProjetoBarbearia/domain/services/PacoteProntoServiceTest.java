@@ -73,9 +73,10 @@ class PacoteProntoServiceTest {
     public void deveBuscarPacoteProntoPorId() {
         Mockito.when(pacoteProntoRepository.findById(1L)).thenReturn(Optional.of(pacotePronto));
 
-        PacotePronto pP = pacoteProntoService.buscarPorId(1L);
+        PacotePronto pacoteProntoSalvo = pacoteProntoService.buscarPorId(1L);
 
-        assertEquals(pP, pacotePronto);
+        assertEquals(pacoteProntoSalvo, pacotePronto);
+        assertEquals(pacoteProntoSalvo.getId(), 1L);
         verify(pacoteProntoRepository).findById(1L);
         verifyNoMoreInteractions(pacoteProntoRepository);
     }

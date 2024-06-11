@@ -1,5 +1,6 @@
 package com.jeanpiress.ProjetoBarbearia.api.exceptionHandlers;
 
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,8 +9,8 @@ import java.util.List;
 
 @Getter
 @Builder
-@Schema(example = "Problema")
-public class Problem {
+@Schema(defaultValue = "Problema")
+public class Problema {
 
 	@Schema(example = "Dados inválidos")
 	public String title;
@@ -20,8 +21,8 @@ public class Problem {
 	
 	
 	@Getter
-	@Builder
 	@Schema(example = "ObjetoProblema")
+	@Builder
 	public static class Field{
 
 		@Schema(example = "nome")

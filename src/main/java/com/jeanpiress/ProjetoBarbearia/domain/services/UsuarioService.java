@@ -1,9 +1,7 @@
 package com.jeanpiress.ProjetoBarbearia.domain.services;
 
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.UsuarioNovaSenhaInput;
-import com.jeanpiress.ProjetoBarbearia.domain.exceptions.ConferenciaSenhaException;
-import com.jeanpiress.ProjetoBarbearia.domain.exceptions.SenhaAtualIncorretaException;
-import com.jeanpiress.ProjetoBarbearia.domain.exceptions.UsuarioNaoEncontradoException;
+import com.jeanpiress.ProjetoBarbearia.domain.exceptions.*;
 import com.jeanpiress.ProjetoBarbearia.domain.model.*;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,55 +30,70 @@ public class UsuarioService {
     private PasswordEncoder passwordEncoder;
 
 
-    public Usuario buscarUsuarioPorId(Long usuarioId){
+    public Usuario buscarPorId(Long usuarioId){
         return usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException(usuarioId));
     }
 
-    public Usuario buscarUsuarioPorEmail(String email){
+    public Usuario buscarPorEmail(String email){
         return usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException());
     }
 
 
     public Usuario criarUsuarioClienteExistente(Usuario usuario, Long clienteId){
+        verificarSeEmailExistente(usuario);
         Cliente cliente = clienteService.buscarPorId(clienteId);
         usuario.setCliente(cliente);
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-        maiorPermissao(usuario);
+        usuario.setPermissoes(permissoesInferiores(4L));
+        usuario.setMaiorPermissao("CLIENTE");
 
         return usuarioRepository.save(usuario);
     }
 
     public Usuario criarUsuario(Usuario usuario){
+        verificarSeEmailExistente(usuario);
+        if(usuario.getMaiorPermissao() == null){
+            throw new PermissaoNaoEncontradaException("Permissao é obrigátorio");
+        }
+        String permissao = usuario.getMaiorPermissao();
+        Long permissaoId = buscarIdPermissaoPorNome(permissao.toUpperCase());
+        Set<Permissao> permissoes = permissoesInferiores(permissaoId);
+        usuario.setPermissoes(permissoes);
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
         return usuarioRepository.save(usuario);
     }
 
 
     public Usuario criarUsuarioProfissionalExistente(Usuario usuario, Long profissionalId){
+        verificarSeEmailExistente(usuario);
+        String permissao = usuario.getMaiorPermissao();
+        Long permissaoId = buscarIdPermissaoPorNome(permissao.toUpperCase());
+        Set<Permissao> permissoes = permissoesInferiores(permissaoId);
+        usuario.setPermissoes(permissoes);
         Profissional profissional = profissionalService.buscarPorId(profissionalId);
         usuario.setProfissional(profissional);
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-        maiorPermissao(usuario);
 
         return usuarioRepository.save(usuario);
     }
 
-    public Set<Permissao> permissoesInferiores(Long permissaoId) {
+    private Set<Permissao> permissoesInferiores(Long permissaoId) {
         Set<Permissao> permissoes = new HashSet<>();
 
         while(permissaoId <= 4){
             Permissao permissao = permissaoService.buscarPorId(permissaoId);
             permissoes.add(permissao);
             permissaoId++;
+
         }
+
         return permissoes;
     }
 
-    public Usuario conferirSenha(UsuarioNovaSenhaInput novaSenha){
-        Usuario usuario = buscarUsuarioPorEmail(novaSenha.getEmail());
-
+    public void alterarSenha(UsuarioNovaSenhaInput novaSenha){
+        Usuario usuario = buscarPorEmail(novaSenha.getEmail());
 
         if(!passwordEncoder.matches(novaSenha.getSenhaAtual(), usuario.getSenha())){
             throw new SenhaAtualIncorretaException();
@@ -90,25 +103,34 @@ public class UsuarioService {
             throw new ConferenciaSenhaException();
         }
 
-        usuario.setSenha(novaSenha.getNovaSenha());
+        usuario.setSenha(passwordEncoder.encode(novaSenha.getNovaSenha()));
 
-        return usuarioRepository.save(usuario);
-    }
-
-    private void maiorPermissao(Usuario usuario) {
-        Set<Permissao> permissoes = usuario.getPermissoes();
-
-        Optional<Permissao> permissaoComMenorId = permissoes.stream()
-                .min(Comparator.comparingLong(Permissao::getId));
-
-        usuario.setPermissao(permissaoComMenorId.get().getNome());
-
+        usuarioRepository.save(usuario);
     }
 
     public void alterarPermissao(Long usuarioId, Long permissaoId) {
-        Usuario usuario = buscarUsuarioPorId(usuarioId);
+        Usuario usuario = buscarPorId(usuarioId);
         Set<Permissao> permissoes = permissoesInferiores(permissaoId);
         usuario.setPermissoes(permissoes);
+        Permissao maiorPermissao = permissoes.stream()
+                .min(Comparator.comparing(Permissao::getId))
+                .get();
+        usuario.setMaiorPermissao(maiorPermissao.getNome());
         usuarioRepository.save(usuario);
+    }
+
+    public Long buscarIdPermissaoPorNome(String permissao){
+        switch (permissao) {
+            case "GERENTE": return 1L;
+            case "RECEPCAO": return 2L;
+            case "PROFISSIONAL": return 3L;
+            default: throw new PermissaoInvalidaException(String.format("%s não é um nome de permissao valido", permissao));
+        }
+    }
+
+    private void verificarSeEmailExistente(Usuario usuario){
+        if(usuarioRepository.existsByEmail(usuario.getEmail())){
+            throw new EmailExistenteException();
+        }
     }
 }

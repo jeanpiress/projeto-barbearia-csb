@@ -27,7 +27,7 @@ public class Usuario {
 
     private String nome;
 
-    private String permissao;
+    private String maiorPermissao;
 
     @OneToOne
     private Cliente cliente;

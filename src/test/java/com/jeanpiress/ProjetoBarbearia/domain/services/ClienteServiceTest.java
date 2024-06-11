@@ -4,6 +4,7 @@ import com.jeanpiress.ProjetoBarbearia.domain.eventos.ClienteAtendidoEvento;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.ClienteNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.EntidadeEmUsoException;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Cliente;
+import com.jeanpiress.ProjetoBarbearia.domain.model.Endereco;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Profissional;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.ClienteRepository;
 import org.junit.jupiter.api.Assertions;
@@ -36,6 +37,7 @@ class ClienteServiceTest {
     private ClienteRepository clienteRepository;
 
     Cliente cliente;
+    Endereco endereco;
 
     ClienteAtendidoEvento clienteAtendidoEvento;
 
@@ -43,8 +45,9 @@ class ClienteServiceTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
+        endereco = new Endereco("23456789", "Rua canção", "123", "ape 456", "morumbi");
         cliente = new Cliente(1L, "João", "34999999999", OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), null,
-                BigDecimal.ZERO, null, null, 30, Profissional.builder().build(), null);
+                BigDecimal.ZERO, null, null, 30, Profissional.builder().build(), endereco);
 
         clienteAtendidoEvento = new ClienteAtendidoEvento(cliente);
 
@@ -54,9 +57,10 @@ class ClienteServiceTest {
     public void deveBuscarClientePorId() {
         Mockito.when(clienteRepository.findById(1L)).thenReturn(Optional.of(cliente));
 
-        Cliente cli = clienteService.buscarPorId(1L);
+        Cliente clienteSalvo = clienteService.buscarPorId(1L);
 
-        assertEquals(cli, cliente);
+        assertEquals(clienteSalvo, cliente);
+        assertEquals(clienteSalvo.getEndereco(), endereco);
         verify(clienteRepository).findById(1L);
         verifyNoMoreInteractions(clienteRepository);
     }

@@ -77,9 +77,10 @@ class ComissaoServiceTest {
     public void deveBuscarComissaoPorId() {
         when(comissaoRepository.findById(1L)).thenReturn(Optional.of(comissao));
 
-        Comissao comi = comissaoService.buscarPorId(1L);
+        Comissao comissaoSalva = comissaoService.buscarPorId(1L);
 
-        assertEquals(comi, comissao);
+        assertEquals(comissaoSalva, comissao);
+        assertEquals(comissaoSalva.getId(), 1L);
         verify(comissaoRepository).findById(1L);
         verifyNoMoreInteractions(comissaoRepository);
     }

@@ -1,20 +1,22 @@
 package com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios;
 
-import com.jeanpiress.ProjetoBarbearia.domain.model.Profissional;
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.PedidoResumo;
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.ProfissionalIdNome;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RelatorioComissao {
+public class RelatorioComissaoDto {
 
 
-    private Profissional profissional;
+    private ProfissionalIdNome profissional;
 
     @Schema(example = "1000.00")
     private BigDecimal totalVendas;

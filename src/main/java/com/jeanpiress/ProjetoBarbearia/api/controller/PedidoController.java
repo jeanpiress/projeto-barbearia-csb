@@ -6,19 +6,11 @@ import com.jeanpiress.ProjetoBarbearia.api.converteDto.dissembler.PedidoInputDis
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.PedidoDto;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoAlteracaoInput;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoInput;
-import com.jeanpiress.ProjetoBarbearia.core.security.CsbSecurity;
-import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPagamento;
-import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPedido;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.FormaPagamentoJson;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealizacaoItemPacote;
-import com.jeanpiress.ProjetoBarbearia.domain.exceptions.PedidoNaoEncontradoException;
-import com.jeanpiress.ProjetoBarbearia.domain.exceptions.NegocioException;
-import com.jeanpiress.ProjetoBarbearia.domain.exceptions.PedidoNaoPodeSerCanceladoException;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Pedido;
-import com.jeanpiress.ProjetoBarbearia.domain.model.Usuario;
 import com.jeanpiress.ProjetoBarbearia.domain.services.PedidoService;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.PedidoRepository;
-import com.jeanpiress.ProjetoBarbearia.domain.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,7 +19,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController
@@ -35,10 +26,10 @@ import java.util.List;
 public class PedidoController implements PedidoControllerOpenApi {
 
     @Autowired
-    private PedidoRepository repository;
+    private PedidoRepository pedidoRepository;
 
     @Autowired
-    private PedidoService service;
+    private PedidoService pedidoService;
 
     @Autowired
     private PedidoAssembler pedidoAssembler;
@@ -46,20 +37,11 @@ public class PedidoController implements PedidoControllerOpenApi {
     @Autowired
     private PedidoInputDissembler pedidoDissembler;
 
-    @Autowired
-    private UsuarioService usuarioService;
-
-    @Autowired
-    private CsbSecurity security;
-    @Autowired
-    private PedidoRepository pedidoRepository;
-    @Autowired
-    private PedidoService pedidoService;
 
     @PreAuthorize("hasAuthority('RECEPCAO')")
     @GetMapping
     public ResponseEntity<List<PedidoDto>> listar(){
-        List<Pedido> pedidos = repository.findByPagoAndCaixaAberto();
+        List<Pedido> pedidos = pedidoRepository.findByPagoAndCaixaAberto();
         List<PedidoDto> pedidosDto = pedidoAssembler.collectionToModel(pedidos);
         return ResponseEntity.ok(pedidosDto);
     }
@@ -67,9 +49,8 @@ public class PedidoController implements PedidoControllerOpenApi {
     @PreAuthorize("hasAuthority('RECEPCAO')")
     @GetMapping(value = "/{pedidoId}")
     public ResponseEntity<PedidoDto> buscarPorId(@PathVariable Long pedidoId) {
-        Pedido pedido = service.buscarPorId(pedidoId);
+        Pedido pedido = pedidoService.buscarPorId(pedidoId);
         PedidoDto pedidoDto = pedidoAssembler.toModel(pedido);
-
         return ResponseEntity.ok(pedidoDto);
     }
 
@@ -77,10 +58,7 @@ public class PedidoController implements PedidoControllerOpenApi {
     @PostMapping
     public ResponseEntity<PedidoDto> adicionar(@RequestBody @Valid PedidoInput pedidoInput) {
         Pedido pedido = pedidoDissembler.toDomainObject(pedidoInput);
-        pedido.setCriadoAs(OffsetDateTime.now());
-        Usuario usuario = usuarioService.buscarUsuarioPorId(security.getUsuarioId());
-        pedido.setCriadoPor(usuario);
-        Pedido pedidoCriado = service.criar(pedido);
+        Pedido pedidoCriado = pedidoService.criar(pedido);
         PedidoDto pedidoDto = pedidoAssembler.toModel(pedidoCriado);
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDto);
 
@@ -90,24 +68,14 @@ public class PedidoController implements PedidoControllerOpenApi {
     @DeleteMapping("/{pedidoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancelar(@PathVariable Long pedidoId){
-        Pedido pedido = service.buscarPorId(pedidoId);
-        Usuario usuario = usuarioService.buscarUsuarioPorId(security.getUsuarioId());
-        boolean isGerente = usuario.getPermissoes().stream().anyMatch(permissao -> permissao.getId().equals(1L));
-        if(pedido.getStatusPagamento().equals(StatusPagamento.PAGO) && !isGerente){
-            throw new PedidoNaoPodeSerCanceladoException("Apenas os gerentes do sistema pode cancelar pedidos pagos");
-        }
-        pedido.setStatusPedido(StatusPedido.CANCELADO);
-        pedido.setStatusPagamento(StatusPagamento.CANCELADO);
-        pedido.setCanceladoAs(OffsetDateTime.now());
-        pedido.setCanceladoPor(usuario);
-        pedidoRepository.save(pedido);
+        pedidoService.cancelarPedido(pedidoId);
 
     }
 
     @PreAuthorize("hasAuthority('RECEPCAO')")
     @PutMapping("/{pedidoId}/add-item/{itemPedidoId}")
     public ResponseEntity<PedidoDto> adicionarItemPedido(@PathVariable Long pedidoId, @PathVariable Long itemPedidoId){
-        Pedido pedido = service.adicionarItemPedido(pedidoId, itemPedidoId);
+        Pedido pedido = pedidoService.adicionarItemPedido(pedidoId, itemPedidoId);
         PedidoDto pedidoDto = pedidoAssembler.toModel(pedido);
         return ResponseEntity.ok(pedidoDto);
     }
@@ -115,24 +83,17 @@ public class PedidoController implements PedidoControllerOpenApi {
     @PreAuthorize("hasAuthority('RECEPCAO')")
     @PutMapping(value = "/{pedidoId}")
     public ResponseEntity<PedidoDto> alterar(@RequestBody @Valid PedidoAlteracaoInput pedidoAlteracaoInput, @PathVariable Long pedidoId) {
-        try {
-            Pedido pedido = service.buscarPorId(pedidoId);
-            pedidoService.alterarProfissionalOuHorarioPedido(pedidoAlteracaoInput, pedidoId);
-            Usuario usuario = usuarioService.buscarUsuarioPorId(security.getUsuarioId());
-            pedido.setAlteradoPor(usuario);
-            pedido.setModificadoAs(OffsetDateTime.now());
-            PedidoDto pedidoDto = pedidoAssembler.toModel(repository.save(pedido));
-            return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDto);
-        }catch(PedidoNaoEncontradoException e) {
-            throw new NegocioException(e.getMessage(), e);
-        }
+        Pedido pedido = pedidoService.alterarProfissionalOuHorarioPedido(pedidoAlteracaoInput, pedidoId);
+        PedidoDto pedidoDto = pedidoAssembler.toModel(pedidoRepository.save(pedido));
+        return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDto);
+
     }
 
 
     @PreAuthorize("hasAuthority('RECEPCAO')")
     @DeleteMapping("/{pedidoId}/remove-item/{itemPedidoId}")
     public ResponseEntity<PedidoDto> removerItemPedido(@PathVariable Long pedidoId, @PathVariable Long itemPedidoId){
-        Pedido pedido = service.removerItemPedido(pedidoId, itemPedidoId);
+        Pedido pedido = pedidoService.removerItemPedido(pedidoId, itemPedidoId);
         PedidoDto pedidoDto = pedidoAssembler.toModel(pedido);
         return ResponseEntity.ok(pedidoDto);
     }
@@ -141,29 +102,19 @@ public class PedidoController implements PedidoControllerOpenApi {
     @PreAuthorize("hasAuthority('RECEPCAO')")
     @PutMapping(value = "/{pedidoId}/pagar")
     public ResponseEntity<PedidoDto> efetuarPagamento(@RequestBody @Valid FormaPagamentoJson formaPagamento, @PathVariable @Valid Long pedidoId) {
-        try {
-            Pedido pedido = service.realizarPagamento(formaPagamento, pedidoId);
-            Usuario usuario = usuarioService.buscarUsuarioPorId(security.getUsuarioId());
-            pedido.setRecibidoPor(usuario);
-            PedidoDto pedidoDto = pedidoAssembler.toModel(pedido);
-            return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDto);
-        }catch(PedidoNaoEncontradoException e) {
-            throw new NegocioException(e.getMessage(), e);
-        }
+       Pedido pedido = pedidoService.realizarPagamento(formaPagamento, pedidoId);
+       PedidoDto pedidoDto = pedidoAssembler.toModel(pedido);
+       return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDto);
+
     }
 
     @PreAuthorize("hasAuthority('RECEPCAO')")
     @PutMapping(value = "/{pedidoId}/pagar/pacote")
     public ResponseEntity<PedidoDto> efetuarPagamentoComPacote(@RequestBody @Valid RealizacaoItemPacote realizacaoItemPacote, @PathVariable @Valid Long pedidoId) {
-        try {
-            Pedido pedido = service.realizarPagamentoComPedidoExistente(realizacaoItemPacote, pedidoId);
-            Usuario usuario = usuarioService.buscarUsuarioPorId(security.getUsuarioId());
-            pedido.setRecibidoPor(usuario);
-            PedidoDto pedidoDto = pedidoAssembler.toModel(pedido);
-            return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDto);
-        }catch(PedidoNaoEncontradoException e) {
-            throw new NegocioException(e.getMessage(), e);
-        }
+        Pedido pedido = pedidoService.realizarPagamentoComPedidoExistente(realizacaoItemPacote, pedidoId);
+        PedidoDto pedidoDto = pedidoAssembler.toModel(pedido);
+        return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDto);
+
     }
 
     @PreAuthorize("hasAuthority('PROFISSIONAL')")
@@ -172,6 +123,5 @@ public class PedidoController implements PedidoControllerOpenApi {
     public void confirmarPedido(@PathVariable Long pedidoId){
         pedidoService.confirmarPedido(pedidoId);
     }
-
 
 }

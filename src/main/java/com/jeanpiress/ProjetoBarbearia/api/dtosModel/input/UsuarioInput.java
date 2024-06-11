@@ -19,8 +19,9 @@ public class UsuarioInput {
     @Schema(example = "123456", required = true)
     private String senha;
 
-    @Schema(example = "1")
-    private Long permissao;
+    @NotBlank
+    @Schema(example = "GERENTE")
+    private String maiorPermissao;
 
     @Schema(description = "nome do usuario", example = "João")
     private String nome;
