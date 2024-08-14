@@ -19,22 +19,22 @@ public interface ItemPedidoControllerOpenApi {
     public ResponseEntity<List<ItemPedidoDto>> listar();
 
     @Operation(summary ="Busca ItemPedido por id", responses ={
-            @ApiResponse(responseCode = "400", description = "Id do ItemPedido inválido", content = @Content(schema = @Schema)),
-            @ApiResponse(responseCode = "404", description = "ItemPedido não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "400", description = "Id do ItemPedido inválido", content = @Content(schema = @Schema(ref = "Problema"))),
+            @ApiResponse(responseCode = "404", description = "ItemPedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<ItemPedidoDto> buscarPorId(@Parameter(description = "ID de um itemPedido", example = "1")
                                                          Long itemPedidoId);
     @Operation(summary ="Cria um novo ItemPedido", responses ={
             @ApiResponse(responseCode = "201", description = "ItemPedido cadastrado"),
-            @ApiResponse(responseCode = "400", description = "Id do itemPedido inválido", content = @Content(schema = @Schema)),
-            @ApiResponse(responseCode = "404", description = "ItemPedido não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "400", description = "Id do itemPedido inválido", content = @Content(schema = @Schema(ref = "Problema"))),
+            @ApiResponse(responseCode = "404", description = "ItemPedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<ItemPedidoDto> adicionar(@Parameter(description = "Representação de um novo itemPedido")
                                                        ItemPedidoInput itemPedidoInput);
    
     @Operation(summary ="Altera um itemPedido", responses ={
             @ApiResponse(responseCode = "200", description = "ItemPedido atualizado"),
-            @ApiResponse(responseCode = "404", description = "ItemPedido não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "ItemPedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<ItemPedidoDto> alterar(@Parameter(description = "Representação de um novo itemPedido com novos dados")
                                                      ItemPedidoInput itemPedidoInput,
@@ -42,7 +42,7 @@ public interface ItemPedidoControllerOpenApi {
                                                      Long itemPedidoId);
     @Operation(summary ="Apaga um ItemPedido", responses ={
             @ApiResponse(responseCode = "204", description = "ItemPedido excluido"),
-            @ApiResponse(responseCode = "404", description = "ItemPedido não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "ItemPedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public void deletar(@Parameter(description = "ID de um itemPedido", example = "1")
                             Long itemPedidoId);

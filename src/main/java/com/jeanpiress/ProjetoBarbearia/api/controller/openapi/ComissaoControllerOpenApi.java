@@ -19,21 +19,21 @@ public interface ComissaoControllerOpenApi {
     public ResponseEntity<List<ComissaoDto>> listar();
 
     @Operation(summary ="Busca comissão por id", responses ={
-            @ApiResponse(responseCode = "400", description = "Id da comissão inválida", content = @Content(schema = @Schema)),
-            @ApiResponse(responseCode = "404", description = "comissão não encontrada", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "400", description = "Id da comissão inválida", content = @Content(schema = @Schema(ref = "Problema"))),
+            @ApiResponse(responseCode = "404", description = "comissão não encontrada", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<ComissaoDto> buscarPorId(@Parameter(description = "ID de uma comissão", example = "1")
                                                        Long comissaoId);
     @Operation(summary ="Cria uma nova comissão", responses ={
             @ApiResponse(responseCode = "201", description = "Comissão cadastrada"),
-            @ApiResponse(responseCode = "400", description = "Id da comissão inválida", content = @Content(schema = @Schema)),
-            @ApiResponse(responseCode = "404", description = "Comissão não encontrada", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "400", description = "Id da comissão inválida", content = @Content(schema = @Schema(ref = "Problema"))),
+            @ApiResponse(responseCode = "404", description = "Comissão não encontrada", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<ComissaoDto> adicionar(@Parameter(description = "Representação de uma nova comissão")
                                                      ComissaoInput comissaoInput);
     @Operation(summary ="Altera uma categoria", responses ={
             @ApiResponse(responseCode = "200", description = "Comissão atualizada"),
-            @ApiResponse(responseCode = "404", description = "Comissão não encontrada", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "Comissão não encontrada", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<ComissaoDto> alterar(@Parameter(description = "Representação de uma nova comissão com novos dados")
                                                    ComissaoInput comissaoInput,
@@ -42,7 +42,7 @@ public interface ComissaoControllerOpenApi {
 
     @Operation(summary ="Apaga uma categoria", responses ={
             @ApiResponse(responseCode = "204", description = "Comissão excluida"),
-            @ApiResponse(responseCode = "404", description = "Comissão não encontrada", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "Comissão não encontrada", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public void deletar(@Parameter(description = "ID de uma comissão", example = "1")
                             Long comissaoId);

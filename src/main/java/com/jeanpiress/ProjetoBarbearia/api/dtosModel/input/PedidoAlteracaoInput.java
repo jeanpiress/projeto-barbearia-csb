@@ -2,9 +2,7 @@ package com.jeanpiress.ProjetoBarbearia.api.dtosModel.input;
 
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.ProfissionalId;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -13,6 +11,8 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PedidoAlteracaoInput {
 
     @NotNull

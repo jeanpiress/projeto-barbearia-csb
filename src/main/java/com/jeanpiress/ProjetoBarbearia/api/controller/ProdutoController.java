@@ -59,14 +59,11 @@ public class ProdutoController implements ProdutoControllerOpenApi {
 
     @PutMapping(value = "/{produtoId}")
     public ResponseEntity<ProdutoDto> alterar(@RequestBody @Valid ProdutoInput produtoInput, @PathVariable Long produtoId) {
-        try {
-            Produto produto = service.buscarPorId(produtoId);
-            produtoDissembler.copyToDomainObject(produtoInput, produto);
-            ProdutoDto produtoDto = produtoAssembler.toModel(service.adicionar(produto));
-            return ResponseEntity.status(HttpStatus.CREATED).body(produtoDto);
-        }catch(ProdutoNaoEncontradoException e) {
-            throw new NegocioException(e.getMessage(), e);
-        }
+        Produto produto = service.buscarPorId(produtoId);
+        produtoDissembler.copyToDomainObject(produtoInput, produto);
+        ProdutoDto produtoDto = produtoAssembler.toModel(service.adicionar(produto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(produtoDto);
+
     }
 
     @DeleteMapping("/{produtoId}")

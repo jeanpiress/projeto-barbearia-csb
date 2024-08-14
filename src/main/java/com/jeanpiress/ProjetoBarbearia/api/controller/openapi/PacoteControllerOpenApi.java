@@ -19,8 +19,8 @@ public interface PacoteControllerOpenApi {
     public ResponseEntity<List<PacoteDto>> listar();
 
     @Operation(summary ="Busca pacote por id", responses ={
-            @ApiResponse(responseCode = "400", description = "Id do pacote inválido", content = @Content(schema = @Schema)),
-            @ApiResponse(responseCode = "404", description = "pacote não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "400", description = "Id do pacote inválido", content = @Content(schema = @Schema(ref = "Problema"))),
+            @ApiResponse(responseCode = "404", description = "pacote não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<PacoteDto> buscarPorId(@Parameter(description = "ID de um pacote", example = "1")
                                                      Long pacoteId);
@@ -32,7 +32,7 @@ public interface PacoteControllerOpenApi {
     public ResponseEntity<List<PacoteDto>> buscarPacotesExpirados();
 
     @Operation(summary ="Busca pacotes por cliente", responses ={
-            @ApiResponse(responseCode = "400", description = "Id do cliente inválido", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "400", description = "Id do cliente inválido", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<List<PacoteDto>> buscarPorCliente(@Parameter(description = "ID de um cliente", example = "1")
                                                                 Long clienteId);

@@ -1,8 +1,6 @@
 package com.jeanpiress.ProjetoBarbearia.domain.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -10,6 +8,8 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ComparacaoMes {
 
     private OffsetDateTime dataInicio;

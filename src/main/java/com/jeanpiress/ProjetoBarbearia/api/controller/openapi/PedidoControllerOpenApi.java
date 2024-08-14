@@ -22,22 +22,22 @@ public interface PedidoControllerOpenApi {
     public ResponseEntity<List<PedidoDto>> listar();
 
     @Operation(summary ="Busca Pedido por id", responses ={
-            @ApiResponse(responseCode = "400", description = "Id do Pedido inválido", content = @Content(schema = @Schema)),
-            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "400", description = "Id do Pedido inválido", content = @Content(schema = @Schema(ref = "Problema"))),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<PedidoDto> buscarPorId(@Parameter(description = "ID de um pedido", example = "1")
                                                          Long pedidoId);
     @Operation(summary ="Cria um novo Pedido", responses ={
             @ApiResponse(responseCode = "201", description = "Pedido cadastrado"),
-            @ApiResponse(responseCode = "400", description = "Id do pedido inválido", content = @Content(schema = @Schema)),
-            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "400", description = "Id do pedido inválido", content = @Content(schema = @Schema(ref = "Problema"))),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<PedidoDto> adicionar(@Parameter(description = "Representação de um novo pedido")
                                                        PedidoInput pedidoInput);
    
     @Operation(summary ="Altera um pedido", responses ={
             @ApiResponse(responseCode = "200", description = "Pedido atualizado"),
-            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<PedidoDto> alterar(@Parameter(description = "Representação de um novo pedido com novos dados")
                                                  PedidoAlteracaoInput pedidoInput,
@@ -46,14 +46,14 @@ public interface PedidoControllerOpenApi {
 
     @Operation(summary ="Cancelar um Pedido", responses ={
             @ApiResponse(responseCode = "204", description = "Pedido cancelado"),
-            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public void cancelar(@Parameter(description = "ID de um pedido", example = "1")
                             Long pedidoId);
 
 
     @Operation(summary ="Adiciona um ItemPedido", responses ={
-            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<PedidoDto> adicionarItemPedido(@Parameter(description = "ID de um pedido", example = "1")
                                                              Long pedidoId,
@@ -61,7 +61,7 @@ public interface PedidoControllerOpenApi {
                                                              Long itemPedidoId);
 
     @Operation(summary ="Remove um ItemPedido", responses ={
-            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<PedidoDto> removerItemPedido(@Parameter(description = "ID de um pedido", example = "1")
                                                            Long pedidoId,
@@ -69,7 +69,7 @@ public interface PedidoControllerOpenApi {
                                                            Long itemPedidoId);
 
     @Operation(summary ="Efetua o pagamento de um pedido", responses ={
-            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<PedidoDto> efetuarPagamento(@Parameter(description = "Representação de uma nova forma de pagamento")
                                                           FormaPagamentoJson formaPagamento,
@@ -78,7 +78,7 @@ public interface PedidoControllerOpenApi {
 
 
     @Operation(summary ="Confirma um pedido", responses ={
-            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public void confirmarPedido(@Parameter(description = "ID de um pedido", example = "1")
                                     @PathVariable Long pedidoId);

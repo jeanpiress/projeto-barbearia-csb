@@ -27,6 +27,7 @@ public class Usuario {
 
     private String nome;
 
+    @Column(name = "permissao")
     private String maiorPermissao;
 
     @OneToOne

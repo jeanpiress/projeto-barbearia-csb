@@ -21,8 +21,8 @@ public interface ClienteControllerOpenApi {
 
 
     @Operation(summary ="Busca cliente por id", responses ={
-            @ApiResponse(responseCode = "400", description = "Id do cliente inválido", content = @Content(schema = @Schema)),
-            @ApiResponse(responseCode = "404", description = "cliente não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "400", description = "Id do cliente inválido", content = @Content(schema = @Schema(ref = "Problema"))),
+            @ApiResponse(responseCode = "404", description = "cliente não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<ClienteDto> buscarPorId(@Parameter(description = "ID de um cliente", example = "1")
                                                       Long clienteId);
@@ -30,8 +30,8 @@ public interface ClienteControllerOpenApi {
 
     @Operation(summary ="Cria um novo cliente", responses ={
             @ApiResponse(responseCode = "201", description = "Cliente cadastrado"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos"),
-            @ApiResponse(responseCode = "400", description = "Mensagem incompreensivel")
+            @ApiResponse(responseCode = "400", description = "Dados invalidos", content = @Content(schema = @Schema(ref = "Problema"))),
+            @ApiResponse(responseCode = "400", description = "Mensagem incompreensivel",content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<ClienteDto> adicionar(@Parameter(description = "Representação de um novo cliente")
                                                     ClienteInput clienteInput);
@@ -39,7 +39,7 @@ public interface ClienteControllerOpenApi {
 
     @Operation(summary ="Altera um cliente", responses ={
             @ApiResponse(responseCode = "200", description = "Cliente atualizado"),
-            @ApiResponse(responseCode = "404", description = "cliente não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "cliente não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<ClienteDto> alterar(@Parameter(description = "Representação de um novo cliente com novos dados")
                                                   ClienteInput clienteInput,
@@ -49,7 +49,7 @@ public interface ClienteControllerOpenApi {
 
     @Operation(summary ="Apaga um cliente", responses ={
             @ApiResponse(responseCode = "204", description = "Cliente excluido"),
-            @ApiResponse(responseCode = "404", description = "cliente não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "cliente não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public void deletar(@Parameter(description = "ID de um cliente", example = "1")
                             Long clienteId);

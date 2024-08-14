@@ -63,7 +63,7 @@ insert into comissao (id, profissional_id, produto_id, porcentagem_comissao) val
 insert into comissao (id, profissional_id, produto_id, porcentagem_comissao) values (2, 1, 2, 50.00);
 
 insert into usuario(id, email, senha, cliente_id, profissional_id, permissao, nome) values (1, "jean.m.pires@gmail.com",
-                    "$2a$12$m3gxyIEulI0qxAiKsruEUeRX37lcYqoVeLsowdaAmut3.QGHh2ds.", null, 1, "GERENTE", "Jean");
+                    "$2a$12$yXbDuQ0PtltBXPiP8wnhrOYfY647RoyNOOcD70kBnSzwgESEISFE.", null, 1, "GERENTE", "Jean");
 
 insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada,
                     caixa_aberto, valor_total, data_pagamento, pontuacao_profissional_gerada, pontuacao_cliente_gerada,

@@ -19,22 +19,22 @@ public interface ProdutoControllerOpenApi {
     public ResponseEntity<List<ProdutoDto>> listar();
 
     @Operation(summary ="Busca Produto por id", responses ={
-            @ApiResponse(responseCode = "400", description = "Id do Produto inválido", content = @Content(schema = @Schema)),
-            @ApiResponse(responseCode = "404", description = "Produto não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "400", description = "Id do Produto inválido", content = @Content(schema = @Schema(ref = "Problema"))),
+            @ApiResponse(responseCode = "404", description = "Produto não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<ProdutoDto> buscarPorId(@Parameter(description = "ID de um produto", example = "1")
                                                          Long produtoId);
     @Operation(summary ="Cria um novo Produto", responses ={
             @ApiResponse(responseCode = "201", description = "Produto cadastrado"),
-            @ApiResponse(responseCode = "400", description = "Id do produto inválido", content = @Content(schema = @Schema)),
-            @ApiResponse(responseCode = "404", description = "Produto não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "400", description = "Id do produto inválido", content = @Content(schema = @Schema(ref = "Problema"))),
+            @ApiResponse(responseCode = "404", description = "Produto não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<ProdutoDto> adicionar(@Parameter(description = "Representação de um novo produto")
                                                        ProdutoInput produtoInput);
    
     @Operation(summary ="Altera um produto", responses ={
             @ApiResponse(responseCode = "201", description = "Produto atualizado"),
-            @ApiResponse(responseCode = "404", description = "Produto não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "Produto não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<ProdutoDto> alterar(@Parameter(description = "Representação de um novo produto com novos dados")
                                                      ProdutoInput produtoInput,
@@ -42,7 +42,7 @@ public interface ProdutoControllerOpenApi {
                                                      Long produtoId);
     @Operation(summary ="Apaga um Produto", responses ={
             @ApiResponse(responseCode = "204", description = "Produto excluido"),
-            @ApiResponse(responseCode = "404", description = "Produto não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "Produto não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public void deletar(@Parameter(description = "ID de um produto", example = "1")
                             Long produtoId);

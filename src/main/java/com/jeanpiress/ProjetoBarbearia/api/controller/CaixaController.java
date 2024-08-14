@@ -19,13 +19,14 @@ public class CaixaController implements CaixaControllerOpenApi {
 
 
 
-    @PreAuthorize("hasAuthority('RECEPCAO')")
+    //@PreAuthorize("hasAuthority('RECEPCAO')")
     @GetMapping
     public ResponseEntity<CaixaModel> buscarCaixaDiario(){
         CaixaModel caixaDiario = caixaService.gerarCaixaDiario();
         return ResponseEntity.ok(caixaDiario);
     }
-    @PreAuthorize("hasAuthority('RECEPCAO')")
+
+    //@PreAuthorize("hasAuthority('RECEPCAO')")
     @DeleteMapping("/fechar")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void fecharCaixa(){

@@ -1,13 +1,15 @@
 package com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class ProdutoId {
 
     @NotNull

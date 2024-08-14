@@ -20,23 +20,23 @@ public interface CategoriaControllerOpenApi {
     public ResponseEntity<List<CategoriaDto>> listar();
 
     @Operation(summary ="Busca categoria por id", responses = {
-            @ApiResponse(responseCode = "400", description = "Id da categoria inválida", content = @Content(schema = @Schema)),
-            @ApiResponse(responseCode = "404", description = "categoria não encontrada", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "400", description = "Id da categoria inválida", content = @Content(schema = @Schema(ref = "Problema"))),
+            @ApiResponse(responseCode = "404", description = "categoria não encontrada", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<CategoriaDto> buscarPorId(@Parameter(description = "ID de uma categoria", example = "1")
                                                         Long categoriaId);
 
     @Operation(summary ="Cria uma nova categoria", responses = {
             @ApiResponse(responseCode = "201", description = "Categoria cadastrada"),
-            @ApiResponse(responseCode = "400", description = "Id da categoria inválida", content = @Content(schema = @Schema)),
-            @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "400", description = "Id da categoria inválida", content = @Content(schema = @Schema(ref = "Problema"))),
+            @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<CategoriaDto> adicionar(@Parameter(description = "Representação de uma nova categoria")
                                                       CategoriaInput categoriaInput);
 
     @Operation(summary ="Altera uma categoria", responses = {
             @ApiResponse(responseCode = "200", description = "categoria atualizada"),
-            @ApiResponse(responseCode = "404", description = "categoria não encontrada", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "categoria não encontrada", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<CategoriaDto> alterar(@Parameter(description = "Representação de uma nova categoria com novos dados")
                                                     CategoriaInput categoriaInput,
@@ -46,7 +46,7 @@ public interface CategoriaControllerOpenApi {
 
     @Operation(summary ="Apaga uma categoria", responses = {
             @ApiResponse(responseCode = "204", description = "Categoria excluida"),
-            @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public void deletar(@Parameter(description = "ID de uma categoria", example = "1")
                         Long categoriaId);

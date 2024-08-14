@@ -65,14 +65,10 @@ public class ClienteController implements ClienteControllerOpenApi {
 
     @PutMapping(value = "/{clienteId}")
     public ResponseEntity<ClienteDto> alterar(@RequestBody @Valid ClienteInput clienteInput, @PathVariable Long clienteId) {
-        try {
-            Cliente cliente = service.buscarPorId(clienteId);
-            clienteDissembler.copyToDomainObject(clienteInput, cliente);
-            ClienteDto clienteDto = clienteAssembler.toModel(service.adicionar(cliente));
-            return ResponseEntity.status(HttpStatus.CREATED).body(clienteDto);
-        }catch(ClienteNaoEncontradoException e) {
-            throw new NegocioException(e.getMessage(), e);
-        }
+        Cliente cliente = service.buscarPorId(clienteId);
+        clienteDissembler.copyToDomainObject(clienteInput, cliente);
+        ClienteDto clienteDto = clienteAssembler.toModel(service.adicionar(cliente));
+        return ResponseEntity.status(HttpStatus.CREATED).body(clienteDto);
     }
 
 

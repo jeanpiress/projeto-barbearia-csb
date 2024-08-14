@@ -59,14 +59,11 @@ public class CategoriaController implements CategoriaControllerOpenApi {
 
     @PutMapping(value = "/{categoriaId}")
     public ResponseEntity<CategoriaDto> alterar(@RequestBody @Valid CategoriaInput categoriaInput, @PathVariable Long categoriaId) {
-        try {
-            Categoria categoria = service.buscarPorId(categoriaId);
-            categoriaDissembler.copyToDomainObject(categoriaInput, categoria);
-            CategoriaDto categoriaDto = categoriaAssembler.toModel(service.adicionar(categoria));
-            return ResponseEntity.status(HttpStatus.CREATED).body(categoriaDto);
-        }catch(CategoriaNaoEncontradoException e) {
-            throw new NegocioException(e.getMessage(), e);
-        }
+        Categoria categoria = service.buscarPorId(categoriaId);
+        categoriaDissembler.copyToDomainObject(categoriaInput, categoria);
+        CategoriaDto categoriaDto = categoriaAssembler.toModel(service.adicionar(categoria));
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoriaDto);
+
     }
 
     @DeleteMapping("/{categoriaId}")

@@ -59,14 +59,10 @@ public class ItemPedidoController implements ItemPedidoControllerOpenApi {
 
     @PutMapping(value = "/{itemPedidoId}")
     public ResponseEntity<ItemPedidoDto> alterar(@RequestBody @Valid ItemPedidoInput itemPedidoInput, @PathVariable Long itemPedidoId) {
-        try {
-            ItemPedido itemPedido = service.buscarPorId(itemPedidoId);
-            itemPedidoDissembler.copyToDomainObject(itemPedidoInput, itemPedido);
-            ItemPedidoDto itemPedidoDto = itemPedidoAssembler.toModel(service.adicionar(itemPedido));
-            return ResponseEntity.status(HttpStatus.CREATED).body(itemPedidoDto);
-        }catch(ItemPedidoNaoEncontradoException e) {
-            throw new NegocioException(e.getMessage(), e);
-        }
+        ItemPedido itemPedido = service.buscarPorId(itemPedidoId);
+        itemPedidoDissembler.copyToDomainObject(itemPedidoInput, itemPedido);
+        ItemPedidoDto itemPedidoDto = itemPedidoAssembler.toModel(service.adicionar(itemPedido));
+        return ResponseEntity.status(HttpStatus.CREATED).body(itemPedidoDto);
     }
 
     @DeleteMapping("/{itemPedidoId}")

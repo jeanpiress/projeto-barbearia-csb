@@ -22,7 +22,7 @@ public interface PacoteProntoControllerOpenApi {
     public ResponseEntity<List<PacoteProntoDto>> listarAtivos();
 
     @Operation(summary ="Busca pacote pronto por id", responses ={
-            @ApiResponse(responseCode = "404", description = "Pacote pronto não encontrado", content = @Content(schema = @Schema))
+            @ApiResponse(responseCode = "404", description = "Pacote pronto não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
 
     })
     public ResponseEntity<PacoteProntoDto> pacoteProntoPorId(@Parameter(description = "ID de um pacote pronto", example = "1")
@@ -30,7 +30,7 @@ public interface PacoteProntoControllerOpenApi {
 
     @Operation(summary ="Cria um pacote pronto", responses ={
             @ApiResponse(responseCode = "201", description = "Pacote pronto cadastrado"),
-            @ApiResponse(responseCode = "400", description = "Dados invalidos", content = @Content(schema = @Schema)),
+            @ApiResponse(responseCode = "400", description = "Dados invalidos", content = @Content(schema = @Schema(ref = "Problema"))),
             @ApiResponse(responseCode = "406", description = "Mensagem incompreensivel", content = @Content(schema = @Schema))
     })
     public ResponseEntity<PacoteProntoDto> criarPacotePronto(@Parameter(description = "Representação de um novo pacote pronto")

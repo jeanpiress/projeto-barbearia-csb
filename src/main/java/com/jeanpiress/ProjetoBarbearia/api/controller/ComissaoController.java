@@ -5,8 +5,6 @@ import com.jeanpiress.ProjetoBarbearia.api.converteDto.assebler.ComissaoAssemble
 import com.jeanpiress.ProjetoBarbearia.api.converteDto.dissembler.ComissaoInputDissembler;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.ComissaoDto;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.ComissaoInput;
-import com.jeanpiress.ProjetoBarbearia.domain.exceptions.ComissaoNaoEncontradoException;
-import com.jeanpiress.ProjetoBarbearia.domain.exceptions.NegocioException;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Comissao;
 import com.jeanpiress.ProjetoBarbearia.domain.services.ComissaoService;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.ComissaoRepository;
@@ -59,14 +57,10 @@ public class ComissaoController implements ComissaoControllerOpenApi {
 
     @PutMapping(value = "/{comissaoId}")
     public ResponseEntity<ComissaoDto> alterar(@RequestBody @Valid ComissaoInput comissaoInput, @PathVariable Long comissaoId) {
-        try {
-            Comissao comissao = service.buscarPorId(comissaoId);
-            comissaoDissembler.copyToDomainObject(comissaoInput, comissao);
-            ComissaoDto comissaoDto = comissaoAssembler.toModel(service.adicionar(comissao));
-            return ResponseEntity.status(HttpStatus.CREATED).body(comissaoDto);
-        }catch(ComissaoNaoEncontradoException e) {
-            throw new NegocioException(e.getMessage(), e);
-        }
+        Comissao comissao = service.buscarPorId(comissaoId);
+        comissaoDissembler.copyToDomainObject(comissaoInput, comissao);
+        ComissaoDto comissaoDto = comissaoAssembler.toModel(service.adicionar(comissao));
+        return ResponseEntity.status(HttpStatus.CREATED).body(comissaoDto);
     }
 
     @DeleteMapping("/{comissaoId}")

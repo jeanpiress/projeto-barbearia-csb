@@ -59,14 +59,10 @@ public class ProfissionalController implements ProfissionalControllerOpenApi {
 
     @PutMapping(value = "/{profissionalId}")
     public ResponseEntity<ProfissionalDto> alterar(@RequestBody @Valid ProfissionalInput profissionalInput, @PathVariable Long profissionalId) {
-        try {
-            Profissional profissional = service.buscarPorId(profissionalId);
-            profissionalDissembler.copyToDomainObject(profissionalInput, profissional);
-            ProfissionalDto profissionalDto = profissionalAssembler.toModel(service.adicionar(profissional));
-            return ResponseEntity.status(HttpStatus.CREATED).body(profissionalDto);
-        }catch(ProfissionalNaoEncontradoException e) {
-            throw new NegocioException(e.getMessage(), e);
-        }
+        Profissional profissional = service.buscarPorId(profissionalId);
+        profissionalDissembler.copyToDomainObject(profissionalInput, profissional);
+        ProfissionalDto profissionalDto = profissionalAssembler.toModel(service.adicionar(profissional));
+        return ResponseEntity.status(HttpStatus.CREATED).body(profissionalDto);
     }
 
     @DeleteMapping("/{profissionalId}")

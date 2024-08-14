@@ -3,11 +3,15 @@ package com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.PacoteProntoIdNome;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Categoria;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 public class ProdutoDto {
