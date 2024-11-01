@@ -128,23 +128,23 @@ class PedidoServiceTest {
         pedidoPago = new Pedido(1L, OffsetDateTime.parse("2024-05-19T15:30:00-03:00"), listaComItemPedidoDoisProdutos, StatusPagamento.PAGO,
                 FormaPagamento.DINHEIRO, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(45), BigDecimal.valueOf(90),
                 BigDecimal.valueOf(90),true, BigDecimal.valueOf(90), OffsetDateTime.now(), null, null, null,
-                null, null, null, null);
+                null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
 
 
         pedidoSemItemPedido = new Pedido(2L, OffsetDateTime.parse("2024-05-19T15:30:00-03:00"), listaItemPedidoVazia,
                 StatusPagamento.AGUARDANDO_PAGAMENTO,null, StatusPedido.AGENDADO, cliente, profissional, BigDecimal.ZERO,
                 BigDecimal.ZERO, BigDecimal.ZERO,true, BigDecimal.ZERO, OffsetDateTime.now(), null,
-                null, null,null, null, null, null);
+                null, null,null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
 
         pedidoAguardandoPg = new Pedido(3L, OffsetDateTime.parse("2024-05-19T15:30:00-03:00"), listaComItemPedidoUmProduto, StatusPagamento.AGUARDANDO_PAGAMENTO,
                 null, StatusPedido.AGENDADO, cliente, profissional, BigDecimal.valueOf(22.5), BigDecimal.valueOf(45), BigDecimal.valueOf(45),
                 true, BigDecimal.valueOf(45), OffsetDateTime.now(), null, null, null,
-                null, null, null, null);
+                null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
 
         pedidoAguardandoPgPorPacote = new Pedido(4L, OffsetDateTime.parse("2024-05-19T15:30:00-03:00"), listaComItemPedidoUmProduto, StatusPagamento.AGUARDANDO_PAGAMENTO,
                 null, StatusPedido.AGENDADO, cliente, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
                 true, BigDecimal.ZERO, OffsetDateTime.now(), null, null, null,
-                null, null, null, null);
+                null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
 
 
         itemPacoteConsumidoAntigo = new ItemPacote(1L, itemPedidoDoisProdutos, profissional, OffsetDateTime.parse("2024-04-19T15:30:00-03:00"));

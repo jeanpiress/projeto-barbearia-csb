@@ -86,13 +86,13 @@ class RelatorioServiceTest {
                 StatusPagamento.PAGO, FormaPagamento.DINHEIRO, StatusPedido.FINALIZADO, cliente, profissional,
                 BigDecimal.valueOf(75), BigDecimal.valueOf(50), BigDecimal.valueOf(100), true, BigDecimal.valueOf(100),
                 OffsetDateTime.parse("2024-04-19T15:30:00-03:00"),null, null, null,
-                null, null, null, null);
+                null, null, null, null, null, null, null);
 
         pedidoPagoMesCinco = new Pedido(2L, OffsetDateTime.parse("2024-05-19T15:30:00-03:00"), List.of(itemPedido),
                 StatusPagamento.PAGO, FormaPagamento.DINHEIRO, StatusPedido.FINALIZADO, cliente, profissional,
                 BigDecimal.valueOf(75), BigDecimal.valueOf(50), BigDecimal.valueOf(100), true, BigDecimal.valueOf(150),
                 OffsetDateTime.parse("2024-04-19T15:30:00-03:00"),null, null, null,
-                null, null, null, null);
+                null, null, null, null, null, null, null);
 
         caixaMesQuatro = new CaixaModel(BigDecimal.valueOf(100), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
                 BigDecimal.ZERO, BigDecimal.valueOf(50), BigDecimal.valueOf(100), 1, 1);
@@ -206,7 +206,7 @@ class RelatorioServiceTest {
     public void deveBuscarTodasComissoes(){
         when(pedidoRepository.findByDataPagamento(dataInicioFim.getInicio(), dataInicioFim.getFim())).
                 thenReturn(List.of(pedidoPagoMesQuatro, pedidoPagoMesCinco));
-        when(profissionalRepository.buscarProfissionaisAtivos()).thenReturn(Set.of(profissional));
+        when(profissionalRepository.buscarProfissionaisAtivos()).thenReturn(List.of(profissional));
 
         List<RelatorioComissao> relatorioComissaoList= relatorioService.buscarTodasComissoes(dataInicioFim);
         RelatorioComissao relatorioComissao = relatorioComissaoList.get(0);

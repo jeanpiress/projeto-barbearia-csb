@@ -4,7 +4,9 @@ public enum StatusPedido {
 
     AGENDADO,
     CONFIRMADO,
+    AGUARDANDO,
     EMATENDIMENTO,
     FINALIZADO,
-    CANCELADO;
+    CANCELADO,
+    EXCLUIDO;
 }

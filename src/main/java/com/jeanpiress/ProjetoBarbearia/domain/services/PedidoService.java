@@ -1,6 +1,7 @@
 package com.jeanpiress.ProjetoBarbearia.domain.services;
 
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoAlteracaoInput;
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.ProfissionalId;
 import com.jeanpiress.ProjetoBarbearia.core.security.CsbSecurity;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.FormaPagamentoJson;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.FormaPagamento;
@@ -21,8 +22,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -81,6 +84,7 @@ public class PedidoService {
         pedido.setCriadoAs(OffsetDateTime.now());
         Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
         pedido.setCriadoPor(usuario);
+        pedido.setStatusPedido(StatusPedido.AGUARDANDO);
 
         return repository.save(pedido);
     }
@@ -140,6 +144,15 @@ public class PedidoService {
         BigDecimal pontuacaoCliente = pedido.getPontuacaoClienteGerada().subtract(gerarPontuacaoCliente(itemPedido));
         pedido.setPontuacaoClienteGerada(pontuacaoCliente);
 
+        return repository.save(pedido);
+    }
+
+    public Pedido removerTodosItensPedido(Pedido pedido){
+        pedido.setItemPedidos(new ArrayList<>());
+        pedido.setComissaoGerada(BigDecimal.ZERO);
+        pedido.setValorTotal(BigDecimal.ZERO);
+        pedido.setPontuacaoProfissionalGerada(BigDecimal.ZERO);
+        pedido.setPontuacaoClienteGerada(BigDecimal.ZERO);
         return repository.save(pedido);
     }
 
@@ -237,7 +250,7 @@ public class PedidoService {
         if(pedido.getStatusPagamento().equals(StatusPagamento.PAGO)){
             throw new PedidoJaFoiPagoException("Não é permitido alterar profissional de pedido já recebido");
         }
-        if(pedidoAlteracaoInput.getHorario().isBefore(OffsetDateTime.now())){
+        if(pedidoAlteracaoInput.getHorario().isBefore(OffsetDateTime.now().minusMinutes(1))){
             throw new HorarioInvalidoException("Não é possivel marcar um horario em uma data que já passou");
         }
         Profissional profissional = profissionalService.buscarPorId(pedidoAlteracaoInput.getProfissional().getId());
@@ -250,26 +263,69 @@ public class PedidoService {
         return pedido;
     }
 
+    public Pedido alterarProfissional(Long profissionalId, Long pedidoId) {
+        Pedido pedido = buscarPorId(pedidoId);
+        if(pedido.getStatusPagamento().equals(StatusPagamento.PAGO)){
+            throw new PedidoJaFoiPagoException("Não é permitido alterar profissional de pedido já recebido");
+        }
+        Profissional profissional = profissionalService.buscarPorId(profissionalId);
+        pedido.setProfissional(profissional);
+        Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
+        pedido.setAlteradoPor(usuario);
+        pedido.setModificadoAs(OffsetDateTime.now());
+
+        return pedido;
+    }
+
     public void confirmarPedido(Long pedidoId) {
         Pedido pedido = buscarPorId(pedidoId);
         if(pedido.getStatusPedido().equals(StatusPedido.AGENDADO)){
             pedido.setStatusPedido(StatusPedido.CONFIRMADO);
+            repository.save(pedido);
         }else{
             throw new PedidoNaoPodeSerConfirmadoException(pedidoId);
+        }
+
+    }
+
+    public void iniciarExecucaoPedido(Long pedidoId) {
+        Pedido pedido = buscarPorId(pedidoId);
+        if(pedido.getStatusPedido().equals(StatusPedido.CANCELADO) ||
+                pedido.getStatusPedido().equals(StatusPedido.FINALIZADO) ||
+                pedido.getStatusPedido().equals(StatusPedido.EXCLUIDO)){
+
+            throw new PedidoNaoPodeSerConfirmadoException(pedidoId);
+        }else{
+            pedido.setStatusPedido(StatusPedido.EMATENDIMENTO);
+            pedido.setInicioAtendimento(OffsetDateTime.now());
+            repository.save(pedido);
         }
     }
 
     public void cancelarPedido(Long pedidoId) {
         Pedido pedido = buscarPorId(pedidoId);
         Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
+        if(pedido.getStatusPagamento().equals(StatusPagamento.PAGO)){
+            throw new PedidoNaoPodeSerCanceladoException("Pedidos pagos não podem ser cancelados");
+        }
+        pedido.setStatusPedido(StatusPedido.CANCELADO);
+        pedido.setStatusPagamento(StatusPagamento.AGUARDANDO_PAGAMENTO);
+        pedido.setCanceladoAs(OffsetDateTime.now());
+        pedido.setCanceladoPor(usuario);
+        repository.save(pedido);
+    }
+
+    public void excluirPedido(Long pedidoId) {
+        Pedido pedido = buscarPorId(pedidoId);
+        Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
         boolean isGerente = usuario.getPermissoes().stream().anyMatch(permissao -> permissao.getId().equals(1L));
         if(pedido.getStatusPagamento().equals(StatusPagamento.PAGO) && !isGerente){
             throw new PedidoNaoPodeSerCanceladoException("Apenas os gerentes do sistema pode cancelar pedidos pagos");
         }
-        pedido.setStatusPedido(StatusPedido.CANCELADO);
+        pedido.setStatusPedido(StatusPedido.EXCLUIDO);
         pedido.setStatusPagamento(StatusPagamento.CANCELADO);
-        pedido.setCanceladoAs(OffsetDateTime.now());
-        pedido.setCanceladoPor(usuario);
+        pedido.setExcluidoAs(OffsetDateTime.now());
+        pedido.setExcluidoPor(usuario);
         repository.save(pedido);
     }
 

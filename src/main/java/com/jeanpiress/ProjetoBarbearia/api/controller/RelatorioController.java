@@ -35,14 +35,14 @@ public class RelatorioController implements RelatorioControllerOpenApi {
 
 
 
-    @PostMapping("/faturamento-data")
+    @PostMapping("/faturamento/data")
     public ResponseEntity<RelatorioFaturamento> buscarFaturamentoData(@RequestBody @Valid DataInicioFim dataInicioFim){
         RelatorioFaturamento faturamentoPorData = relatorioService.buscarFaturamentoData(dataInicioFim);
         return ResponseEntity.ok(faturamentoPorData);
     }
 
 
-    @PostMapping("/comissoes-data")
+    @PostMapping("/comissoes/data")
     public ResponseEntity<List<RelatorioComissaoDto>> buscarRelatorioComissao(@RequestBody @Valid DataInicioFim dataInicioFim){
         List<RelatorioComissao> relatoriosComissoes = relatorioService.buscarTodasComissoes(dataInicioFim);
         return ResponseEntity.ok(relatorioComissaoAssembler.collectionToModel(relatoriosComissoes));
@@ -56,20 +56,20 @@ public class RelatorioController implements RelatorioControllerOpenApi {
         return ResponseEntity.ok(relatorioComissaoDetalhadaAssembler.toModel(relatorioComissao));
     }
 
-    @GetMapping("/cliente-volta/{dias}")
+    @GetMapping("/cliente/volta/{dias}")
     public ResponseEntity<List<ClientesRetornoDto>> clientesParaVoltar(@PathVariable Integer dias){
         List<ClientesRetorno> clientes = relatorioService.buscarClientesParaRetornarHoje(dias);
         return ResponseEntity.ok(clientesRetornoAssembler.collectionToModel(clientes));
     }
 
-    @PostMapping("/compara-mes")
+    @PostMapping("/compara/mes")
     public ResponseEntity<ComparacaoMes> comparacaoFaturamentoMesFechado(@RequestBody @Valid DataInicioFim dataJson){
         ComparacaoMes comparacaoMes = relatorioService.compararMetricasMesFechado(dataJson);
 
         return ResponseEntity.ok(comparacaoMes);
     }
 
-    @PostMapping("/compara-data")
+    @PostMapping("/compara/data")
     public ResponseEntity<ComparacaoMes> comparaDataAtualComMesFornecido(@RequestBody @Valid MesAno mesAnoJson){
         ComparacaoMes comparacaoDataAtual = relatorioService.compararMetricasDataAtualMesmoPeriodoMesSelecionado(mesAnoJson);
         return ResponseEntity.ok(comparacaoDataAtual);

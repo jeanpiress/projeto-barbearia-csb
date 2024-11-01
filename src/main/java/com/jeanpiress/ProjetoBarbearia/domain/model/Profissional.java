@@ -25,7 +25,7 @@ public class Profissional {
     private OffsetDateTime dataNascimento;
     private BigDecimal salarioFixo;
     private Integer diaPagamento;
-    private boolean ativo;
+    private boolean ativo = true;
 
 
     @Embedded

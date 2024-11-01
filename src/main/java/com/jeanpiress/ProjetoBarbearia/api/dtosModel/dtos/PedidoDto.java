@@ -17,10 +17,10 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class PedidoDto {
 
     @Schema(description = "ID do pedido", example = "1")
@@ -53,22 +53,38 @@ public class PedidoDto {
     @Schema(example = "true")
     private Boolean caixaAberto;
 
-    @Schema(description = "Pontuação gerada pelo pedido", example = "100")
-    private BigDecimal pontuacaoGerada;
+    @Schema(description = "Pontuação gerada para o profissional", example = "100")
+    private BigDecimal pontuacaoProfissionalGerada;
+
+    @Schema(description = "Pontuação gerada para o cliente", example = "100")
+    private BigDecimal pontuacaoClienteGerada;
 
     private UsuarioResumo criadoPor;
+
     @Schema(description ="Pedido criado no horario:", example = "2024-01-25T14:30:00-03:00")
     private OffsetDateTime criadoAs;
 
     private UsuarioResumo alteradoPor;
+
     @Schema(description ="Pedido modificado no horario:", example = "2024-01-25T14:30:00-03:00")
     private OffsetDateTime modificadoAs;
 
     private UsuarioResumo recibidoPor;
+
     @Schema(description ="Pedido pago no horario:", example = "2024-01-25T14:30:00-03:00")
     private OffsetDateTime dataPagamento;
 
     private UsuarioResumo canceladoPor;
+
     @Schema(description ="Pedido cancelado no horario:", example = "2024-01-25T14:30:00-03:00")
     private OffsetDateTime canceladoAs;
+
+    private UsuarioResumo exlcuidoPor;
+
+    @Schema(description ="Pedido excluido no horario:", example = "2024-01-25T14:30:00-03:00")
+    private OffsetDateTime excluidoAs;
+
+    @Schema(description ="Pedido começou a ser executado no horario:", example = "2024-01-25T14:30:00-03:00")
+    private OffsetDateTime inicioAtendimento;
+
 }

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -24,6 +25,14 @@ public interface ProdutoControllerOpenApi {
     })
     public ResponseEntity<ProdutoDto> buscarPorId(@Parameter(description = "ID de um produto", example = "1")
                                                          Long produtoId);
+
+    @Operation(summary ="lista os Produto por categoria", responses ={
+            @ApiResponse(responseCode = "400", description = "Id da Categoria inválido", content = @Content(schema = @Schema(ref = "Problema")))
+    })
+    public ResponseEntity<List<ProdutoDto>> buscarPorCategoria(@Parameter(description = "ID de uma categoria", example = "1")
+                                                                   Long categoriaId);
+
+
     @Operation(summary ="Cria um novo Produto", responses ={
             @ApiResponse(responseCode = "201", description = "Produto cadastrado"),
             @ApiResponse(responseCode = "400", description = "Id do produto inválido", content = @Content(schema = @Schema(ref = "Problema"))),

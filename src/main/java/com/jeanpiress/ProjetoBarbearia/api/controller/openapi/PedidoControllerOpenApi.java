@@ -3,6 +3,7 @@ package com.jeanpiress.ProjetoBarbearia.api.controller.openapi;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.PedidoDto;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoAlteracaoInput;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoInput;
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.ProfissionalId;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.FormaPagamentoJson;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,14 +13,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Tag(name = "Pedidos")
 public interface PedidoControllerOpenApi {
 
-    @Operation(summary ="Lista os pedidos")
-    public ResponseEntity<List<PedidoDto>> listar();
+    @Operation(summary ="Lista os pedidos que estão pagos e com caixa aberto")
+    public ResponseEntity<List<PedidoDto>> listarPagosCaixaAberto();
 
     @Operation(summary ="Busca Pedido por id", responses ={
             @ApiResponse(responseCode = "400", description = "Id do Pedido inválido", content = @Content(schema = @Schema(ref = "Problema"))),
@@ -44,12 +48,28 @@ public interface PedidoControllerOpenApi {
                                              @Parameter(description = "ID de um pedido", example = "1")
                                                      Long pedidoId);
 
+    @Operation(summary ="Altera profissional de um pedido", responses ={
+            @ApiResponse(responseCode = "200", description = "Pedido atualizado"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
+    })
+    public ResponseEntity<PedidoDto> alterarProfissional(@Parameter(description = "Representação de um profissional")
+                                                             Long pedidoInput,
+                                                         @Parameter(description = "ID de um pedido", example = "1")
+                                                             Long pedidoId);
+
     @Operation(summary ="Cancelar um Pedido", responses ={
             @ApiResponse(responseCode = "204", description = "Pedido cancelado"),
             @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public void cancelar(@Parameter(description = "ID de um pedido", example = "1")
                             Long pedidoId);
+
+    @Operation(summary ="Exclui um Pedido", responses ={
+            @ApiResponse(responseCode = "204", description = "Pedido excluido"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
+    })
+    public void excluir(@Parameter(description = "ID de um pedido", example = "1")
+                         Long pedidoId);
 
 
     @Operation(summary ="Adiciona um ItemPedido", responses ={

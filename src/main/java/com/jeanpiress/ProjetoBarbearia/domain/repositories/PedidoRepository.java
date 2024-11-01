@@ -1,6 +1,5 @@
 package com.jeanpiress.ProjetoBarbearia.domain.repositories;
 
-import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Pedido;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,8 +11,6 @@ import java.util.List;
 
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
-
-    StatusPagamento statusPago = StatusPagamento.PAGO;
 
     @Query(value = "SELECT * FROM pedido p WHERE p.caixa_aberto = true " +
             "AND p.status_pagamento = 1", nativeQuery = true)
@@ -31,6 +28,13 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
             "AND p.status_pagamento = 1", nativeQuery = true)
     List<Pedido> findByDataPagamentoAndProfissionalId(@Param("inicio") OffsetDateTime inicio, @Param("fim") OffsetDateTime fim, @Param("profissionalId") Long profissionalId);
 
+    @Query(value = "SELECT * FROM pedido p WHERE  p.status_pagamento <> 1 " +
+            "AND p.status_pedido = 2", nativeQuery = true)
+    List<Pedido> findByAguardando();
+
+    @Query(value = "SELECT * FROM pedido p WHERE  p.status_pagamento <> 1 " +
+            "AND p.status_pedido = 3", nativeQuery = true)
+    List<Pedido> findByEmAtendimento();
 
 
 

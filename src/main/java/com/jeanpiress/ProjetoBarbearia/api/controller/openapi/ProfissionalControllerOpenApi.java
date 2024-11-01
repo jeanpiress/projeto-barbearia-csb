@@ -18,6 +18,12 @@ public interface ProfissionalControllerOpenApi {
     @Operation(summary ="Lista os Profissionais")
     public ResponseEntity<List<ProfissionalDto>> listar();
 
+    @Operation(summary ="Lista os Profissionais com status ativo")
+    public ResponseEntity<List<ProfissionalDto>> listarProfissionaisAtivos();
+
+    @Operation(summary ="Lista os Profissionais com status inativo")
+    public ResponseEntity<List<ProfissionalDto>> listarProfissionaisInativos();
+
     @Operation(summary ="Busca Profissional por id", responses ={
             @ApiResponse(responseCode = "400", description = "Id do Profissional inválido", content = @Content(schema = @Schema(ref = "Problema"))),
             @ApiResponse(responseCode = "404", description = "Profissional não encontrado", content = @Content(schema = @Schema(ref = "Problema")))

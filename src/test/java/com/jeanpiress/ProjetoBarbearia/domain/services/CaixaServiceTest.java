@@ -64,27 +64,27 @@ class CaixaServiceTest {
 
         pedidoDinheiro = new Pedido(1L, OffsetDateTime.parse("2024-05-19T15:30:00-03:00"), itensPedido, StatusPagamento.PAGO,
                 FormaPagamento.DINHEIRO, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(50), BigDecimal.valueOf(100),
-                BigDecimal.valueOf(100),true, BigDecimal.valueOf(100), OffsetDateTime.now(), null, null, null, null, null, null, null);
+                BigDecimal.valueOf(100),true, BigDecimal.valueOf(100), OffsetDateTime.now(), null, null, null, null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
 
         pedidoPix = new Pedido(2L, OffsetDateTime.parse("2024-05-18T15:30:00-03:00"), itensPedido, StatusPagamento.PAGO,
                 FormaPagamento.PIX, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(100), BigDecimal.valueOf(200),
-                BigDecimal.valueOf(200), true, BigDecimal.valueOf(200), OffsetDateTime.now(), null, null, null, null, null, null, null);
+                BigDecimal.valueOf(200), true, BigDecimal.valueOf(200), OffsetDateTime.now(), null, null, null, null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
 
         pedidoCredito = new Pedido(3L, OffsetDateTime.parse("2024-05-17T15:30:00-03:00"), itensPedido, StatusPagamento.PAGO,
                 FormaPagamento.CREDITO, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(150), BigDecimal.valueOf(300),
-                BigDecimal.valueOf(300), true, BigDecimal.valueOf(300), OffsetDateTime.now(), null, null, null, null, null, null, null);
+                BigDecimal.valueOf(300), true, BigDecimal.valueOf(300), OffsetDateTime.now(), null, null, null, null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
 
         pedidoDebito = new Pedido(4L, OffsetDateTime.parse("2024-05-16T15:30:00-03:00"), itensPedido, StatusPagamento.PAGO,
                 FormaPagamento.DEBITO, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(200), BigDecimal.valueOf(400),
-                BigDecimal.valueOf(400), true, BigDecimal.valueOf(400), OffsetDateTime.now(), null, null, null, null, null, null, null);
+                BigDecimal.valueOf(400), true, BigDecimal.valueOf(400), OffsetDateTime.now(), null, null, null, null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
 
         pedidoVoucher = new Pedido(5L, OffsetDateTime.parse("2024-05-15T15:30:00-03:00"), itensPedido, StatusPagamento.PAGO,
                 FormaPagamento.VOUCHER, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(250), BigDecimal.valueOf(500),
-                BigDecimal.valueOf(500), true, BigDecimal.valueOf(500), OffsetDateTime.now(), null, null, null, null, null, null, null);
+                BigDecimal.valueOf(500), true, BigDecimal.valueOf(500), OffsetDateTime.now(), null, null, null, null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
 
         pedidoPontos = new Pedido(6L, OffsetDateTime.parse("2024-05-14T15:30:00-03:00"), itensPedido, StatusPagamento.PAGO,
                 FormaPagamento.PONTO, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(300), BigDecimal.valueOf(600),
-                BigDecimal.valueOf(600), true, BigDecimal.valueOf(600), OffsetDateTime.now(), null, null, null, null, null, null, null);
+                BigDecimal.valueOf(600), true, BigDecimal.valueOf(600), OffsetDateTime.now(), null, null, null, null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
 
         pedidos = new ArrayList<>();
         pedidos.addAll(Arrays.asList(pedidoDinheiro, pedidoPix, pedidoCredito, pedidoDebito, pedidoVoucher, pedidoPontos));

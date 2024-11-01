@@ -116,7 +116,7 @@ public class RelatorioService {
 
     public List<RelatorioComissao> buscarTodasComissoes(DataInicioFim data){
         List<Pedido> pedidos = pedidoRepository.findByDataPagamento(data.getInicio(), data.getFim());
-        Set<Profissional> profissionais = profissionalRepository.buscarProfissionaisAtivos();
+        List<Profissional> profissionais = profissionalRepository.buscarProfissionaisAtivos();
         List<RelatorioComissao> relatoriosComissoes = relatoriosComissoesZeradosComProfissionais(profissionais);
 
         for(Pedido pedido : pedidos){
@@ -184,7 +184,7 @@ public class RelatorioService {
 
     }
 
-    private List<RelatorioComissao> relatoriosComissoesZeradosComProfissionais(Set<Profissional> profissionais){
+    private List<RelatorioComissao> relatoriosComissoesZeradosComProfissionais(List<Profissional> profissionais){
         List<RelatorioComissao> relatoriosComissoes = new ArrayList<>();
          for(Profissional profissional : profissionais){
             RelatorioComissao relatorioComissao = RelatorioComissao.builder()

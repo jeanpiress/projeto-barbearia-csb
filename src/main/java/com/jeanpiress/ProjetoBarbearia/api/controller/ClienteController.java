@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -36,6 +37,7 @@ public class ClienteController implements ClienteControllerOpenApi {
     @Autowired
     private ClienteInputDissembler clienteDissembler;
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @GetMapping
     public ResponseEntity<List<ClienteDto>> listar(@RequestParam(required = false) String nome){
         List<Cliente> clienteList = (nome != null && !nome.isEmpty())

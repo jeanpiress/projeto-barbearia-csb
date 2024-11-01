@@ -88,7 +88,7 @@ class PedidoControllerTest {
         pedido = new Pedido(1L, OffsetDateTime.parse("2024-05-19T15:30:00-03:00"), List.of(itemPedido), StatusPagamento.PAGO,
                 FormaPagamento.DINHEIRO, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(45), BigDecimal.valueOf(90),
                 BigDecimal.valueOf(90), true, BigDecimal.valueOf(90), OffsetDateTime.now(), null, null,
-                null, null, null, null, null);
+                null, null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
         pedidoDto = new PedidoDto();
         pedidoInput = new PedidoInput(OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), ClienteId.builder().id(1L).build(),
                 ProfissionalId.builder().id(1L).build());

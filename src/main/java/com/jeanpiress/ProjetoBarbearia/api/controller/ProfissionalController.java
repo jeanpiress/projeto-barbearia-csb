@@ -42,6 +42,20 @@ public class ProfissionalController implements ProfissionalControllerOpenApi {
         return ResponseEntity.ok(profissionaisDto);
     }
 
+    @GetMapping("/ativos")
+    public ResponseEntity<List<ProfissionalDto>> listarProfissionaisAtivos(){
+        List<Profissional> profissionais = repository.buscarProfissionaisAtivos();
+        List<ProfissionalDto> profissionaisDto = profissionalAssembler.collectionToModel(profissionais);
+        return ResponseEntity.ok(profissionaisDto);
+    }
+
+    @GetMapping("/inativos")
+    public ResponseEntity<List<ProfissionalDto>> listarProfissionaisInativos(){
+        List<Profissional> profissionais = repository.buscarProfissionaisInativos();
+        List<ProfissionalDto> profissionaisDto = profissionalAssembler.collectionToModel(profissionais);
+        return ResponseEntity.ok(profissionaisDto);
+    }
+
     @GetMapping(value = "/{profissionalId}")
     public ResponseEntity<ProfissionalDto> buscarPorId(@PathVariable Long profissionalId) {
         Profissional profissional = service.buscarPorId(profissionalId);
@@ -70,6 +84,21 @@ public class ProfissionalController implements ProfissionalControllerOpenApi {
     public void deletar(@PathVariable Long profissionalId){
         service.remover(profissionalId);
 
+    }
+
+    @PutMapping(value = "/{profissionalId}/ativar")
+    public void ativar(@PathVariable Long profissionalId) {
+        Profissional profissional = service.buscarPorId(profissionalId);
+        profissional.setAtivo(true);
+        repository.save(profissional);
+
+    }
+
+    @PutMapping(value = "/{profissionalId}/inativar")
+    public void inativar(@PathVariable Long profissionalId) {
+        Profissional profissional = service.buscarPorId(profissionalId);
+        profissional.setAtivo(false);
+        repository.save(profissional);
     }
 
 }

@@ -79,7 +79,7 @@ public class ComissaoService {
     @EventListener
     public void criarComissaoBase(ProdutoCriadoEvento produtoEvento){
         Produto produto = produtoEvento.getProduto();
-        Set<Profissional> profissionais = profissionalRepository.buscarProfissionaisAtivos();
+        List<Profissional> profissionais = profissionalRepository.buscarProfissionaisAtivos();
         Comissao comissao = new Comissao();
         List<Comissao> comissoesCriadas = new ArrayList<>();
         for(Profissional profissional: profissionais){

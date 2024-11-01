@@ -194,7 +194,7 @@ class ComissaoServiceTest {
 
     @Test
     public void deveCriarAComissaoBaseDoProdutoParaTodosProfissionais() {
-        when(profissionalRepository.buscarProfissionaisAtivos()).thenReturn(Set.of(profissional));
+        when(profissionalRepository.buscarProfissionaisAtivos()).thenReturn(List.of(profissional));
 
         comissaoService.criarComissaoBase(produtoCriadoEvento);
 

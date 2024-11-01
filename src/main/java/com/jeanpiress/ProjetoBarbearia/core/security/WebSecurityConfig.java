@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
@@ -32,7 +33,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable().cors()
+                .cors()
+                .and()
+                .csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/oauth/token").permitAll()
+                .anyRequest().authenticated()
                 .and().oauth2ResourceServer()
                 .jwt()
                 .jwtAuthenticationConverter(jwtAuthenticationConverter());

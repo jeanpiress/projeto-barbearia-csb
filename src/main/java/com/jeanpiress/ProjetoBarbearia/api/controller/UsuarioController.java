@@ -35,7 +35,7 @@ public class UsuarioController implements UsuarioControllerOpenApi {
    @Autowired
    private UsuarioInputDissembler usuarioDissembler;
 
-   //@PreAuthorize("hasAuthority('GERENTE')")
+   @PreAuthorize("hasAuthority('GERENTE')")
    @GetMapping
    public ResponseEntity<List<UsuarioDto>> buscarUsuarios(){
        List<Usuario> usuarios = usuarioRepository.findAll();

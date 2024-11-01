@@ -49,6 +49,13 @@ public class ProdutoController implements ProdutoControllerOpenApi {
         return ResponseEntity.ok(produtoDto);
     }
 
+    @GetMapping(value = "/categoria/{categoriaId}")
+    public ResponseEntity<List<ProdutoDto>> buscarPorCategoria(@PathVariable Long categoriaId){
+        List<Produto> produtos = repository.buscarPorCategoria(categoriaId);
+        List<ProdutoDto> produtosDto = produtoAssembler.collectionToModel(produtos);
+        return ResponseEntity.ok(produtosDto);
+    }
+
     @PostMapping
     public ResponseEntity<ProdutoDto> adicionar(@RequestBody @Valid ProdutoInput produtoInput) {
         Produto produto = produtoDissembler.toDomainObject(produtoInput);

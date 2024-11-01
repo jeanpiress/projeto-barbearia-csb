@@ -64,6 +64,8 @@ public class ItemPedidoService {
         itemPedido.setPrecoTotal(valorTotal);
 
     }
-
+    public void removerPorLista(List<Long> itensPedidoId) {
+        repository.deleteByIdIn(itensPedidoId);
+    }
 
 }

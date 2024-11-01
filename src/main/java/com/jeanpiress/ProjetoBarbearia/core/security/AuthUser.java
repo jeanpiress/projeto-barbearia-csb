@@ -13,6 +13,7 @@ public class AuthUser extends User {
 
     private String nomeCompleto;
     private Long idUsuario;
+    private String nomeExibicao;
 
     public AuthUser(Usuario usuario, Collection<? extends GrantedAuthority> authorities) {
        super(usuario.getEmail(), usuario.getSenha(), authorities);
@@ -20,10 +21,12 @@ public class AuthUser extends User {
        if(usuario.getCliente() != null) {
            this.nomeCompleto = usuario.getCliente().getNome();
            this.idUsuario = usuario.getCliente().getId();
+           this.nomeExibicao = null;
        }
        if(usuario.getProfissional() != null){
            this.nomeCompleto = usuario.getProfissional().getNome();
            this.idUsuario = usuario.getProfissional().getId();
+           this.nomeExibicao = usuario.getProfissional().getNome();
        }
     }
 }

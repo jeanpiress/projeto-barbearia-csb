@@ -11,13 +11,13 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@NoArgsConstructor
-@AllArgsConstructor
 public class Pedido {
 
     @EqualsAndHashCode.Include
@@ -79,6 +79,16 @@ public class Pedido {
 
     @Column(name = "cancelado_as")
     private OffsetDateTime canceladoAs;
+
+    @ManyToOne
+    @JoinColumn(name = "excluido_por")
+    private Usuario excluidoPor;
+
+    @Column(name = "excluido_as")
+    private OffsetDateTime excluidoAs;
+
+    @Column(name = "inicio_atendimento")
+    private OffsetDateTime inicioAtendimento;
 
     public void adicionarItemPedido(ItemPedido itemPedido){
         itemPedidos.add(itemPedido);
