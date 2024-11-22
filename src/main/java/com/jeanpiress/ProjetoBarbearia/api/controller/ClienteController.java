@@ -5,6 +5,7 @@ import com.jeanpiress.ProjetoBarbearia.api.converteDto.assebler.ClienteAssembler
 import com.jeanpiress.ProjetoBarbearia.api.converteDto.dissembler.ClienteInputDissembler;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.ClienteDto;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.ClienteInput;
+import com.jeanpiress.ProjetoBarbearia.domain.exceptions.CampoObrigatorioException;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.ClienteNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.NegocioException;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Cliente;
@@ -19,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 
 
 @RestController()
@@ -39,13 +41,14 @@ public class ClienteController implements ClienteControllerOpenApi {
 
     @PreAuthorize("hasAuthority('GERENTE')")
     @GetMapping
-    public ResponseEntity<List<ClienteDto>> listar(@RequestParam(required = false) String nome){
-        List<Cliente> clienteList = (nome != null && !nome.isEmpty())
-                ? repository.findByNome(nome)
-                : repository.findAll();
-
-       List<ClienteDto> clientesDto = clienteAssembler.collectionToModel(clienteList);
-       return ResponseEntity.ok(clientesDto);
+    public ResponseEntity<List<ClienteDto>> listar(@RequestParam String nome, @RequestParam boolean ativo){
+        if(Objects.nonNull(nome)  && !nome.isBlank()){
+            List<Cliente> clienteList = repository.findByNome(nome, ativo);
+            List<ClienteDto> clientesDto = clienteAssembler.collectionToModel(clienteList);
+            return ResponseEntity.ok(clientesDto);
+        } else {
+            throw new CampoObrigatorioException("Nome é obrigatorio");
+        }
     }
 
     @GetMapping(value = "/{clienteId}")
@@ -78,6 +81,13 @@ public class ClienteController implements ClienteControllerOpenApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable Long clienteId){
         service.remover(clienteId);
+
+    }
+
+    @DeleteMapping("/{clienteId}/desativar")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void desativar(@PathVariable Long clienteId){
+        service.desativar(clienteId);
 
     }
 

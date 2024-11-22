@@ -31,8 +31,10 @@ public class Pedido {
             inverseJoinColumns = @JoinColumn(name = "item_pedido_id"))
     private List<ItemPedido> itemPedidos = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
     private StatusPagamento statusPagamento;
     private FormaPagamento formaPagamento;
+    @Enumerated(EnumType.STRING)
     private StatusPedido statusPedido;
 
     @ManyToOne
@@ -90,6 +92,8 @@ public class Pedido {
     @Column(name = "inicio_atendimento")
     private OffsetDateTime inicioAtendimento;
 
+    private String descricao;
+
     public void adicionarItemPedido(ItemPedido itemPedido){
         itemPedidos.add(itemPedido);
     }
@@ -97,6 +101,7 @@ public class Pedido {
     public void removerItemPedido(ItemPedido itemPedido){
         itemPedidos.remove(itemPedido);
     }
+
 
 
 }

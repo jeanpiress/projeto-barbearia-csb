@@ -50,11 +50,11 @@ insert into categoria (id, nome) values (3, 'produto');
 insert into profissional (id, nome, nome_exibicao, celular, cpf, data_nascimento, salario_fixo, dia_pagamento, ativo) values (1, 'Jean Carlo', 'jean', '34999708382', '10158594614', utc_timestamp, 0, 5, true);
 insert into profissional (id, nome, nome_exibicao, celular, cpf, data_nascimento, salario_fixo, dia_pagamento, ativo) values (2, 'Mc Victor', 'Mono', '34924242424', '10158594614', utc_timestamp, 0, 5, true);
 
-insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id, endereco_bairro, endereco_cep, endereco_complemento, endereco_logradouro, endereco_numero) values (1, 'jean', '34999708382', utc_timestamp, utc_timestamp, 100.00, timestamp('2024-04-12 14:30:45.12'), 'sem obs' , 30, 1,'morumbi', '38407381', 'casa', 'rua grupiara', '313');
-insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id) values (2, 'Kirk', '34999708385', utc_timestamp, utc_timestamp, 50.00, timestamp('2024-04-19 14:30:45.12'), 'sem obs', 30, 1);
-insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id) values (3, 'Carol', '34999708385', utc_timestamp, utc_timestamp, 50.00, timestamp('2024-04-17 14:30:45.12'), 'sem obs', 30, 2);
-insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id) values (4, 'Carolina', '34999708385', utc_timestamp, utc_timestamp, 50.00, timestamp('2024-04-17 14:30:45.12'), 'sem obs', 30, 2);
-insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id) values (5, 'Calorina', '34999708385', utc_timestamp, utc_timestamp, 50.00, timestamp('2024-04-17 14:30:45.12'), 'sem obs', 30, 2);
+insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id, ativo, endereco_bairro, endereco_cep, endereco_complemento, endereco_logradouro, endereco_numero) values (1, 'jean', '34999708382', utc_timestamp, utc_timestamp, 100.00, timestamp('2024-04-12 14:30:45.12'), 'sem obs' , 30, 1, true, 'morumbi', '38407381', 'casa', 'rua grupiara', '313');
+insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id, ativo) values (2, 'Kirk', '34999708385', utc_timestamp, utc_timestamp, 50.00, timestamp('2024-04-19 14:30:45.12'), 'sem obs', 30, 1, true);
+insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id, ativo) values (3, 'Carol', '34999708385', utc_timestamp, utc_timestamp, 50.00, timestamp('2024-04-17 14:30:45.12'), 'sem obs', 30, 2, true);
+insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id, ativo) values (4, 'Carolina', '34999708385', utc_timestamp, utc_timestamp, 50.00, timestamp('2024-04-17 14:30:45.12'), 'sem obs', 30, 2, true);
+insert into cliente (id, nome, celular, data_nascimento, ultima_visita, pontos, previsao_retorno, observacao, dias_retorno, ultimo_profissional_id, ativo) values (5, 'Calorina', '34999708385', utc_timestamp, utc_timestamp, 50.00, timestamp('2024-04-17 14:30:45.12'), 'sem obs', 30, 2, true);
 
 insert into produto (id, nome, preco, ativo, tem_estoque, estoque, vendido_por_ponto, peso_pontuacao_cliente, peso_pontuacao_profissional, preco_em_pontos, comissao_base, categoria_id) values (1, 'corte', 45.00, true, false, 0, false, 1, 1, 0, 50.00, 1);
 insert into produto (id, nome, preco, ativo, tem_estoque, estoque, vendido_por_ponto, peso_pontuacao_cliente, peso_pontuacao_profissional, preco_em_pontos, comissao_base, categoria_id) values (2, 'barba', 45.00, true, false, 0, false, 1, 1, 0, 50.00, 1);
@@ -73,39 +73,39 @@ insert into usuario(id, email, senha, cliente_id, profissional_id, permissao, no
 
 insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada,
                     caixa_aberto, valor_total, data_pagamento, pontuacao_profissional_gerada, pontuacao_cliente_gerada,
-                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as, inicio_atendimento)
-                    values(1, utc_timestamp, 0, 6, 2, 2, 2, 22.50, true, 45.00, timestamp('2024-05-02 14:30:45.12'), 45.00,
-                           45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null, null);
+                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as, inicio_atendimento, descricao)
+                    values(1, utc_timestamp, 'AGUARDANDO_PAGAMENTO', 6, 'AGUARDANDO', 2, 2, 22.50, true, 45.00, timestamp('2024-05-02 14:30:45.12'), 45.00,
+                           45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null, null, '');
 
 insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada,
                     caixa_aberto, valor_total, data_pagamento, pontuacao_profissional_gerada, pontuacao_cliente_gerada,
-                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as, inicio_atendimento)
-                    values(2, utc_timestamp, 1, 1, 1, 1, 1, 22.50, true, 45.00, timestamp('2024-05-01 14:30:45.12'), 45.00,
-                           45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null, null);
+                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as, inicio_atendimento,descricao)
+                    values(2, utc_timestamp, 'PAGO', 1, 'EMATENDIMENTO', 1, 1, 22.50, true, 45.00, timestamp('2024-05-01 14:30:45.12'), 45.00,
+                           45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null, null, '');
 
 insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada,
                     caixa_aberto, valor_total, data_pagamento, pontuacao_profissional_gerada, pontuacao_cliente_gerada,
-                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as, inicio_atendimento)
-                    values(3, utc_timestamp, 1, 1, 1, 1, 2, 18.00, true, 180.00, timestamp('2024-04-06 14:30:45.12'), 1800.00,
-                           45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null, null);
+                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as, inicio_atendimento, descricao)
+                    values(3, utc_timestamp, 'PAGO', 1, 'EMATENDIMENTO', 1, 2, 18.00, true, 180.00, timestamp('2024-04-06 14:30:45.12'), 1800.00,
+                           45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null, null, '');
 
 insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada,
                     caixa_aberto, valor_total,data_pagamento, pontuacao_profissional_gerada, pontuacao_cliente_gerada,
-                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as, inicio_atendimento)
-                    values(4, utc_timestamp, 1, 1, 1, 1, 2, 18.00, true, 180.00, timestamp('2024-04-07 14:30:45.12'), 1800.00,
-                           45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null, null);
+                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as, inicio_atendimento, descricao)
+                    values(4, utc_timestamp, 'AGUARDANDO_PAGAMENTO', 1, 'EMATENDIMENTO', 1, 2, 18.00, true, 180.00, timestamp('2024-04-07 14:30:45.12'), 1800.00,
+                           45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null, null, '');
 
 insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada,
                     caixa_aberto, valor_total,data_pagamento, pontuacao_profissional_gerada, pontuacao_cliente_gerada,
-                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as, inicio_atendimento)
-                    values(5, utc_timestamp, 0, 6, 2, 1, 2, 18.00, true, 180.00, timestamp('2024-04-07 14:30:45.12'), 1800.00,
-                           45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null, null);
+                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as, inicio_atendimento, descricao)
+                    values(5, utc_timestamp, 'AGUARDANDO_PAGAMENTO', 6, 'AGUARDANDO', 1, 2, 18.00, true, 180.00, timestamp('2024-04-07 14:30:45.12'), 1800.00,
+                           45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null, null, '');
 
 insert into pedido (id, horario, status_pagamento, forma_pagamento, status_pedido, cliente_id, profissional_id, comissao_gerada,
                     caixa_aberto, valor_total,data_pagamento, pontuacao_profissional_gerada, pontuacao_cliente_gerada,
-                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as, inicio_atendimento)
-                    values(6, utc_timestamp, 0, 6, 2, 2, 2, 18.00, true, 180.00, timestamp('2024-04-07 14:30:45.12'), 1800.00,
-                    45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null, null);
+                    criado_por, alterado_por, recebido_por, cancelado_por, criado_as, modificado_as, cancelado_as, inicio_atendimento, descricao)
+                    values(6, utc_timestamp, 'PAGO', 6, 'AGUARDANDO', 2, 2, 18.00, true, 180.00, timestamp('2024-04-07 14:30:45.12'), 1800.00,
+                    45.00, 1, null, null, null, timestamp('2024-04-19 14:30:45.12'), null, null, null, '');
 
 insert into item_pedido (id, preco_unitario, preco_total, quantidade, produto_id) values (1, 45.00, 45.00, 1, 1);
 insert into item_pedido (id, preco_unitario, preco_total, quantidade, produto_id) values (2, 45.00, 45.00, 1, 2);

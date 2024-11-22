@@ -47,6 +47,12 @@ public class ProdutoService {
     }
 
 
+    public void desativar(Long produtoId){
+       Produto produto = buscarPorId(produtoId);
+       produto.setAtivo(false);
+       repository.save(produto);
+    }
+
     public void remover(Long produtoId) {
         try {
             repository.deleteById(produtoId);

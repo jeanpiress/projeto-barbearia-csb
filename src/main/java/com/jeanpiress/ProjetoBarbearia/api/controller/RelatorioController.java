@@ -58,7 +58,7 @@ public class RelatorioController implements RelatorioControllerOpenApi {
 
     @GetMapping("/cliente/volta/{dias}")
     public ResponseEntity<List<ClientesRetornoDto>> clientesParaVoltar(@PathVariable Integer dias){
-        List<ClientesRetorno> clientes = relatorioService.buscarClientesParaRetornarHoje(dias);
+        List<ClientesRetorno> clientes = relatorioService.buscarClientesParaRetornar(dias);
         return ResponseEntity.ok(clientesRetornoAssembler.collectionToModel(clientes));
     }
 

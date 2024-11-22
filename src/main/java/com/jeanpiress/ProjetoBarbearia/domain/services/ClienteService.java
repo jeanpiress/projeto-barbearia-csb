@@ -40,16 +40,27 @@ public class ClienteService {
         }
     }
 
+    public void desativar(Long clienteId) {
+        Cliente cliente = buscarPorId(clienteId);
+        cliente.setAtivo(false);
+        repository.save(cliente);
+    }
+
     //Escutando de PedidoService metodos realizarPagamentoComPacote e realizarPagamento
     @EventListener
     public void alterarPrevisaoRetorno(ClienteAtendidoEvento clienteAtendido){
-        Cliente cliente = clienteAtendido.getCliente();
-        Integer DiasRetorno = cliente.getDiasRetorno();
-        OffsetDateTime agora = OffsetDateTime.now();
-        OffsetDateTime previsaoRetorno = agora.plusDays(DiasRetorno);
-        cliente.setPrevisaoRetorno(previsaoRetorno);
+        try{
+            Cliente cliente = clienteAtendido.getCliente();
+            Integer DiasRetorno = cliente.getDiasRetorno();
+            OffsetDateTime agora = OffsetDateTime.now();
+            OffsetDateTime previsaoRetorno = agora.plusDays(DiasRetorno);
+            cliente.setPrevisaoRetorno(previsaoRetorno);
 
-        repository.save(cliente);
+            repository.save(cliente);
+        }catch (Exception e) {
+            throw new ClienteNaoEncontradoException(clienteAtendido.getCliente().getId());
+        }
+
 
     }
 }

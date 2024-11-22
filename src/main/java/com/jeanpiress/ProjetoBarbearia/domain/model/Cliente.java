@@ -26,6 +26,7 @@ public class Cliente {
     private OffsetDateTime previsaoRetorno;
     private String observacao;
     private Integer diasRetorno;
+    private boolean ativo = true;
 
     @ManyToOne
     @JoinColumn(name = "ultimo_profissional_id")
@@ -33,4 +34,6 @@ public class Cliente {
 
     @Embedded
     private Endereco endereco;
+
+
 }

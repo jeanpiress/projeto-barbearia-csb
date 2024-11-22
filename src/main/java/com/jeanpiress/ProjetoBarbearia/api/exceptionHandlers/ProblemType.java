@@ -15,7 +15,8 @@ public enum ProblemType {
 	ACESSO_NEGADO("/acesso-negado", "Acesso negado"),
 	EMAIL_EXISTENTE("/email-existente", "Email já cadastrado"),
 	SENHA_INCORRETA("/senha-incorreta", "Senha atual esta incorreta"),
-	CONFERENCIA_SENHA_INCORRETA("/conf-incorreta", "Confirme corretamente sua senha");
+	CONFERENCIA_SENHA_INCORRETA("/conf-incorreta", "Confirme corretamente sua senha"),
+	CAMPO_OBRIGATORIO("/campo-obrigatorio", "Campo obrigatorio não preenchido");
 	
 	
 	private String title;

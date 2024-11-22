@@ -140,7 +140,7 @@ public class RelatorioService {
         return relatoriosComissoes;
     }
 
-    public List<ClientesRetorno> buscarClientesParaRetornarHoje(Integer quantidadeDias){
+    public List<ClientesRetorno> buscarClientesParaRetornar(Integer quantidadeDias){
         OffsetDateTime dataAtual = OffsetDateTime.now();
         OffsetDateTime dataInicial = dataAtual.minusDays(quantidadeDias).withHour(0).withMinute(0).withSecond(0).withNano(0);
         OffsetDateTime dataFinal = dataAtual.plusDays(quantidadeDias).withHour(23).withMinute(59).withSecond(59).withNano(999999999);
@@ -149,17 +149,16 @@ public class RelatorioService {
 
         for(Cliente cliente: clientes){
             long diferencaDias = ChronoUnit.DAYS.between(dataAtual, cliente.getPrevisaoRetorno());
-            if(dataAtual.isAfter(cliente.getPrevisaoRetorno())){ diferencaDias -= 1;}
 
             ClientesRetorno clienteRetorno = ClientesRetorno.builder()
                     .cliente(cliente)
-                    .diasPassados(diferencaDias)
+                    .diasPassadosRetorno(diferencaDias * -1)
                     .previsaoRetorno(cliente.getPrevisaoRetorno())
                     .build();
 
             clientesRetorno.add(clienteRetorno);
         }
-        clientesRetorno.sort(Comparator.comparingLong(c -> c.getDiasPassados()));
+        clientesRetorno.sort(Comparator.comparingLong(c -> c.getDiasPassadosRetorno()));
 
         return clientesRetorno;
     }

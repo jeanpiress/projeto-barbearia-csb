@@ -12,6 +12,12 @@ import java.util.List;
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
+    @Query("SELECT p FROM Produto p WHERE LOWER(p.nome) " +
+            "LIKE LOWER(CONCAT(:nome, '%')) " +
+            "AND p.ativo = :isAtivo " +
+            "AND (:categoriaId IS NULL OR p.categoria.id = :categoriaId)")
+    List<Produto> findByNome(String nome, boolean isAtivo, Long categoriaId);
+
     @Query(value = "SELECT * FROM produto WHERE categoria_id = :id", nativeQuery = true)
     List<Produto> buscarPorCategoria(@Param("id") Long id);
 }

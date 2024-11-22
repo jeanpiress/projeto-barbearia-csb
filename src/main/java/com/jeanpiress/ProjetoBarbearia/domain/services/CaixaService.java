@@ -2,6 +2,7 @@ package com.jeanpiress.ProjetoBarbearia.domain.services;
 
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios.CaixaModel;
+import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbearia.domain.model.ItemPedido;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Pedido;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.PedidoRepository;
@@ -81,12 +82,12 @@ public class CaixaService {
     }
 
     public CaixaModel gerarCaixaDiario(){
-        List<Pedido> pedidos = pedidoRepository.findByPagoAndCaixaAberto();
+        List<Pedido> pedidos = pedidoRepository.findByStatusAndIsCaixaAberto(true, StatusPagamento.PAGO);
         return gerarCaixa(pedidos);
     }
 
     public void fecharCaixa() {
-        List<Pedido> pedidos = pedidoRepository.findByPagoAndCaixaAberto();
+        List<Pedido> pedidos = pedidoRepository.findByStatusAndIsCaixaAberto(true, StatusPagamento.PAGO);
         pedidos.forEach(pedido -> pedido.setCaixaAberto(false));
         pedidoRepository.saveAll(pedidos);
         

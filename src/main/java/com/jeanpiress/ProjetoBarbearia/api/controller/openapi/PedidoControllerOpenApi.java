@@ -3,7 +3,6 @@ package com.jeanpiress.ProjetoBarbearia.api.controller.openapi;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.PedidoDto;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoAlteracaoInput;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoInput;
-import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.ProfissionalId;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.FormaPagamentoJson;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,17 +12,23 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @Tag(name = "Pedidos")
 public interface PedidoControllerOpenApi {
 
-    @Operation(summary ="Lista os pedidos que estão pagos e com caixa aberto")
-    public ResponseEntity<List<PedidoDto>> listarPagosCaixaAberto();
+    @Operation(summary ="Lista os pedidos por status pagamento e com caixa aberto ou fechado")
+    public ResponseEntity<List<PedidoDto>> listarPagosCaixaAberto(@Parameter(description = "Informa se o caixa esta aberto")
+                                                                       Boolean caixaAberto,
+                                                                     @Parameter(description = "Representação o status do pagamento")
+                                                                       String statusPagamento);
+
+    @Operation(summary ="Lista os pedidos por status pagamento e pedido")
+    public ResponseEntity<List<PedidoDto>> listarPedidosFiltroStatus(@Parameter(description = "Representação o status do pedido")
+                                                                        String statusPedido,
+                                                                     @Parameter(description = "Representação o status do pagamento")
+                                                                        String statusPagamento);
 
     @Operation(summary ="Busca Pedido por id", responses ={
             @ApiResponse(responseCode = "400", description = "Id do Pedido inválido", content = @Content(schema = @Schema(ref = "Problema"))),

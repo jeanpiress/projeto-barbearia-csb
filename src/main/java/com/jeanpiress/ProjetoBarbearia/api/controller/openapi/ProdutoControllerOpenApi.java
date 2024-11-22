@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -17,7 +16,9 @@ import java.util.List;
 public interface ProdutoControllerOpenApi {
 
     @Operation(summary ="Lista os Produtos")
-    public ResponseEntity<List<ProdutoDto>> listar();
+    public ResponseEntity<List<ProdutoDto>> listar(@Parameter(description = "nome do produto") String nome,
+                                                   @Parameter(description = "indica se é um produto ativo") boolean isAtivo,
+                                                   @Parameter(description = "passa a categoria do produto a ser procurado") Long categoriaId);
 
     @Operation(summary ="Busca Produto por id", responses ={
             @ApiResponse(responseCode = "400", description = "Id do Produto inválido", content = @Content(schema = @Schema(ref = "Problema"))),
@@ -56,6 +57,12 @@ public interface ProdutoControllerOpenApi {
     public void deletar(@Parameter(description = "ID de um produto", example = "1")
                             Long produtoId);
 
+    @Operation(summary ="Desativa um Produto", responses ={
+            @ApiResponse(responseCode = "204", description = "Produto desativado"),
+            @ApiResponse(responseCode = "404", description = "Produto não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
+    })
+    public void desativar(@Parameter(description = "ID de um produto", example = "1")
+                        Long produtoId);
 
 }
 

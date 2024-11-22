@@ -6,11 +6,11 @@ import com.jeanpiress.ProjetoBarbearia.api.converteDto.dissembler.PedidoInputDis
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.PedidoDto;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoAlteracaoInput;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoInput;
+import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPagamento;
+import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPedido;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.FormaPagamentoJson;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealizacaoItemPacote;
-import com.jeanpiress.ProjetoBarbearia.domain.model.ItemPedido;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Pedido;
-import com.jeanpiress.ProjetoBarbearia.domain.services.ItemPedidoService;
 import com.jeanpiress.ProjetoBarbearia.domain.services.PedidoService;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +20,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping(path ="/pedidos", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -38,33 +42,63 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     @Autowired
     private PedidoInputDissembler pedidoDissembler;
-    @Autowired
-    private ItemPedidoService itemPedidoService;
 
-
-    //@PreAuthorize("hasAuthority('RECEPCAO')")
     @GetMapping
-    public ResponseEntity<List<PedidoDto>> listarPagosCaixaAberto(){
-        List<Pedido> pedidos = pedidoRepository.findByPagoAndCaixaAberto();
+    public ResponseEntity<List<PedidoDto>> listarTodos(){
+        List<Pedido> pedidos = pedidoRepository.findAll();
         List<PedidoDto> pedidosDto = pedidoAssembler.collectionToModel(pedidos);
         return ResponseEntity.ok(pedidosDto);
     }
 
     //@PreAuthorize("hasAuthority('RECEPCAO')")
-    @GetMapping("/aguardando")
-    public ResponseEntity<List<PedidoDto>> listarPedidosAguardando(){
-        List<Pedido> pedidos = pedidoRepository.findByAguardando();
+    @GetMapping(value = "/caixa")
+    public ResponseEntity<List<PedidoDto>> listarPagosCaixaAberto(@RequestParam Boolean isAberto,
+                                                                  @RequestParam String statusPagamento) {
+
+        StatusPagamento statusPagamentoFinal;
+        try {
+            statusPagamentoFinal = StatusPagamento.valueOf(statusPagamento.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        List<Pedido> pedidos = pedidoRepository.findByStatusAndIsCaixaAberto(isAberto, statusPagamentoFinal);
         List<PedidoDto> pedidosDto = pedidoAssembler.collectionToModel(pedidos);
         return ResponseEntity.ok(pedidosDto);
     }
 
+
     //@PreAuthorize("hasAuthority('RECEPCAO')")
-    @GetMapping("/emAtendimento")
-    public ResponseEntity<List<PedidoDto>> listarPedidosEmAtendimento(){
-        List<Pedido> pedidos = pedidoRepository.findByEmAtendimento();
+    @GetMapping(value = "/status")
+    public ResponseEntity<List<PedidoDto>> listarPedidosFiltroStatus(@RequestParam String statusPedido,
+                                                                     @RequestParam String statusPagamento) {
+
+        StatusPedido statusPedidoFinal;
+        StatusPagamento statusPagamentoFinal;
+
+        try {
+            statusPedidoFinal = StatusPedido.valueOf(statusPedido.toUpperCase());
+            statusPagamentoFinal = StatusPagamento.valueOf(statusPagamento.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        List<Pedido> pedidos = pedidoRepository.findByStatus(statusPedidoFinal, statusPagamentoFinal);
         List<PedidoDto> pedidosDto = pedidoAssembler.collectionToModel(pedidos);
         return ResponseEntity.ok(pedidosDto);
     }
+
+    @GetMapping(value = "/horario")
+    public ResponseEntity<List<PedidoDto>> listarPorData(@RequestParam String horario){
+        LocalDate localDate = LocalDate.parse(horario);
+        OffsetDateTime inicioDoDia = localDate.atStartOfDay(ZoneOffset.systemDefault()).toOffsetDateTime();
+        OffsetDateTime fimDoDia = inicioDoDia.plusDays(1);
+
+        List<Pedido> pedidos = pedidoRepository.findByData(inicioDoDia, fimDoDia);
+        List<PedidoDto> pedidosDto = pedidoAssembler.collectionToModel(pedidos);
+        return ResponseEntity.ok(pedidosDto);
+    }
+
 
     //@PreAuthorize("hasAuthority('RECEPCAO')")
     @GetMapping(value = "/{pedidoId}")

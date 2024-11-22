@@ -87,4 +87,7 @@ public class PedidoDto {
     @Schema(description ="Pedido começou a ser executado no horario:", example = "2024-01-25T14:30:00-03:00")
     private OffsetDateTime inicioAtendimento;
 
+    @Schema(description ="Descricao do pedido/agendamento:", example = "Corte degrade navalhado")
+    private String descricao;
+
 }

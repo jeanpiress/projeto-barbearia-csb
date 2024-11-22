@@ -280,6 +280,19 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler{
 		return handleExceptionInternal(ex, problema, new HttpHeaders(), status, request);
 	}
 
+	private ResponseEntity<Object> handleCampoObrigatorioException(CampoObrigatorioException ex,
+																HttpHeaders headers, HttpStatus status, WebRequest request) {
+
+		ProblemType problemType = ProblemType.CAMPO_OBRIGATORIO;
+
+		String detail = ex.getMessage();
+
+		Problema problema = createProblemBuilder(status, problemType, detail).build();
+
+		return handleExceptionInternal(ex, problema, new HttpHeaders(), status, request);
+	}
+
+
 	private Problema.ProblemaBuilder createProblemBuilder(HttpStatus status, ProblemType problemType, String detail){
 		return Problema.builder().
 				title(problemType.getTitle())

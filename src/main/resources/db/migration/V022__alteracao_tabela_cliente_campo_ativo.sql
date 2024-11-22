@@ -1,0 +1,3 @@
+ALTER TABLE cliente ADD COLUMN ativo BOOLEAN;
+
+

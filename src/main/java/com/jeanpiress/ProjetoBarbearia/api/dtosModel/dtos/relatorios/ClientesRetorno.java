@@ -16,7 +16,7 @@ public class ClientesRetorno {
     private Cliente cliente;
 
     @Schema(description = "Dias passados", example = "5")
-    private Long diasPassados;
+    private Long diasPassadosRetorno;
 
     @Schema(description = "Previsão de retorno")
     private OffsetDateTime previsaoRetorno;

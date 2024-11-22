@@ -1,5 +1,7 @@
 package com.jeanpiress.ProjetoBarbearia.domain.repositories;
 
+import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPagamento;
+import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPedido;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Pedido;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,9 +14,9 @@ import java.util.List;
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
-    @Query(value = "SELECT * FROM pedido p WHERE p.caixa_aberto = true " +
-            "AND p.status_pagamento = 1", nativeQuery = true)
-    List<Pedido> findByPagoAndCaixaAberto();
+    @Query(value = "SELECT p FROM Pedido p WHERE p.caixaAberto = :isAberto " +
+            "AND p.statusPagamento = :statusPagamento")
+    List<Pedido> findByStatusAndIsCaixaAberto(Boolean isAberto, StatusPagamento statusPagamento);
 
 
     @Query(value = "SELECT * FROM pedido p WHERE p.data_pagamento > :inicio " +
@@ -28,14 +30,13 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
             "AND p.status_pagamento = 1", nativeQuery = true)
     List<Pedido> findByDataPagamentoAndProfissionalId(@Param("inicio") OffsetDateTime inicio, @Param("fim") OffsetDateTime fim, @Param("profissionalId") Long profissionalId);
 
-    @Query(value = "SELECT * FROM pedido p WHERE  p.status_pagamento <> 1 " +
-            "AND p.status_pedido = 2", nativeQuery = true)
-    List<Pedido> findByAguardando();
 
-    @Query(value = "SELECT * FROM pedido p WHERE  p.status_pagamento <> 1 " +
-            "AND p.status_pedido = 3", nativeQuery = true)
-    List<Pedido> findByEmAtendimento();
+    @Query("SELECT p FROM Pedido p WHERE " +
+            "(p.statusPedido = :statusPedido) " +
+            "AND p.statusPagamento = :statusPagamento")
+    List<Pedido> findByStatus(StatusPedido statusPedido, StatusPagamento statusPagamento);
 
-
+    @Query(value = "SELECT p FROM Pedido p WHERE p.horario >= :inicioDoDia AND p.horario < :fimDoDia")
+    List<Pedido> findByData(OffsetDateTime inicioDoDia, OffsetDateTime fimDoDia);
 
 }

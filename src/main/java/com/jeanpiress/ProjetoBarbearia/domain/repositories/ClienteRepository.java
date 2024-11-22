@@ -10,8 +10,8 @@ import java.util.List;
 
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
-    @Query("SELECT c FROM Cliente c WHERE LOWER(c.nome) LIKE LOWER(CONCAT(:nome, '%'))")
-    List<Cliente> findByNome(String nome);
+    @Query("SELECT c FROM Cliente c WHERE LOWER(c.nome) LIKE LOWER(CONCAT(:nome, '%')) AND c.ativo = :ativo")
+    List<Cliente> findByNome(String nome, boolean ativo);
 
 
     @Query("SELECT c FROM Cliente c WHERE c.previsaoRetorno BETWEEN :dataInicial AND :dataFinal")

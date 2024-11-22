@@ -17,7 +17,9 @@ public interface ClienteControllerOpenApi {
 
     @Operation(summary ="Lista os clientes")
     public ResponseEntity<List<ClienteDto>> listar(@Parameter(description = "nome de um cliente")
-                                                       String nome);
+                                                       String nome,
+                                                   @Parameter(description = "true para cliente ativo")
+                                                       boolean ativo);
 
 
     @Operation(summary ="Busca cliente por id", responses ={
@@ -52,6 +54,13 @@ public interface ClienteControllerOpenApi {
             @ApiResponse(responseCode = "404", description = "cliente não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public void deletar(@Parameter(description = "ID de um cliente", example = "1")
+                            Long clienteId);
+
+    @Operation(summary ="Desativa um cliente", responses ={
+            @ApiResponse(responseCode = "204", description = "Cliente desativado"),
+            @ApiResponse(responseCode = "404", description = "cliente não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
+    })
+    public void desativar(@Parameter(description = "ID de um cliente", example = "1")
                             Long clienteId);
 
 

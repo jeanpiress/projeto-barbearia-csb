@@ -36,8 +36,10 @@ public class ProdutoController implements ProdutoControllerOpenApi {
     private ProdutoInputDissembler produtoDissembler;
 
     @GetMapping
-    public ResponseEntity<List<ProdutoDto>> listar(){
-        List<Produto> produtos = repository.findAll();
+    public ResponseEntity<List<ProdutoDto>> listar(@RequestParam String nome,
+                                                   @RequestParam boolean isAtivo,
+                                                   @RequestParam (required = false) Long categoriaId ){
+        List<Produto> produtos = repository.findByNome(nome, isAtivo, categoriaId);
         List<ProdutoDto> produtosDto = produtoAssembler.collectionToModel(produtos);
         return ResponseEntity.ok(produtosDto);
     }
@@ -77,6 +79,13 @@ public class ProdutoController implements ProdutoControllerOpenApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable Long produtoId){
         service.remover(produtoId);
+
+    }
+
+    @DeleteMapping("/{produtoId}/desativar")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void desativar(@PathVariable Long produtoId){
+        service.desativar(produtoId);
 
     }
 

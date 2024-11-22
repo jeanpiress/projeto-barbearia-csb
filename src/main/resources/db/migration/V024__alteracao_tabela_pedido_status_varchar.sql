@@ -1,0 +1,4 @@
+ALTER TABLE pedido MODIFY COLUMN status_pedido VARCHAR(250);
+ALTER TABLE pedido MODIFY COLUMN status_pagamento VARCHAR(250);
+
+
