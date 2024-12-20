@@ -23,4 +23,10 @@ public class PedidoAlteracaoInput {
     @Valid
     @Schema(description = "ID do profissional", example = "1", required = true)
     private ProfissionalId profissional;
+
+    @Schema(description = "Descrição do serviço", example = "corte")
+    private String descricao;
+
+    @Schema(description = "Duracao do serviço", example = "01:00")
+    private String duracao;
 }

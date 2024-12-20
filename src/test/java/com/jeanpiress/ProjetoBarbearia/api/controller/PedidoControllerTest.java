@@ -181,7 +181,7 @@ class PedidoControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
 
-        when(pedidoService.alterarProfissionalOuHorarioPedido(any(PedidoAlteracaoInput.class), anyLong())).thenReturn(pedido);
+        when(pedidoService.alterarInfoPedido(any(PedidoAlteracaoInput.class), anyLong())).thenReturn(pedido);
         when(pedidoAssembler.toModel(any())).thenReturn(pedidoDto);
 
         mockMvc.perform(put("/pedidos/{pedidoId}", 1L)
@@ -190,7 +190,7 @@ class PedidoControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        verify(pedidoService).alterarProfissionalOuHorarioPedido(any(PedidoAlteracaoInput.class), anyLong());
+        verify(pedidoService).alterarInfoPedido(any(PedidoAlteracaoInput.class), anyLong());
         verify(pedidoAssembler).toModel(any());
         verifyNoMoreInteractions(pedidoService);
     }

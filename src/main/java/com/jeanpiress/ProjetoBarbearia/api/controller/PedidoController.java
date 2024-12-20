@@ -4,6 +4,7 @@ import com.jeanpiress.ProjetoBarbearia.api.controller.openapi.PedidoControllerOp
 import com.jeanpiress.ProjetoBarbearia.api.converteDto.assebler.PedidoAssembler;
 import com.jeanpiress.ProjetoBarbearia.api.converteDto.dissembler.PedidoInputDissembler;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.PedidoDto;
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.ItemPedidoInput;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoAlteracaoInput;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoInput;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPagamento;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Objects;
 
 
 @RestController
@@ -70,14 +72,20 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     //@PreAuthorize("hasAuthority('RECEPCAO')")
     @GetMapping(value = "/status")
-    public ResponseEntity<List<PedidoDto>> listarPedidosFiltroStatus(@RequestParam String statusPedido,
+    public ResponseEntity<List<PedidoDto>> listarPedidosFiltroStatus(@RequestParam(required = false) String statusPedido,
                                                                      @RequestParam String statusPagamento) {
 
-        StatusPedido statusPedidoFinal;
-        StatusPagamento statusPagamentoFinal;
+        StatusPedido statusPedidoFinal = null;
+        StatusPagamento statusPagamentoFinal = null;
 
+        if(Objects.nonNull(statusPedido)){
+            try {
+                statusPedidoFinal = StatusPedido.valueOf(statusPedido.toUpperCase());
+            }catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body(null);
+            }
+        }
         try {
-            statusPedidoFinal = StatusPedido.valueOf(statusPedido.toUpperCase());
             statusPagamentoFinal = StatusPagamento.valueOf(statusPagamento.toUpperCase());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
@@ -89,16 +97,24 @@ public class PedidoController implements PedidoControllerOpenApi {
     }
 
     @GetMapping(value = "/horario")
-    public ResponseEntity<List<PedidoDto>> listarPorData(@RequestParam String horario){
+    public ResponseEntity<List<PedidoDto>> listarPorData(@RequestParam String horario,
+                                                         @RequestParam String statusPedido){
+
+        StatusPedido statusPedidoFinal;
+        try{
+            statusPedidoFinal = StatusPedido.valueOf(statusPedido.toUpperCase());
+        }catch(IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(null);
+        }
+
         LocalDate localDate = LocalDate.parse(horario);
         OffsetDateTime inicioDoDia = localDate.atStartOfDay(ZoneOffset.systemDefault()).toOffsetDateTime();
         OffsetDateTime fimDoDia = inicioDoDia.plusDays(1);
 
-        List<Pedido> pedidos = pedidoRepository.findByData(inicioDoDia, fimDoDia);
+        List<Pedido> pedidos = pedidoRepository.findByDataExcetoStatus(inicioDoDia, fimDoDia, statusPedidoFinal);
         List<PedidoDto> pedidosDto = pedidoAssembler.collectionToModel(pedidos);
         return ResponseEntity.ok(pedidosDto);
     }
-
 
     //@PreAuthorize("hasAuthority('RECEPCAO')")
     @GetMapping(value = "/{pedidoId}")
@@ -110,9 +126,9 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     //@PreAuthorize("hasAuthority('CLIENTE')")
     @PostMapping
-    public ResponseEntity<PedidoDto> adicionar(@RequestBody @Valid PedidoInput pedidoInput) {
+    public ResponseEntity<PedidoDto> adicionar(@RequestBody @Valid PedidoInput pedidoInput, @RequestParam String statusPedido) {
         Pedido pedido = pedidoDissembler.toDomainObject(pedidoInput);
-        Pedido pedidoCriado = pedidoService.criar(pedido);
+        Pedido pedidoCriado = pedidoService.criar(pedido, statusPedido);
         PedidoDto pedidoDto = pedidoAssembler.toModel(pedidoCriado);
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDto);
 
@@ -151,9 +167,17 @@ public class PedidoController implements PedidoControllerOpenApi {
     }
 
     //@PreAuthorize("hasAuthority('RECEPCAO')")
+    @PutMapping("/{pedidoId}/add-itens")
+    public ResponseEntity<PedidoDto> adicionarItemPedidoPorLIsta(@PathVariable Long pedidoId, @RequestBody List<ItemPedidoInput> itensPedidoInput){
+        Pedido pedido = pedidoService.adicionarItemPedidoPorLista(pedidoId, itensPedidoInput);
+        PedidoDto pedidoDto = pedidoAssembler.toModel(pedido);
+        return ResponseEntity.ok(pedidoDto);
+    }
+
+    //@PreAuthorize("hasAuthority('RECEPCAO')")
     @PutMapping(value = "/{pedidoId}")
     public ResponseEntity<PedidoDto> alterar(@RequestBody @Valid PedidoAlteracaoInput pedidoAlteracaoInput, @PathVariable Long pedidoId) {
-        Pedido pedido = pedidoService.alterarProfissionalOuHorarioPedido(pedidoAlteracaoInput, pedidoId);
+        Pedido pedido = pedidoService.alterarInfoPedido(pedidoAlteracaoInput, pedidoId);
         PedidoDto pedidoDto = pedidoAssembler.toModel(pedidoRepository.save(pedido));
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDto);
 
@@ -182,7 +206,6 @@ public class PedidoController implements PedidoControllerOpenApi {
     @DeleteMapping("/{pedidoId}/remove-todos-itens")
     public ResponseEntity<PedidoDto> removerTodosItemPedido(@PathVariable Long pedidoId){
         Pedido pedidoOriginal = pedidoService.buscarPorId(pedidoId);
-        //List<Long> intensPedidoId = pedidoOriginal.getItemPedidos().stream().map(ItemPedido::getId).toList();
         Pedido pedidoAlterado = pedidoService.removerTodosItensPedido(pedidoOriginal);
         PedidoDto pedidoDto = pedidoAssembler.toModel(pedidoAlterado);
         return ResponseEntity.ok(pedidoDto);

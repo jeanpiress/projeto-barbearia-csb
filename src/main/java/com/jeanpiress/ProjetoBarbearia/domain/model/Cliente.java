@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -20,7 +21,7 @@ public class Cliente {
     private Long id;
     private String nome;
     private String celular;
-    private OffsetDateTime dataNascimento;
+    private LocalDate dataNascimento;
     private OffsetDateTime ultimaVisita;
     private BigDecimal pontos;
     private OffsetDateTime previsaoRetorno;

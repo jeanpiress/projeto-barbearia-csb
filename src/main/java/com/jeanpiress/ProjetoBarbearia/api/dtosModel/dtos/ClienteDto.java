@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Embedded;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @AllArgsConstructor
@@ -24,7 +25,7 @@ public class ClienteDto {
     @Schema(example = "34999999999")
     private String celular;
     @Schema(example = "1991-12-25")
-    private OffsetDateTime dataNascimento;
+    private LocalDate dataNascimento;
     @Schema(example = "2024-01-25")
     private OffsetDateTime ultimaVisita;
     private Integer pontos;

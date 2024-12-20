@@ -699,7 +699,7 @@ class PedidoServiceTest {
         when(profissionalService.buscarPorId(2L)).thenReturn(profissionalVazio);
         when(usuarioService.buscarPorId(any())).thenReturn(usuario);
 
-        pedidoService.alterarProfissionalOuHorarioPedido(pedidoAlteracaoInput, 3L);
+        pedidoService.alterarInfoPedido(pedidoAlteracaoInput, 3L);
 
         assertEquals(pedidoAguardandoPg.getProfissional(), profissionalVazio);
         assertEquals(pedidoAguardandoPg.getHorario().getDayOfMonth(), OffsetDateTime.now().plusDays(1).getDayOfMonth());
@@ -708,7 +708,7 @@ class PedidoServiceTest {
 
         verify(pedidoService).buscarPorId(3L);
         verify(profissionalService).buscarPorId(2L);
-        verify(pedidoService).alterarProfissionalOuHorarioPedido(pedidoAlteracaoInput, 3L);
+        verify(pedidoService).alterarInfoPedido(pedidoAlteracaoInput, 3L);
         verify(usuarioService).buscarPorId(any());
         verifyNoMoreInteractions(pedidoService, profissionalService, usuarioService);
 
@@ -719,13 +719,13 @@ class PedidoServiceTest {
         doReturn(pedidoPago).when(pedidoService).buscarPorId(1L);
 
         PedidoJaFoiPagoException exception = Assertions.assertThrows(PedidoJaFoiPagoException.class,
-                () -> {pedidoService.alterarProfissionalOuHorarioPedido(pedidoAlteracaoInput, 1L);
+                () -> {pedidoService.alterarInfoPedido(pedidoAlteracaoInput, 1L);
                 });
 
         assertEquals("Não é permitido alterar profissional de pedido já recebido", exception.getMessage());
 
         verify(pedidoService).buscarPorId(1L);
-        verify(pedidoService).alterarProfissionalOuHorarioPedido(pedidoAlteracaoInput, 1L);
+        verify(pedidoService).alterarInfoPedido(pedidoAlteracaoInput, 1L);
         verifyNoMoreInteractions(pedidoService);
     }
 
@@ -735,13 +735,13 @@ class PedidoServiceTest {
         pedidoAlteracaoInput.setHorario(OffsetDateTime.now().minusDays(1));
 
         HorarioInvalidoException exception = Assertions.assertThrows(HorarioInvalidoException.class,
-                () -> {pedidoService.alterarProfissionalOuHorarioPedido(pedidoAlteracaoInput, 3L);
+                () -> {pedidoService.alterarInfoPedido(pedidoAlteracaoInput, 3L);
                 });
 
         assertEquals("Não é possivel marcar um horario em uma data que já passou", exception.getMessage());
 
         verify(pedidoService).buscarPorId(3L);
-        verify(pedidoService).alterarProfissionalOuHorarioPedido(pedidoAlteracaoInput, 3L);
+        verify(pedidoService).alterarInfoPedido(pedidoAlteracaoInput, 3L);
         verifyNoMoreInteractions(pedidoService);
     }
 

@@ -6,8 +6,6 @@ import com.jeanpiress.ProjetoBarbearia.api.converteDto.dissembler.ClienteInputDi
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.ClienteDto;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.ClienteInput;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.CampoObrigatorioException;
-import com.jeanpiress.ProjetoBarbearia.domain.exceptions.ClienteNaoEncontradoException;
-import com.jeanpiress.ProjetoBarbearia.domain.exceptions.NegocioException;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbearia.domain.services.ClienteService;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.ClienteRepository;

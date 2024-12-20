@@ -92,7 +92,14 @@ public class Pedido {
     @Column(name = "inicio_atendimento")
     private OffsetDateTime inicioAtendimento;
 
+    @Column(name = "descricao")
     private String descricao;
+
+    @Column(name = "duracao")
+    private String duracao;
+
+    @Column(name = "fim_horario")
+    private OffsetDateTime fimHorario;
 
     public void adicionarItemPedido(ItemPedido itemPedido){
         itemPedidos.add(itemPedido);

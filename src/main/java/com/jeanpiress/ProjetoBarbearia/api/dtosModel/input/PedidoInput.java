@@ -18,8 +18,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 public class PedidoInput {
 
-    @NotNull
-    @Schema(example = "2024-04-19T14:30:00-03:00", required = true)
+    @Schema(example = "2024-04-19T14:30:00-03:00")
     private OffsetDateTime horario;
 
     @Schema(description = "ID do Profissional", example = "1", required = true)
@@ -29,4 +28,10 @@ public class PedidoInput {
     @Valid
     @Schema(description = "ID do Profissional", required = true)
     private ProfissionalId profissional;
+
+    @Schema(description = "Descrição do agendamento", example = "Corte Demorado", required = false)
+    private String descricao;
+
+    @Schema(description = "Duracao do serviço", example = "01:00")
+    private String duracao;
 }

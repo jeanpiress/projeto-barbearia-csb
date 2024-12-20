@@ -90,4 +90,10 @@ public class PedidoDto {
     @Schema(description ="Descricao do pedido/agendamento:", example = "Corte degrade navalhado")
     private String descricao;
 
+    @Schema(description ="Duração programada para o atendimento", example = "00:45")
+    private String duracao;
+
+    @Schema(description ="Hora programada para terminar o atendimento", example = "2024-01-25T14:45:00-03:00")
+    private OffsetDateTime fim_horario;
+
 }

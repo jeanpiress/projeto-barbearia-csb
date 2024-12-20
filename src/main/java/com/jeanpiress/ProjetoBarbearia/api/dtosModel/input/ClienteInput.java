@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @NoArgsConstructor
@@ -27,7 +28,7 @@ public class ClienteInput {
     private String celular;
 
     @Schema(description = "Data de nascimento do cliente", example = "1991-12-25")
-    private OffsetDateTime dataNascimento;
+    private LocalDate dataNascimento;
 
     @Schema(example = "Degrade até a maquina zero")
     private String observacao;

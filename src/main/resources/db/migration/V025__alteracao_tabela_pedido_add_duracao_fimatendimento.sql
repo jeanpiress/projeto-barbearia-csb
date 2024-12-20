@@ -1,0 +1,4 @@
+ALTER TABLE pedido ADD COLUMN duracao VARCHAR(10);
+ALTER TABLE pedido ADD COLUMN fim_horario TIMESTAMP;
+
+

@@ -1,7 +1,9 @@
 package com.jeanpiress.ProjetoBarbearia.domain.services;
 
+import com.jeanpiress.ProjetoBarbearia.api.converteDto.dissembler.ItemPedidoInputDissembler;
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.ItemPedidoInput;
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.ListItemPedidoInput;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoAlteracaoInput;
-import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.ProfissionalId;
 import com.jeanpiress.ProjetoBarbearia.core.security.CsbSecurity;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.FormaPagamentoJson;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.FormaPagamento;
@@ -19,13 +21,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -63,6 +64,9 @@ public class PedidoService {
     @Autowired
     private CsbSecurity security;
 
+    @Autowired
+    private ItemPedidoInputDissembler itemPedidoInputDissembler;
+
 
     public Pedido buscarPorId(Long pedidoId){
         return repository.findById(pedidoId).
@@ -73,7 +77,24 @@ public class PedidoService {
         return repository.save(pedido);
     }
 
-    public Pedido criar(Pedido pedido) {
+    public Pedido criar(Pedido pedido, String statusPedido) {
+        if(Objects.nonNull(pedido.getHorario()) && pedido.getHorario().isBefore(OffsetDateTime.now())){
+            throw new HorarioInvalidoException("Não é possivel marcar um horario em uma data que já passou");
+        }
+        if(Objects.isNull(pedido.getHorario())){
+            pedido.setHorario(OffsetDateTime.now());
+        }
+        if(Objects.nonNull(pedido.getDuracao())) {
+            pedido.setFimHorario(adicionarFimHorario(pedido.getHorario(), pedido.getDuracao()));
+        }
+
+        StatusPedido statusPedidoFinal;
+        try{
+            statusPedidoFinal = StatusPedido.valueOf(statusPedido.toUpperCase());
+        }catch(IllegalArgumentException e){
+            throw new IllegalArgumentException("Falha ao converter status");
+        }
+
         Cliente cliente = clienteService.buscarPorId(pedido.getCliente().getId());
         Profissional profissional = profissionalService.buscarPorId(pedido.getProfissional().getId());
         pedido.setCliente(cliente);
@@ -84,7 +105,8 @@ public class PedidoService {
         pedido.setCriadoAs(OffsetDateTime.now());
         Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
         pedido.setCriadoPor(usuario);
-        pedido.setStatusPedido(StatusPedido.AGUARDANDO);
+        pedido.setStatusPedido(statusPedidoFinal);
+        
 
         return repository.save(pedido);
     }
@@ -123,6 +145,36 @@ public class PedidoService {
         pedido.setPontuacaoClienteGerada(pontuacaoCliente);
         return repository.save(pedido);
     }
+
+    public Pedido adicionarItemPedidoPorLista(Long pedidoId, List<ItemPedidoInput> itensPedidosInput){
+        Pedido pedido = buscarPorId(pedidoId);
+        Long profissionalId = pedido.getProfissional().getId();
+        List<ItemPedido> itensPedidosSalvos = new ArrayList<>();
+        for(ItemPedidoInput itemPedidoInput : itensPedidosInput){
+            ItemPedido itemPedido = itemPedidoInputDissembler.toDomainObject(itemPedidoInput);
+            itensPedidosSalvos.add(itemPedidoService.adicionar(itemPedido));
+        }
+
+        for(ItemPedido itemPedidoSalvo : itensPedidosSalvos) {
+
+            if (pedido.getItemPedidos().contains(itemPedidoSalvo)) {
+                throw new ItemPedidoJaAdicionadoException(itemPedidoSalvo.getId());
+            }
+
+            pedido.getItemPedidos().add(itemPedidoSalvo);
+            BigDecimal comissaoItemPedido = comissaoPorItem(profissionalId, itemPedidoSalvo);
+            BigDecimal comissaoPedido = pedido.getComissaoGerada().add(comissaoItemPedido);
+            pedido.setComissaoGerada(comissaoPedido);
+            BigDecimal valorTotal = pedido.getValorTotal().add(itemPedidoSalvo.getPrecoTotal());
+            pedido.setValorTotal(valorTotal);
+            BigDecimal pontuacaoProfissional = pedido.getPontuacaoProfissionalGerada().add(gerarPontuacaoProfissional(itemPedidoSalvo));
+            pedido.setPontuacaoProfissionalGerada(pontuacaoProfissional);
+            BigDecimal pontuacaoCliente = pedido.getPontuacaoClienteGerada().add(gerarPontuacaoCliente(itemPedidoSalvo));
+            pedido.setPontuacaoClienteGerada(pontuacaoCliente);
+        }
+        return repository.save(pedido);
+    }
+
 
 
     public Pedido removerItemPedido(Long pedidoId, Long itemPedidoId){
@@ -233,6 +285,8 @@ public class PedidoService {
 
         pedido.setStatusPagamento(StatusPagamento.PAGO);
 
+        pedido.setStatusPedido(StatusPedido.FINALIZADO);
+
         pedido = repository.save(pedido);
 
         log.info(pedido.getCliente().getNome());
@@ -245,7 +299,7 @@ public class PedidoService {
         return pedido;
     }
 
-    public Pedido alterarProfissionalOuHorarioPedido(PedidoAlteracaoInput pedidoAlteracaoInput, Long pedidoId) {
+    public Pedido alterarInfoPedido(PedidoAlteracaoInput pedidoAlteracaoInput, Long pedidoId) {
         Pedido pedido = buscarPorId(pedidoId);
         if(pedido.getStatusPagamento().equals(StatusPagamento.PAGO)){
             throw new PedidoJaFoiPagoException("Não é permitido alterar profissional de pedido já recebido");
@@ -255,12 +309,15 @@ public class PedidoService {
         }
         Profissional profissional = profissionalService.buscarPorId(pedidoAlteracaoInput.getProfissional().getId());
         pedido.setProfissional(profissional);
+        pedido.setDescricao(pedidoAlteracaoInput.getDescricao());
         pedido.setHorario(pedidoAlteracaoInput.getHorario());
         Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
         pedido.setAlteradoPor(usuario);
         pedido.setModificadoAs(OffsetDateTime.now());
+        pedido.setDuracao(pedidoAlteracaoInput.getDuracao());
+        pedido.setFimHorario(adicionarFimHorario(pedidoAlteracaoInput.getHorario(), pedidoAlteracaoInput.getDuracao()));
 
-        return pedido;
+        return repository.save(pedido);
     }
 
     public Pedido alterarProfissional(Long profissionalId, Long pedidoId) {
@@ -369,6 +426,14 @@ public class PedidoService {
 
    }
 
+   private OffsetDateTime adicionarFimHorario(OffsetDateTime dataHorario, String duracao){
+       String[] parts = duracao.split(":");
+       int horas = Integer.parseInt(parts[0]);
+       int minutos = Integer.parseInt(parts[1]);
+
+       return dataHorario.plusHours(horas).plusMinutes(minutos);
+   }
+
     @EventListener
     public void criarPedidoPorPacote(PacoteRealizadoEvento pacoteRealizado) {
         Pacote pacote = pacoteRealizado.getPacote();
@@ -390,4 +455,6 @@ public class PedidoService {
 
         pacoteService.adicionar(pacote);
     }
+
+
 }

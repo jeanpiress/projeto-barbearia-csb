@@ -42,7 +42,9 @@ public interface PedidoControllerOpenApi {
             @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
     public ResponseEntity<PedidoDto> adicionar(@Parameter(description = "Representação de um novo pedido")
-                                                       PedidoInput pedidoInput);
+                                                       PedidoInput pedidoInput,
+                                               @Parameter(description = "status do pedido", example = "AGENDADO")
+                                                       String statusPedido);
    
     @Operation(summary ="Altera um pedido", responses ={
             @ApiResponse(responseCode = "200", description = "Pedido atualizado"),

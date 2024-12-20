@@ -15,7 +15,7 @@ import java.util.List;
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     @Query(value = "SELECT p FROM Pedido p WHERE p.caixaAberto = :isAberto " +
-            "AND p.statusPagamento = :statusPagamento")
+            "AND p.statusPagamento <> :statusPagamento")
     List<Pedido> findByStatusAndIsCaixaAberto(Boolean isAberto, StatusPagamento statusPagamento);
 
 
@@ -32,11 +32,17 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
 
     @Query("SELECT p FROM Pedido p WHERE " +
-            "(p.statusPedido = :statusPedido) " +
+            "(:statusPedido IS NULL OR p.statusPedido = :statusPedido) " +
             "AND p.statusPagamento = :statusPagamento")
     List<Pedido> findByStatus(StatusPedido statusPedido, StatusPagamento statusPagamento);
 
+
     @Query(value = "SELECT p FROM Pedido p WHERE p.horario >= :inicioDoDia AND p.horario < :fimDoDia")
     List<Pedido> findByData(OffsetDateTime inicioDoDia, OffsetDateTime fimDoDia);
+
+    @Query(value = "SELECT p FROM Pedido p WHERE p.horario >= :inicioDoDia AND p.horario < :fimDoDia " +
+            "AND p.statusPedido <> :statusPedido")
+    List<Pedido> findByDataExcetoStatus(OffsetDateTime inicioDoDia, OffsetDateTime fimDoDia, StatusPedido statusPedido);
+
 
 }

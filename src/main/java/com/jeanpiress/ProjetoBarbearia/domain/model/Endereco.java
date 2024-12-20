@@ -32,4 +32,12 @@ public class Endereco {
     @Schema(example = "Morumbi")
     @Column(name = "endereco_bairro")
     private String bairro;
+
+    @Schema(example = "Uberalandia")
+    @Column(name = "endereco_cidade")
+    private String cidade;
+
+    @Schema(example = "Minas Gerais")
+    @Column(name = "endereco_estado")
+    private String estado;
 }
