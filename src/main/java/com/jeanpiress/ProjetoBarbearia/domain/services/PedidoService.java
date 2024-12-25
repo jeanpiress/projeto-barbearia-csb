@@ -2,7 +2,6 @@ package com.jeanpiress.ProjetoBarbearia.domain.services;
 
 import com.jeanpiress.ProjetoBarbearia.api.converteDto.dissembler.ItemPedidoInputDissembler;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.ItemPedidoInput;
-import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.ListItemPedidoInput;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoAlteracaoInput;
 import com.jeanpiress.ProjetoBarbearia.core.security.CsbSecurity;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.FormaPagamentoJson;
@@ -21,7 +20,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

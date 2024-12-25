@@ -7,7 +7,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -29,7 +29,7 @@ public class ProfissionalInput {
     private String cpf;
 
     @Schema(example = "1991-11-13T00:00:00Z")
-    private OffsetDateTime dataNascimento;
+    private LocalDate dataNascimento;
 
     @Schema(description = "Salario fixo", example = "0.00")
     private BigDecimal salarioFixo;

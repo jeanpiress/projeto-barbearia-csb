@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -27,7 +27,7 @@ public class ProfissionalDto {
     private String cpf;
 
     @Schema(description = "Data nascimento", example = "1991-12-25")
-    private OffsetDateTime dataNascimento;
+    private LocalDate dataNascimento;
 
     @Schema(example = "0.00")
     private BigDecimal salarioFixo;

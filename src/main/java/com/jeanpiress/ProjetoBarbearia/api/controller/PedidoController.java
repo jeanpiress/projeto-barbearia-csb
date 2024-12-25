@@ -64,7 +64,7 @@ public class PedidoController implements PedidoControllerOpenApi {
             return ResponseEntity.badRequest().body(null);
         }
 
-        List<Pedido> pedidos = pedidoRepository.findByStatusAndIsCaixaAberto(isAberto, statusPagamentoFinal);
+        List<Pedido> pedidos = pedidoRepository.findByEqualStatusAndIsCaixaAberto(isAberto, statusPagamentoFinal);
         List<PedidoDto> pedidosDto = pedidoAssembler.collectionToModel(pedidos);
         return ResponseEntity.ok(pedidosDto);
     }

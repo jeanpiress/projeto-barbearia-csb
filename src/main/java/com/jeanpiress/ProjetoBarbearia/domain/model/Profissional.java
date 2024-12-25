@@ -4,7 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -22,7 +22,7 @@ public class Profissional {
     private String nomeExibicao;
     private String celular;
     private String cpf;
-    private OffsetDateTime dataNascimento;
+    private LocalDate dataNascimento;
     private BigDecimal salarioFixo;
     private Integer diaPagamento;
     private boolean ativo = true;

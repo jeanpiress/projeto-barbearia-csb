@@ -16,7 +16,11 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     @Query(value = "SELECT p FROM Pedido p WHERE p.caixaAberto = :isAberto " +
             "AND p.statusPagamento <> :statusPagamento")
-    List<Pedido> findByStatusAndIsCaixaAberto(Boolean isAberto, StatusPagamento statusPagamento);
+    List<Pedido> findByDiferentStatusAndIsCaixaAberto(Boolean isAberto, StatusPagamento statusPagamento);
+
+    @Query(value = "SELECT p FROM Pedido p WHERE p.caixaAberto = :isAberto " +
+            "AND p.statusPagamento = :statusPagamento")
+    List<Pedido> findByEqualStatusAndIsCaixaAberto(Boolean isAberto, StatusPagamento statusPagamento);
 
 
     @Query(value = "SELECT * FROM pedido p WHERE p.data_pagamento > :inicio " +

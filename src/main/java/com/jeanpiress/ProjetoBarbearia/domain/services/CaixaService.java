@@ -82,12 +82,12 @@ public class CaixaService {
     }
 
     public CaixaModel gerarCaixaDiario(){
-        List<Pedido> pedidos = pedidoRepository.findByStatusAndIsCaixaAberto(true, StatusPagamento.PAGO);
+        List<Pedido> pedidos = pedidoRepository.findByEqualStatusAndIsCaixaAberto(true, StatusPagamento.PAGO);
         return gerarCaixa(pedidos);
     }
 
     public void fecharCaixa() {
-        List<Pedido> pedidos = pedidoRepository.findByStatusAndIsCaixaAberto(true, StatusPagamento.PAGO);
+        List<Pedido> pedidos = pedidoRepository.findByEqualStatusAndIsCaixaAberto(true, StatusPagamento.PAGO);
         pedidos.forEach(pedido -> pedido.setCaixaAberto(false));
         pedidoRepository.saveAll(pedidos);
         
