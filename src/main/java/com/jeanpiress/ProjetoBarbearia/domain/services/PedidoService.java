@@ -346,8 +346,7 @@ public class PedidoService {
     public void iniciarExecucaoPedido(Long pedidoId) {
         Pedido pedido = buscarPorId(pedidoId);
         if(pedido.getStatusPedido().equals(StatusPedido.CANCELADO) ||
-                pedido.getStatusPedido().equals(StatusPedido.FINALIZADO) ||
-                pedido.getStatusPedido().equals(StatusPedido.EXCLUIDO)){
+                pedido.getStatusPedido().equals(StatusPedido.FINALIZADO)){
 
             throw new PedidoNaoPodeSerConfirmadoException(pedidoId);
         }else{
@@ -377,7 +376,7 @@ public class PedidoService {
         if(pedido.getStatusPagamento().equals(StatusPagamento.PAGO) && !isGerente){
             throw new PedidoNaoPodeSerCanceladoException("Apenas os gerentes do sistema pode cancelar pedidos pagos");
         }
-        pedido.setStatusPedido(StatusPedido.EXCLUIDO);
+        pedido.setStatusPedido(StatusPedido.CANCELADO);
         pedido.setStatusPagamento(StatusPagamento.CANCELADO);
         pedido.setExcluidoAs(OffsetDateTime.now());
         pedido.setExcluidoPor(usuario);

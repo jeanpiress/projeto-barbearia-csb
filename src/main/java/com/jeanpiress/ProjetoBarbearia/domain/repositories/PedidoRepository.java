@@ -15,10 +15,6 @@ import java.util.List;
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     @Query(value = "SELECT p FROM Pedido p WHERE p.caixaAberto = :isAberto " +
-            "AND p.statusPagamento <> :statusPagamento")
-    List<Pedido> findByDiferentStatusAndIsCaixaAberto(Boolean isAberto, StatusPagamento statusPagamento);
-
-    @Query(value = "SELECT p FROM Pedido p WHERE p.caixaAberto = :isAberto " +
             "AND p.statusPagamento = :statusPagamento")
     List<Pedido> findByEqualStatusAndIsCaixaAberto(Boolean isAberto, StatusPagamento statusPagamento);
 
