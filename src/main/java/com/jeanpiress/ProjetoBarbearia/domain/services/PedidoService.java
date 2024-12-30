@@ -94,9 +94,13 @@ public class PedidoService {
         }
 
         Cliente cliente = clienteService.buscarPorId(pedido.getCliente().getId());
-        Profissional profissional = profissionalService.buscarPorId(pedido.getProfissional().getId());
+
+        if(Objects.nonNull(pedido.getProfissional())){
+            Profissional profissional = profissionalService.buscarPorId(pedido.getProfissional().getId());
+            pedido.setProfissional(profissional);
+        }
+
         pedido.setCliente(cliente);
-        pedido.setProfissional(profissional);
         List<ItemPedido> itensPedidos = new ArrayList<>();
         pedido.setItemPedidos(itensPedidos);
         preencherPedido(pedido);
@@ -254,8 +258,14 @@ public class PedidoService {
 
     public Pedido realizarPagamento(FormaPagamentoJson formaPagamento, Long pedidoId) {
         Pedido pedido = buscarPorId(pedidoId);
+
+        if(Objects.isNull(pedido.getProfissional())){
+            throw new PedidoSemProfissionalException(pedidoId);
+        }
+
         String letrasMaiusculas = formaPagamento.getFormaPagamento().toUpperCase();
         formaPagamento.setFormaPagamento(letrasMaiusculas);
+
 
 
         if(formaPagamento.getFormaPagamento().equals("DINHEIRO")){
@@ -323,8 +333,13 @@ public class PedidoService {
         if(pedido.getStatusPagamento().equals(StatusPagamento.PAGO)){
             throw new PedidoJaFoiPagoException("Não é permitido alterar profissional de pedido já recebido");
         }
-        Profissional profissional = profissionalService.buscarPorId(profissionalId);
-        pedido.setProfissional(profissional);
+        if(profissionalId != 0L){
+            Profissional profissional = profissionalService.buscarPorId(profissionalId);
+            pedido.setProfissional(profissional);
+        }else {
+            pedido.setProfissional(null);
+        }
+
         Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
         pedido.setAlteradoPor(usuario);
         pedido.setModificadoAs(OffsetDateTime.now());
@@ -349,6 +364,8 @@ public class PedidoService {
                 pedido.getStatusPedido().equals(StatusPedido.FINALIZADO)){
 
             throw new PedidoNaoPodeSerConfirmadoException(pedidoId);
+        }else if(Objects.isNull(pedido.getProfissional())) {
+            throw new PedidoSemProfissionalException("Não tem um profissional definido para este Pedido");
         }else{
             pedido.setStatusPedido(StatusPedido.EMATENDIMENTO);
             pedido.setInicioAtendimento(OffsetDateTime.now());

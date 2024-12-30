@@ -8,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 
 @Getter
@@ -24,9 +22,7 @@ public class PedidoInput {
     @Schema(description = "ID do Profissional", example = "1", required = true)
     private ClienteId cliente;
 
-    @NotNull
-    @Valid
-    @Schema(description = "ID do Profissional", required = true)
+    @Schema(description = "ID do Profissional")
     private ProfissionalId profissional;
 
     @Schema(description = "Descrição do agendamento", example = "Corte Demorado", required = false)

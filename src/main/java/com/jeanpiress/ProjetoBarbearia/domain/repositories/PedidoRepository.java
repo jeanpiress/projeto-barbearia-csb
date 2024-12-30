@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -27,8 +28,8 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     @Query(value = "SELECT * FROM pedido p WHERE p.data_pagamento > :inicio " +
             "AND p.data_pagamento < :fim " +
             "AND p.profissional_id = :profissionalId " +
-            "AND p.status_pagamento = 1", nativeQuery = true)
-    List<Pedido> findByDataPagamentoAndProfissionalId(@Param("inicio") OffsetDateTime inicio, @Param("fim") OffsetDateTime fim, @Param("profissionalId") Long profissionalId);
+            "AND p.status_pagamento = 'PAGO'" + "ORDER BY p.data_pagamento", nativeQuery = true)
+    List<Pedido> findByDataPagamentoAndProfissionalId(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim, @Param("profissionalId") Long profissionalId);
 
 
     @Query("SELECT p FROM Pedido p WHERE " +

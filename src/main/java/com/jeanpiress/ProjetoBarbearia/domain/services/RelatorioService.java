@@ -91,8 +91,10 @@ public class RelatorioService {
 
     }
 
-    public RelatorioComissaoDetalhada buscarComissaoPorProfissional(DataInicioFim data, Long profissionalId){
-        List<Pedido> pedidos = pedidoRepository.findByDataPagamentoAndProfissionalId(data.getInicio(), data.getFim(), profissionalId);
+    public RelatorioComissaoDetalhada buscarComissaoPorProfissional(String dataInicio, String dataFim, Long profissionalId){
+        LocalDateTime dataHoraInicio = LocalDate.parse(dataInicio).atStartOfDay();
+        LocalDateTime dataHoraFim = LocalDate.parse(dataFim).atTime(23, 59, 59);
+        List<Pedido> pedidos = pedidoRepository.findByDataPagamentoAndProfissionalId(dataHoraInicio, dataHoraFim, profissionalId);
         Profissional profissional = profissionalService.buscarPorId(profissionalId);
         RelatorioComissaoDetalhada relatorio = relatorioComissaoZerado(profissional);
 

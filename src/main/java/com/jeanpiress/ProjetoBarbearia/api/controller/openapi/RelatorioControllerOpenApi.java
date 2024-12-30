@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Tag(name = "Relatorios")
@@ -30,8 +32,10 @@ public interface RelatorioControllerOpenApi {
     @Operation(summary ="Busca as comissoes do periodo de um profissional expecifico", responses = {
             @ApiResponse(responseCode = "400", description = "Informações invalidas", content = @Content(schema = @Schema(ref = "Problema")))
     })
-    public ResponseEntity<RelatorioComissaoDetalhadaDto> buscarRelatorioComissaoPorProfissional(@Parameter(description = "Representação de data inicio e fim")
-                                                                                                    DataInicioFim dataInicioFim,
+    public ResponseEntity<RelatorioComissaoDetalhadaDto> buscarRelatorioComissaoPorProfissional(@Parameter(description = "Data inicial da pesquisa")
+                                                                                                    String dataInicio,
+                                                                                                @Parameter(description = "Data final da pesquisa")
+                                                                                                    String dataFim,
                                                                                                 @Parameter(description = "ID de um profissional", example = "1")
                                                                                                     Long profissionalId);
 

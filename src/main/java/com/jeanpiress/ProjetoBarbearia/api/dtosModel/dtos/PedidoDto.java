@@ -40,7 +40,7 @@ public class PedidoDto {
     @Schema(example = "ATENDIDO")
     private StatusPedido statusPedido;
 
-    private ClienteIdNome cliente;
+    private ClienteDto cliente;
 
     private ProfissionalResumo profissional;
 

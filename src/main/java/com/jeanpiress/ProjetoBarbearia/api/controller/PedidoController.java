@@ -126,7 +126,7 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     //@PreAuthorize("hasAuthority('CLIENTE')")
     @PostMapping
-    public ResponseEntity<PedidoDto> adicionar(@RequestBody @Valid PedidoInput pedidoInput, @RequestParam String statusPedido) {
+    public ResponseEntity<PedidoDto> adicionar(@RequestBody PedidoInput pedidoInput, @RequestParam String statusPedido) {
         Pedido pedido = pedidoDissembler.toDomainObject(pedidoInput);
         Pedido pedidoCriado = pedidoService.criar(pedido, statusPedido);
         PedidoDto pedidoDto = pedidoAssembler.toModel(pedidoCriado);
@@ -184,8 +184,8 @@ public class PedidoController implements PedidoControllerOpenApi {
     }
 
     //@PreAuthorize("hasAuthority('RECEPCAO')")
-    @PutMapping(value = "/{pedidoId}/profissional/{profissionalId}")
-    public ResponseEntity<PedidoDto> alterarProfissional(@PathVariable Long pedidoId, @PathVariable Long profissionalId) {
+    @PutMapping(value = "/{pedidoId}/profissional")
+    public ResponseEntity<PedidoDto> alterarProfissional(@PathVariable Long pedidoId, @RequestParam Long profissionalId) {
         Pedido pedido = pedidoService.alterarProfissional(profissionalId, pedidoId);
         PedidoDto pedidoDto = pedidoAssembler.toModel(pedidoRepository.save(pedido));
 
@@ -241,6 +241,7 @@ public class PedidoController implements PedidoControllerOpenApi {
     @PutMapping(value = "/{pedidoId}/iniciar")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void iniciarExecucaoPedido(@PathVariable Long pedidoId){
+
         pedidoService.iniciarExecucaoPedido(pedidoId);
     }
 

@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController()
@@ -48,10 +49,14 @@ public class RelatorioController implements RelatorioControllerOpenApi {
         return ResponseEntity.ok(relatorioComissaoAssembler.collectionToModel(relatoriosComissoes));
     }
 
-    @PostMapping("/comissao/{profissionalId}")
-    public ResponseEntity<RelatorioComissaoDetalhadaDto> buscarRelatorioComissaoPorProfissional(@RequestBody @Valid DataInicioFim dataInicioFim,
-                                                                                                @PathVariable Long profissionalId){
-        RelatorioComissaoDetalhada relatorioComissao = relatorioService.buscarComissaoPorProfissional(dataInicioFim, profissionalId);
+    @GetMapping("/comissoes/{profissionalId}")
+    public ResponseEntity<RelatorioComissaoDetalhadaDto> buscarRelatorioComissaoPorProfissional(
+                                                            @RequestParam(required = true) String dataInicio,
+                                                            @RequestParam(required = true) String dataFim,
+                                                            @PathVariable Long profissionalId){
+
+
+        RelatorioComissaoDetalhada relatorioComissao = relatorioService.buscarComissaoPorProfissional(dataInicio, dataFim, profissionalId);
 
         return ResponseEntity.ok(relatorioComissaoDetalhadaAssembler.toModel(relatorioComissao));
     }
