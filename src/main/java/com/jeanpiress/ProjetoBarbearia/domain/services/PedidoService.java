@@ -20,6 +20,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -347,27 +348,20 @@ public class PedidoService {
         return pedido;
     }
 
-    public void confirmarPedido(Long pedidoId) {
+    public void alterarStatusPedido(Long pedidoId, String statusPedido) {
         Pedido pedido = buscarPorId(pedidoId);
-        if(pedido.getStatusPedido().equals(StatusPedido.AGENDADO)){
-            pedido.setStatusPedido(StatusPedido.CONFIRMADO);
-            repository.save(pedido);
-        }else{
-            throw new PedidoNaoPodeSerConfirmadoException(pedidoId);
-        }
 
-    }
+        StatusPedido statusPedidoFinal = StatusPedido.valueOf(statusPedido.toUpperCase());
 
-    public void iniciarExecucaoPedido(Long pedidoId) {
-        Pedido pedido = buscarPorId(pedidoId);
         if(pedido.getStatusPedido().equals(StatusPedido.CANCELADO) ||
                 pedido.getStatusPedido().equals(StatusPedido.FINALIZADO)){
 
             throw new PedidoNaoPodeSerConfirmadoException(pedidoId);
-        }else if(Objects.isNull(pedido.getProfissional())) {
+        }else if(Objects.isNull(pedido.getProfissional()) && (statusPedidoFinal == StatusPedido.EMATENDIMENTO ||
+                statusPedidoFinal == StatusPedido.FINALIZADO)) {
             throw new PedidoSemProfissionalException("Não tem um profissional definido para este Pedido");
         }else{
-            pedido.setStatusPedido(StatusPedido.EMATENDIMENTO);
+            pedido.setStatusPedido(statusPedidoFinal);
             pedido.setInicioAtendimento(OffsetDateTime.now());
             repository.save(pedido);
         }

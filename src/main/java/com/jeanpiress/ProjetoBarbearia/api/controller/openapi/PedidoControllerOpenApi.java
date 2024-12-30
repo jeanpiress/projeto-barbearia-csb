@@ -104,11 +104,6 @@ public interface PedidoControllerOpenApi {
                                                           Long pedidoId);
 
 
-    @Operation(summary ="Confirma um pedido", responses ={
-            @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
-    })
-    public void confirmarPedido(@Parameter(description = "ID de um pedido", example = "1")
-                                    @PathVariable Long pedidoId);
 }
 
 

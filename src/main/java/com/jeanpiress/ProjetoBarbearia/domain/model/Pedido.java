@@ -101,6 +101,9 @@ public class Pedido {
     @Column(name = "fim_horario")
     private OffsetDateTime fimHorario;
 
+    @Column(name = "is_agendamento")
+    private Boolean isAgendamento;
+
     public void adicionarItemPedido(ItemPedido itemPedido){
         itemPedidos.add(itemPedido);
     }

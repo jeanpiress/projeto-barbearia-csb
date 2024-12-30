@@ -98,7 +98,8 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     @GetMapping(value = "/horario")
     public ResponseEntity<List<PedidoDto>> listarPorData(@RequestParam String horario,
-                                                         @RequestParam String statusPedido){
+                                                         @RequestParam String statusPedido,
+                                                         @RequestParam(required = false) boolean isAgendamento){
 
         StatusPedido statusPedidoFinal;
         try{
@@ -111,7 +112,7 @@ public class PedidoController implements PedidoControllerOpenApi {
         OffsetDateTime inicioDoDia = localDate.atStartOfDay(ZoneOffset.systemDefault()).toOffsetDateTime();
         OffsetDateTime fimDoDia = inicioDoDia.plusDays(1);
 
-        List<Pedido> pedidos = pedidoRepository.findByDataExcetoStatus(inicioDoDia, fimDoDia, statusPedidoFinal);
+        List<Pedido> pedidos = pedidoRepository.findByDataExcetoStatus(inicioDoDia, fimDoDia, statusPedidoFinal,isAgendamento);
         List<PedidoDto> pedidosDto = pedidoAssembler.collectionToModel(pedidos);
         return ResponseEntity.ok(pedidosDto);
     }
@@ -231,18 +232,11 @@ public class PedidoController implements PedidoControllerOpenApi {
     }
 
     //@PreAuthorize("hasAuthority('PROFISSIONAL')")
-    @PutMapping(value = "/{pedidoId}/confirmar")
+    @PutMapping(value = "/{pedidoId}/statusPedido")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void confirmarPedido(@PathVariable Long pedidoId){
-        pedidoService.confirmarPedido(pedidoId);
-    }
+    public void alterarStatusPedido(@PathVariable Long pedidoId, @RequestParam String statusPedido){
 
-    //@PreAuthorize("hasAuthority('PROFISSIONAL')")
-    @PutMapping(value = "/{pedidoId}/iniciar")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void iniciarExecucaoPedido(@PathVariable Long pedidoId){
-
-        pedidoService.iniciarExecucaoPedido(pedidoId);
+        pedidoService.alterarStatusPedido(pedidoId, statusPedido);
     }
 
 }

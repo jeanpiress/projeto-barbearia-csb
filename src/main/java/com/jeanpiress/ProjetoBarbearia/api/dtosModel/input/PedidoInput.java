@@ -30,4 +30,7 @@ public class PedidoInput {
 
     @Schema(description = "Duracao do serviço", example = "01:00")
     private String duracao;
+
+    @Schema(description = "Define se vai aparecer na lista de agendamento")
+    private Boolean isAgendamento = false;
 }

@@ -1,0 +1,1 @@
+ALTER TABLE pedido add COLUMN is_agendamento boolean;

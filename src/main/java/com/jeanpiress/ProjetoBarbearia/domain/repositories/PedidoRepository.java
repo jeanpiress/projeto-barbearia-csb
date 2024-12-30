@@ -42,8 +42,8 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByData(OffsetDateTime inicioDoDia, OffsetDateTime fimDoDia);
 
     @Query(value = "SELECT p FROM Pedido p WHERE p.horario >= :inicioDoDia AND p.horario < :fimDoDia " +
-            "AND p.statusPedido <> :statusPedido")
-    List<Pedido> findByDataExcetoStatus(OffsetDateTime inicioDoDia, OffsetDateTime fimDoDia, StatusPedido statusPedido);
+            "AND p.statusPedido <> :statusPedido AND p.isAgendamento = :isAgendamento")
+    List<Pedido> findByDataExcetoStatus(OffsetDateTime inicioDoDia, OffsetDateTime fimDoDia, StatusPedido statusPedido, Boolean isAgendamento);
 
 
 }
