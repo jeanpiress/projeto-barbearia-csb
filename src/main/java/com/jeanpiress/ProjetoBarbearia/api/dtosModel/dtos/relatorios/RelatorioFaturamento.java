@@ -1,9 +1,12 @@
 package com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios;
 
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.PedidoDto;
+import com.jeanpiress.ProjetoBarbearia.domain.model.Pedido;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -41,5 +44,8 @@ public class RelatorioFaturamento {
 
     @Schema(description = "Quantidade de produtos vendidos" ,example = "10")
     private Integer quantidadeProdutosVendidos;
+
+    @Schema(description = "Faturamento por dia")
+    private List<FaturamentoDia> faturamentos;
 
 }

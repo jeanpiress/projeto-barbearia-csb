@@ -4,7 +4,6 @@ import com.jeanpiress.ProjetoBarbearia.api.converteDto.dissembler.ItemPedidoInpu
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.ItemPedidoInput;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoAlteracaoInput;
 import com.jeanpiress.ProjetoBarbearia.core.security.CsbSecurity;
-import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.FormaPagamentoJson;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPedido;
@@ -20,10 +19,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -241,7 +241,7 @@ public class PedidoService {
         pedido.setStatusPedido(StatusPedido.FINALIZADO);
         pedido.setFormaPagamento(FormaPagamento.VOUCHER);
         pedido.setStatusPagamento(StatusPagamento.PAGO);
-        pedido.setDataPagamento(OffsetDateTime.now());
+        pedido.setDataPagamento(LocalDateTime.now());
         pedido.setValorTotal(itemPacote.getItemPedido().getPrecoTotal());
         pacoteService.alterarAtivoParaConsumido(pacote, pedido.getProfissional(), itemPacoteId);
         Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
@@ -257,40 +257,37 @@ public class PedidoService {
 
 
 
-    public Pedido realizarPagamento(FormaPagamentoJson formaPagamento, Long pedidoId) {
+    public Pedido realizarPagamento(String formaPagamento, Long pedidoId) {
         Pedido pedido = buscarPorId(pedidoId);
 
         if(Objects.isNull(pedido.getProfissional())){
             throw new PedidoSemProfissionalException(pedidoId);
         }
 
-        String letrasMaiusculas = formaPagamento.getFormaPagamento().toUpperCase();
-        formaPagamento.setFormaPagamento(letrasMaiusculas);
+        FormaPagamento formaPagamentoFinal = FormaPagamento.valueOf(formaPagamento.toUpperCase());
 
-
-
-        if(formaPagamento.getFormaPagamento().equals("DINHEIRO")){
+        if(formaPagamentoFinal.equals(FormaPagamento.DINHEIRO)){
             pedido.setFormaPagamento(FormaPagamento.DINHEIRO);
         }
-        else if(formaPagamento.getFormaPagamento().equals("PIX")){
+        else if(formaPagamentoFinal.equals(FormaPagamento.PIX)){
             pedido.setFormaPagamento(FormaPagamento.PIX);
         }
-        else if(formaPagamento.getFormaPagamento().equals("DEBITO")){
+        else if(formaPagamentoFinal.equals(FormaPagamento.DEBITO)){
             pedido.setFormaPagamento(FormaPagamento.DEBITO);
         }
-        else if(formaPagamento.getFormaPagamento().equals("CREDITO")){
+        else if(formaPagamentoFinal.equals(FormaPagamento.CREDITO)){
             pedido.setFormaPagamento(FormaPagamento.CREDITO);
         }
-        else if(formaPagamento.getFormaPagamento().equals("VOUCHER")){
+        else if(formaPagamentoFinal.equals(FormaPagamento.VOUCHER)){
             throw new OperacaoNaoRealizadaException();
         }
-        else if(formaPagamento.getFormaPagamento().equals("PONTO")){
+        else if(formaPagamentoFinal.equals(FormaPagamento.PONTO)){
             throw new OperacaoNaoRealizadaException();
         }
         else{
             throw new FormaPagamentoNaoReconhecidaException();
         }
-        pedido.setDataPagamento(OffsetDateTime.now());
+        pedido.setDataPagamento(LocalDateTime.now());
 
         pedido.setStatusPagamento(StatusPagamento.PAGO);
 

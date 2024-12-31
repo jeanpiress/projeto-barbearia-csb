@@ -3,6 +3,7 @@ package com.jeanpiress.ProjetoBarbearia.domain.model;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @Getter
@@ -12,8 +13,8 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 public class ComparacaoMes {
 
-    private OffsetDateTime dataInicio;
-    private OffsetDateTime dataFim;
+    private LocalDate dataInicio;
+    private LocalDate dataFim;
     private BigDecimal faturamentoPrimeiroMes;
     private BigDecimal faturamentoSegundoMes;
     private BigDecimal diferencaFaturamento;

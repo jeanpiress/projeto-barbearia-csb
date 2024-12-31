@@ -1,9 +1,9 @@
 package com.jeanpiress.ProjetoBarbearia.domain.services;
 
+import com.jeanpiress.ProjetoBarbearia.api.converteDto.assebler.PedidoAssembler;
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.PedidoDto;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios.*;
-import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.DataInicioFim;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.DataInicioFimMes;
-import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.MesAno;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbearia.domain.model.ComparacaoMes;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Profissional;
@@ -40,16 +40,20 @@ public class RelatorioService {
     private ClienteRepository clienteRepository;
 
 
-
-    public RelatorioFaturamento buscarFaturamentoData(DataInicioFim data){
-        List<Pedido> pedidos = pedidoRepository.findByDataPagamento(data.getInicio(), data.getFim());
+    public RelatorioFaturamento buscarFaturamentoData(String dataInicio, String dataFim){
+        LocalDateTime dataIncioDia = LocalDate.parse(dataInicio).atStartOfDay();
+        LocalDateTime dataFimDia = LocalDate.parse(dataFim).atTime(LocalTime.MAX);
+        List<Pedido> pedidos = pedidoRepository.findByDataPagamento(dataIncioDia, dataFimDia);
         return buscarFaturamento(pedidos);
     }
 
-    public ComparacaoMes compararMetricasMesFechado(DataInicioFim data){
-        DataInicioFimMes dataMes = gerarDatasParaComparar(data);
-        List<Pedido> pedidosPrimeiroMes = pedidoRepository.findByDataPagamento(dataMes.getInicioPrimeiroMes(), dataMes.getFimPrimeiroMes());
-        List<Pedido> pedidosSegundoMes = pedidoRepository.findByDataPagamento(dataMes.getInicioSegundoMes(), dataMes.getFimSegundoMes());
+    public ComparacaoMes compararMetricasMesFechado(String dataInicio, String dataFim){
+
+        DataInicioFimMes dataMes = gerarDatasParaComparar(LocalDate.parse(dataInicio), LocalDate.parse(dataFim));
+        List<Pedido> pedidosPrimeiroMes = pedidoRepository.findByDataPagamento(dataMes.getInicioPrimeiroMes().atStartOfDay(),
+                                                                               dataMes.getFimPrimeiroMes().atTime(LocalTime.MAX));
+        List<Pedido> pedidosSegundoMes = pedidoRepository.findByDataPagamento(dataMes.getInicioSegundoMes().atStartOfDay(),
+                                                                              dataMes.getFimSegundoMes().atTime(LocalTime.MAX));
 
         ComparacaoMes comparacaoMes = compararFaturamentos(pedidosPrimeiroMes, pedidosSegundoMes);
         comparacaoMes.setDataInicio(dataMes.getInicioPrimeiroMes());
@@ -58,12 +62,11 @@ public class RelatorioService {
         return comparacaoMes;
     }
 
-    public ComparacaoMes compararMetricasDataAtualMesmoPeriodoMesSelecionado(MesAno mesAnoJson){
-        OffsetDateTime dataAtual = OffsetDateTime.now().withSecond(0).withNano(0);
-        OffsetDateTime dataFornecida = mesAnoJson.getData();
+    public ComparacaoMes compararMetricasDataAtualMesmoPeriodoMesSelecionado(LocalDate dataFornecida){
+        LocalDateTime dataAtual = LocalDateTime.now();
         List<Month> mesesComTrintaDias = Arrays.asList(Month.APRIL, Month.JUNE, Month.SEPTEMBER, Month.NOVEMBER);
         List<Integer> maisDeVinteNoveDias = Arrays.asList(29, 30, 31);
-        OffsetDateTime dataPesquisa;
+        LocalDate dataPesquisa;
 
         boolean mesAtualComTrintaDias = mesesComTrintaDias.contains(dataFornecida.getMonth());
         boolean hojeDia31 = dataAtual.getDayOfMonth() == 31;
@@ -80,11 +83,12 @@ public class RelatorioService {
             dataPesquisa = dataFornecida.withDayOfMonth(dataAtual.getDayOfMonth());
         }
 
-        List<Pedido> pedidosMesAtual = pedidoRepository.findByDataPagamento(dataAtual.withDayOfMonth(1), dataAtual);
-        List<Pedido> pedidosMesPesquisa = pedidoRepository.findByDataPagamento(dataPesquisa.withDayOfMonth(1), dataPesquisa);
+        List<Pedido> pedidosMesAtual = pedidoRepository.findByDataPagamento(dataAtual.withDayOfMonth(1).toLocalDate().atStartOfDay(), dataAtual);
+        List<Pedido> pedidosMesPesquisa = pedidoRepository.findByDataPagamento(dataPesquisa.withDayOfMonth(1).atStartOfDay(),
+                                                                                dataPesquisa.atTime(dataAtual.getHour(), dataAtual.getMinute()));
 
         ComparacaoMes comparacaoMes = compararFaturamentos(pedidosMesPesquisa, pedidosMesAtual);
-        comparacaoMes.setDataInicio(dataAtual);
+        comparacaoMes.setDataInicio(dataAtual.toLocalDate());
         comparacaoMes.setDataFim(dataPesquisa);
 
         return comparacaoMes;
@@ -116,8 +120,9 @@ public class RelatorioService {
         return relatorio;
     }
 
-    public List<RelatorioComissao> buscarTodasComissoes(DataInicioFim data){
-        List<Pedido> pedidos = pedidoRepository.findByDataPagamento(data.getInicio(), data.getFim());
+    public List<RelatorioComissao> buscarTodasComissoes(String dataInicio, String dataFim){
+        List<Pedido> pedidos = pedidoRepository.findByDataPagamento(LocalDate.parse(dataInicio).atStartOfDay(),
+                                                                    LocalDate.parse(dataFim).atTime(LocalTime.MAX));
         List<Profissional> profissionais = profissionalRepository.buscarProfissionaisAtivos();
         List<RelatorioComissao> relatoriosComissoes = relatoriosComissoesZeradosComProfissionais(profissionais);
 
@@ -165,16 +170,14 @@ public class RelatorioService {
         return clientesRetorno;
     }
 
-    public DataInicioFimMes gerarDatasParaComparar(DataInicioFim data) {
-        OffsetDateTime inicioPrimeiroMes = data.getInicio().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+    public DataInicioFimMes gerarDatasParaComparar(LocalDate dataIncio, LocalDate dataFim) {
+        LocalDate inicioPrimeiroMes = dataIncio.withDayOfMonth(1);
 
-        OffsetDateTime fimPrimeiroMes = inicioPrimeiroMes.plusMonths(1).minusDays(1)
-                .withHour(23).withMinute(59).withSecond(59).withNano(0);
+        LocalDate fimPrimeiroMes = inicioPrimeiroMes.plusMonths(1).minusDays(1);
 
-        OffsetDateTime inicioSegundoMes = data.getFim().withDayOfMonth(1);
+        LocalDate inicioSegundoMes = dataFim.withDayOfMonth(1);
 
-        OffsetDateTime fimSegundoMes = inicioSegundoMes.plusMonths(1).minusDays(1)
-                .withHour(23).withMinute(59).withSecond(59).withNano(0);
+        LocalDate fimSegundoMes = inicioSegundoMes.plusMonths(1).minusDays(1);
 
         return DataInicioFimMes.builder()
                 .inicioPrimeiroMes(inicioPrimeiroMes)
@@ -246,7 +249,6 @@ public class RelatorioService {
 
     private RelatorioFaturamento buscarFaturamento(List<Pedido> pedidos){
         CaixaModel caixa = caixaService.gerarCaixa(pedidos);
-
         return RelatorioFaturamento.builder()
                 .dinheiro(caixa.getDinheiro())
                 .pix(caixa.getPix())
@@ -258,6 +260,7 @@ public class RelatorioService {
                 .tkmLoja(gerarTkmLoja(caixa))
                 .clientesAtendidos(caixa.getClientesAtendidos())
                 .quantidadeProdutosVendidos(caixa.getQuantidadeProdutosVendidos())
+                .faturamentos(caixa.getFaturamentos())
                 .build();
     }
 

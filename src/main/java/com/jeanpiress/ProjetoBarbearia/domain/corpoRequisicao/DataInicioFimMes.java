@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 @Builder
@@ -11,8 +13,8 @@ import java.time.OffsetDateTime;
 @Setter
 public class DataInicioFimMes {
 
-    private OffsetDateTime inicioPrimeiroMes;
-    private OffsetDateTime fimPrimeiroMes;
-    private OffsetDateTime inicioSegundoMes;
-    private OffsetDateTime fimSegundoMes;
+    private LocalDate inicioPrimeiroMes;
+    private LocalDate fimPrimeiroMes;
+    private LocalDate inicioSegundoMes;
+    private LocalDate fimSegundoMes;
 }

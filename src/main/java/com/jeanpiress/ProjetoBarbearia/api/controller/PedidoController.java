@@ -9,7 +9,6 @@ import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoAlteracaoInput;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoInput;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPedido;
-import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.FormaPagamentoJson;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealizacaoItemPacote;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Pedido;
 import com.jeanpiress.ProjetoBarbearia.domain.services.PedidoService;
@@ -215,7 +214,7 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     //@PreAuthorize("hasAuthority('RECEPCAO')")
     @PutMapping(value = "/{pedidoId}/pagar")
-    public ResponseEntity<PedidoDto> efetuarPagamento(@RequestBody @Valid FormaPagamentoJson formaPagamento, @PathVariable @Valid Long pedidoId) {
+    public ResponseEntity<PedidoDto> efetuarPagamento(@RequestParam String formaPagamento, @PathVariable @Valid Long pedidoId) {
        Pedido pedido = pedidoService.realizarPagamento(formaPagamento, pedidoId);
        PedidoDto pedidoDto = pedidoAssembler.toModel(pedido);
        return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDto);

@@ -3,7 +3,6 @@ package com.jeanpiress.ProjetoBarbearia.api.controller.openapi;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.PedidoDto;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoAlteracaoInput;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.PedidoInput;
-import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.FormaPagamentoJson;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -98,8 +96,8 @@ public interface PedidoControllerOpenApi {
     @Operation(summary ="Efetua o pagamento de um pedido", responses ={
             @ApiResponse(responseCode = "404", description = "Pedido não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
-    public ResponseEntity<PedidoDto> efetuarPagamento(@Parameter(description = "Representação de uma nova forma de pagamento")
-                                                          FormaPagamentoJson formaPagamento,
+    public ResponseEntity<PedidoDto> efetuarPagamento(@Parameter(description = "Forma de pagamento")
+                                                          String formaPagamento,
                                                       @Parameter(description = "ID de um pedido", example = "1")
                                                           Long pedidoId);
 

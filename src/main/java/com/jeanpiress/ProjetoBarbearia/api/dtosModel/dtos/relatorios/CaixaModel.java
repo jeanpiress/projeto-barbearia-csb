@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -40,5 +41,8 @@ public class CaixaModel {
 
     @Schema(description = "Quantidade de produtos vendidos" ,example = "10")
     private Integer quantidadeProdutosVendidos;
+
+    @Schema(description = "Lista separando o faturamento por dia")
+    private List<FaturamentoDia> faturamentos;
 
 }

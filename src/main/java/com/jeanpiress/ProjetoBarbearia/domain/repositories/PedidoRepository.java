@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -20,15 +21,15 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByEqualStatusAndIsCaixaAberto(Boolean isAberto, StatusPagamento statusPagamento);
 
 
-    @Query(value = "SELECT * FROM pedido p WHERE p.data_pagamento > :inicio " +
-            "AND p.data_pagamento < :fim " +
-            "AND p.status_pagamento = 1", nativeQuery = true)
-    List<Pedido> findByDataPagamento(@Param("inicio") OffsetDateTime inicio, @Param("fim") OffsetDateTime fim);
+    @Query(value = "SELECT * FROM pedido p WHERE p.data_pagamento >= :inicio " +
+            "AND p.data_pagamento <= :fim " +
+            "AND p.status_pagamento = 'PAGO'", nativeQuery = true)
+    List<Pedido> findByDataPagamento(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 
     @Query(value = "SELECT * FROM pedido p WHERE p.data_pagamento > :inicio " +
             "AND p.data_pagamento < :fim " +
             "AND p.profissional_id = :profissionalId " +
-            "AND p.status_pagamento = 'PAGO'" + "ORDER BY p.data_pagamento", nativeQuery = true)
+            "AND p.status_pagamento = 'PAGO' ORDER BY p.data_pagamento", nativeQuery = true)
     List<Pedido> findByDataPagamentoAndProfissionalId(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim, @Param("profissionalId") Long profissionalId);
 
 
@@ -37,9 +38,6 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
             "AND p.statusPagamento = :statusPagamento")
     List<Pedido> findByStatus(StatusPedido statusPedido, StatusPagamento statusPagamento);
 
-
-    @Query(value = "SELECT p FROM Pedido p WHERE p.horario >= :inicioDoDia AND p.horario < :fimDoDia")
-    List<Pedido> findByData(OffsetDateTime inicioDoDia, OffsetDateTime fimDoDia);
 
     @Query(value = "SELECT p FROM Pedido p WHERE p.horario >= :inicioDoDia AND p.horario < :fimDoDia " +
             "AND p.statusPedido <> :statusPedido AND p.isAgendamento = :isAgendamento")
