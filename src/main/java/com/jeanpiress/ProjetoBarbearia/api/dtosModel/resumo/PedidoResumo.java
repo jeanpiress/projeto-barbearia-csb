@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 @NoArgsConstructor
@@ -31,5 +32,5 @@ public class PedidoResumo {
     private BigDecimal valorTotal;
 
     @Schema(example = "2024-04-01T00:00:00Z")
-    private OffsetDateTime dataPagamento;
+    private LocalDateTime dataPagamento;
 }

@@ -42,14 +42,14 @@ public class UsuarioController implements UsuarioControllerOpenApi {
        return ResponseEntity.ok(usuarioAssembler.collectionToModel(usuarios));
    }
 
-   //@PreAuthorize("hasAuthority('GERENTE')")
+   @PreAuthorize("hasAuthority('GERENTE')")
    @GetMapping(value = "/id/{usuarioId}")
    public ResponseEntity<UsuarioDto> buscarUsuarioPorId(@PathVariable Long usuarioId){
        Usuario usuario = usuarioService.buscarPorId(usuarioId);
        return ResponseEntity.ok(usuarioAssembler.toModel(usuario));
    }
 
-    //@PreAuthorize("hasAuthority('GERENTE')")
+    @PreAuthorize("hasAuthority('GERENTE')")
     @GetMapping(value = "/email/{email}")
     public ResponseEntity<UsuarioDto> buscarUsuarioPorEmail(@PathVariable String email){
         Usuario usuario = usuarioService.buscarPorEmail(email);
@@ -64,7 +64,7 @@ public class UsuarioController implements UsuarioControllerOpenApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioAssembler.toModel(usuarioNovo));
     }
 
-    //@PreAuthorize("hasAuthority('GERENTE')")
+    @PreAuthorize("hasAuthority('GERENTE')")
     @PostMapping(value = "/criar")
     public ResponseEntity<UsuarioDto> criarUsuarioNovo(@RequestBody @Valid UsuarioInput usuarioInput){
         Usuario usuario = usuarioDissembler.toDomainObject(usuarioInput);
@@ -72,7 +72,7 @@ public class UsuarioController implements UsuarioControllerOpenApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioAssembler.toModel(usuarioNovo));
     }
 
-    //@PreAuthorize("hasAuthority('RECEPCAO')")
+    @PreAuthorize("hasAuthority('GERENTE')")
     @PostMapping(value = "/criar/profissional/{profissionalId}")
     public ResponseEntity<UsuarioDto> criarUsuarioProfissionalExistente(@RequestBody @Valid UsuarioInput usuarioInput, @PathVariable @Valid Long profissionalId){
         Usuario usuario = usuarioDissembler.toDomainObject(usuarioInput);
@@ -87,7 +87,7 @@ public class UsuarioController implements UsuarioControllerOpenApi {
         usuarioService.alterarSenha(novaSenha);
 
     }
-    //@PreAuthorize("hasAuthority('GERENTE')")
+    @PreAuthorize("hasAuthority('GERENTE')")
     @PutMapping(value = "/{usuarioId}/alterar-permissao/{permissaoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void alterarPermissaoUsuario(@PathVariable Long usuarioId, @PathVariable Long permissaoId){

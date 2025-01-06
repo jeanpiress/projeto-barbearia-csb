@@ -106,14 +106,6 @@ public class Pedido {
     @Column(name = "is_agendamento")
     private Boolean isAgendamento;
 
-    public void adicionarItemPedido(ItemPedido itemPedido){
-        itemPedidos.add(itemPedido);
-    }
-
-    public void removerItemPedido(ItemPedido itemPedido){
-        itemPedidos.remove(itemPedido);
-    }
-
-
-
+    @Column(name = "inicio_espera")
+    private OffsetDateTime inicioEspera;
 }

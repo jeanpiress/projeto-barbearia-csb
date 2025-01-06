@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -35,6 +36,7 @@ public class ProfissionalController implements ProfissionalControllerOpenApi {
     @Autowired
     private ProfissionalInputDissembler profissionalDissembler;
 
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping
     public ResponseEntity<List<ProfissionalDto>> listar(){
         List<Profissional> profissionais = repository.findAll();
@@ -42,6 +44,7 @@ public class ProfissionalController implements ProfissionalControllerOpenApi {
         return ResponseEntity.ok(profissionaisDto);
     }
 
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping("/ativos")
     public ResponseEntity<List<ProfissionalDto>> listarProfissionaisAtivos(){
         List<Profissional> profissionais = repository.buscarProfissionaisAtivos();
@@ -49,6 +52,7 @@ public class ProfissionalController implements ProfissionalControllerOpenApi {
         return ResponseEntity.ok(profissionaisDto);
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @GetMapping("/inativos")
     public ResponseEntity<List<ProfissionalDto>> listarProfissionaisInativos(){
         List<Profissional> profissionais = repository.buscarProfissionaisInativos();
@@ -56,6 +60,7 @@ public class ProfissionalController implements ProfissionalControllerOpenApi {
         return ResponseEntity.ok(profissionaisDto);
     }
 
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping(value = "/{profissionalId}")
     public ResponseEntity<ProfissionalDto> buscarPorId(@PathVariable Long profissionalId) {
         Profissional profissional = service.buscarPorId(profissionalId);
@@ -63,6 +68,7 @@ public class ProfissionalController implements ProfissionalControllerOpenApi {
         return ResponseEntity.ok(profissionalDto);
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @PostMapping
     public ResponseEntity<ProfissionalDto> adicionar(@RequestBody @Valid ProfissionalInput profissionalInput) {
         Profissional profissional = profissionalDissembler.toDomainObject(profissionalInput);
@@ -71,6 +77,7 @@ public class ProfissionalController implements ProfissionalControllerOpenApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(profissionalDto);
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @PutMapping(value = "/{profissionalId}")
     public ResponseEntity<ProfissionalDto> alterar(@RequestBody @Valid ProfissionalInput profissionalInput, @PathVariable Long profissionalId) {
         Profissional profissional = service.buscarPorId(profissionalId);
@@ -79,6 +86,7 @@ public class ProfissionalController implements ProfissionalControllerOpenApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(profissionalDto);
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @DeleteMapping("/{profissionalId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable Long profissionalId){
@@ -86,6 +94,7 @@ public class ProfissionalController implements ProfissionalControllerOpenApi {
 
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @PutMapping(value = "/{profissionalId}/ativar")
     public void ativar(@PathVariable Long profissionalId) {
         Profissional profissional = service.buscarPorId(profissionalId);
@@ -94,6 +103,7 @@ public class ProfissionalController implements ProfissionalControllerOpenApi {
 
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @PutMapping(value = "/{profissionalId}/inativar")
     public void inativar(@PathVariable Long profissionalId) {
         Profissional profissional = service.buscarPorId(profissionalId);

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -35,6 +36,7 @@ public class CategoriaController implements CategoriaControllerOpenApi {
     @Autowired
     private CategoriaInputDissembler categoriaDissembler;
 
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping
     public ResponseEntity<List<CategoriaDto>> listar(){
         List<Categoria> categorias = repository.findAll();
@@ -42,6 +44,7 @@ public class CategoriaController implements CategoriaControllerOpenApi {
         return ResponseEntity.ok(categriasDto);
     }
 
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping(value = "/{categoriaId}")
     public ResponseEntity<CategoriaDto> buscarPorId(@PathVariable @Valid Long categoriaId) {
         Categoria categoria = service.buscarPorId(categoriaId);
@@ -49,6 +52,7 @@ public class CategoriaController implements CategoriaControllerOpenApi {
         return ResponseEntity.ok(categoriaDto);
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @PostMapping
     public ResponseEntity<CategoriaDto> adicionar(@RequestBody @Valid CategoriaInput categoriaInput) {
         Categoria categoria = categoriaDissembler.toDomainObject(categoriaInput);
@@ -57,6 +61,7 @@ public class CategoriaController implements CategoriaControllerOpenApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoriaDto);
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @PutMapping(value = "/{categoriaId}")
     public ResponseEntity<CategoriaDto> alterar(@RequestBody @Valid CategoriaInput categoriaInput, @PathVariable Long categoriaId) {
         Categoria categoria = service.buscarPorId(categoriaId);
@@ -66,6 +71,7 @@ public class CategoriaController implements CategoriaControllerOpenApi {
 
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @DeleteMapping("/{categoriaId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable Long categoriaId){

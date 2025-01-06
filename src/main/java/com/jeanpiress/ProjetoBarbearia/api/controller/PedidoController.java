@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -44,6 +45,7 @@ public class PedidoController implements PedidoControllerOpenApi {
     @Autowired
     private PedidoInputDissembler pedidoDissembler;
 
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping
     public ResponseEntity<List<PedidoDto>> listarTodos(){
         List<Pedido> pedidos = pedidoRepository.findAll();
@@ -51,7 +53,7 @@ public class PedidoController implements PedidoControllerOpenApi {
         return ResponseEntity.ok(pedidosDto);
     }
 
-    //@PreAuthorize("hasAuthority('RECEPCAO')")
+    @PreAuthorize("hasAuthority('RECEPCAO')")
     @GetMapping(value = "/caixa")
     public ResponseEntity<List<PedidoDto>> listarPagosCaixaAberto(@RequestParam Boolean isAberto,
                                                                   @RequestParam String statusPagamento) {
@@ -69,7 +71,7 @@ public class PedidoController implements PedidoControllerOpenApi {
     }
 
 
-    //@PreAuthorize("hasAuthority('RECEPCAO')")
+    @PreAuthorize("hasAuthority('PROFISSIONAL')")
     @GetMapping(value = "/status")
     public ResponseEntity<List<PedidoDto>> listarPedidosFiltroStatus(@RequestParam(required = false) String statusPedido,
                                                                      @RequestParam String statusPagamento) {
@@ -95,6 +97,7 @@ public class PedidoController implements PedidoControllerOpenApi {
         return ResponseEntity.ok(pedidosDto);
     }
 
+    @PreAuthorize("hasAuthority('PROFISSIONAL')")
     @GetMapping(value = "/horario")
     public ResponseEntity<List<PedidoDto>> listarPorData(@RequestParam String horario,
                                                          @RequestParam String statusPedido,
@@ -116,7 +119,7 @@ public class PedidoController implements PedidoControllerOpenApi {
         return ResponseEntity.ok(pedidosDto);
     }
 
-    //@PreAuthorize("hasAuthority('RECEPCAO')")
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping(value = "/{pedidoId}")
     public ResponseEntity<PedidoDto> buscarPorId(@PathVariable Long pedidoId) {
         Pedido pedido = pedidoService.buscarPorId(pedidoId);
@@ -124,7 +127,7 @@ public class PedidoController implements PedidoControllerOpenApi {
         return ResponseEntity.ok(pedidoDto);
     }
 
-    //@PreAuthorize("hasAuthority('CLIENTE')")
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @PostMapping
     public ResponseEntity<PedidoDto> adicionar(@RequestBody PedidoInput pedidoInput, @RequestParam String statusPedido) {
         Pedido pedido = pedidoDissembler.toDomainObject(pedidoInput);
@@ -134,7 +137,8 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     }
 
-    //@PreAuthorize("hasAuthority('CLIENTE')")
+    //Autorisação valida apenas para pedidos não confimardos, no proprio metodo exitem verificações para pedidos confimados ou pagos
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @DeleteMapping("cancelar/{pedidoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancelar(@PathVariable Long pedidoId){
@@ -142,7 +146,7 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     }
 
-    //@PreAuthorize("hasAuthority('CLIENTE')")
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @DeleteMapping("excluir/{pedidoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void excluir(@PathVariable Long pedidoId){
@@ -150,7 +154,7 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     }
 
-    //@PreAuthorize("hasAuthority('CLIENTE')")
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @DeleteMapping("limpar-itens")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void limparItens(@PathVariable Long pedidoId){
@@ -158,7 +162,7 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     }
 
-    //@PreAuthorize("hasAuthority('RECEPCAO')")
+    @PreAuthorize("hasAuthority('RECEPCAO')")
     @PutMapping("/{pedidoId}/add-item/{itemPedidoId}")
     public ResponseEntity<PedidoDto> adicionarItemPedido(@PathVariable Long pedidoId, @PathVariable Long itemPedidoId){
         Pedido pedido = pedidoService.adicionarItemPedido(pedidoId, itemPedidoId);
@@ -166,7 +170,7 @@ public class PedidoController implements PedidoControllerOpenApi {
         return ResponseEntity.ok(pedidoDto);
     }
 
-    //@PreAuthorize("hasAuthority('RECEPCAO')")
+    @PreAuthorize("hasAuthority('RECEPCAO')")
     @PutMapping("/{pedidoId}/add-itens")
     public ResponseEntity<PedidoDto> adicionarItemPedidoPorLIsta(@PathVariable Long pedidoId, @RequestBody List<ItemPedidoInput> itensPedidoInput){
         Pedido pedido = pedidoService.adicionarItemPedidoPorLista(pedidoId, itensPedidoInput);
@@ -174,7 +178,7 @@ public class PedidoController implements PedidoControllerOpenApi {
         return ResponseEntity.ok(pedidoDto);
     }
 
-    //@PreAuthorize("hasAuthority('RECEPCAO')")
+    @PreAuthorize("hasAuthority('RECEPCAO')")
     @PutMapping(value = "/{pedidoId}")
     public ResponseEntity<PedidoDto> alterar(@RequestBody @Valid PedidoAlteracaoInput pedidoAlteracaoInput, @PathVariable Long pedidoId) {
         Pedido pedido = pedidoService.alterarInfoPedido(pedidoAlteracaoInput, pedidoId);
@@ -183,7 +187,7 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     }
 
-    //@PreAuthorize("hasAuthority('RECEPCAO')")
+    @PreAuthorize("hasAuthority('RECEPCAO')")
     @PutMapping(value = "/{pedidoId}/profissional")
     public ResponseEntity<PedidoDto> alterarProfissional(@PathVariable Long pedidoId, @RequestParam Long profissionalId) {
         Pedido pedido = pedidoService.alterarProfissional(profissionalId, pedidoId);
@@ -194,7 +198,7 @@ public class PedidoController implements PedidoControllerOpenApi {
     }
 
 
-    //@PreAuthorize("hasAuthority('RECEPCAO')")
+    @PreAuthorize("hasAuthority('RECEPCAO')")
     @DeleteMapping("/{pedidoId}/remove-item/{itemPedidoId}")
     public ResponseEntity<PedidoDto> removerItemPedido(@PathVariable Long pedidoId, @PathVariable Long itemPedidoId){
         Pedido pedido = pedidoService.removerItemPedido(pedidoId, itemPedidoId);
@@ -202,7 +206,7 @@ public class PedidoController implements PedidoControllerOpenApi {
         return ResponseEntity.ok(pedidoDto);
     }
 
-    //@PreAuthorize("hasAuthority('RECEPCAO')")
+    @PreAuthorize("hasAuthority('RECEPCAO')")
     @DeleteMapping("/{pedidoId}/remove-todos-itens")
     public ResponseEntity<PedidoDto> removerTodosItemPedido(@PathVariable Long pedidoId){
         Pedido pedidoOriginal = pedidoService.buscarPorId(pedidoId);
@@ -212,7 +216,7 @@ public class PedidoController implements PedidoControllerOpenApi {
     }
 
 
-    //@PreAuthorize("hasAuthority('RECEPCAO')")
+    @PreAuthorize("hasAuthority('RECEPCAO')")
     @PutMapping(value = "/{pedidoId}/pagar")
     public ResponseEntity<PedidoDto> efetuarPagamento(@RequestParam String formaPagamento, @PathVariable @Valid Long pedidoId) {
        Pedido pedido = pedidoService.realizarPagamento(formaPagamento, pedidoId);
@@ -221,7 +225,7 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     }
 
-    //@PreAuthorize("hasAuthority('RECEPCAO')")
+    @PreAuthorize("hasAuthority('RECEPCAO')")
     @PutMapping(value = "/{pedidoId}/pagar/pacote")
     public ResponseEntity<PedidoDto> efetuarPagamentoComPacote(@RequestBody @Valid RealizacaoItemPacote realizacaoItemPacote, @PathVariable @Valid Long pedidoId) {
         Pedido pedido = pedidoService.realizarPagamentoComPedidoExistente(realizacaoItemPacote, pedidoId);
@@ -230,7 +234,7 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     }
 
-    //@PreAuthorize("hasAuthority('PROFISSIONAL')")
+    @PreAuthorize("hasAuthority('RECEPCAO')")
     @PutMapping(value = "/{pedidoId}/statusPedido")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void alterarStatusPedido(@PathVariable Long pedidoId, @RequestParam String statusPedido){

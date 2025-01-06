@@ -3,6 +3,7 @@ package com.jeanpiress.ProjetoBarbearia.domain.services;
 import com.jeanpiress.ProjetoBarbearia.api.converteDto.assebler.PedidoAssembler;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.PedidoDto;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios.*;
+import com.jeanpiress.ProjetoBarbearia.core.security.CsbSecurity;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.DataInicioFimMes;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbearia.domain.model.ComparacaoMes;
@@ -13,6 +14,7 @@ import com.jeanpiress.ProjetoBarbearia.domain.repositories.PedidoRepository;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.ProfissionalRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -38,6 +40,9 @@ public class RelatorioService {
 
     @Autowired
     private ClienteRepository clienteRepository;
+
+    @Autowired
+    private CsbSecurity security;
 
 
     public RelatorioFaturamento buscarFaturamentoData(String dataInicio, String dataFim){
@@ -95,7 +100,11 @@ public class RelatorioService {
 
     }
 
-    public RelatorioComissaoDetalhada buscarComissaoPorProfissional(String dataInicio, String dataFim, Long profissionalId){
+    public RelatorioComissaoDetalhada buscarComissaoPorProfissional(String dataInicio, String dataFim, Long profissionalId) {
+        if(!security.temAutorizacao("GERENTE") && !security.getUsuarioId().equals(profissionalId)){
+            throw new AccessDeniedException("");
+        }
+
         LocalDateTime dataHoraInicio = LocalDate.parse(dataInicio).atStartOfDay();
         LocalDateTime dataHoraFim = LocalDate.parse(dataFim).atTime(23, 59, 59);
         List<Pedido> pedidos = pedidoRepository.findByDataPagamentoAndProfissionalId(dataHoraInicio, dataHoraFim, profissionalId);

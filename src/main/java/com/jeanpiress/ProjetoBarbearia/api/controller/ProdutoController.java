@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -35,6 +36,7 @@ public class ProdutoController implements ProdutoControllerOpenApi {
     @Autowired
     private ProdutoInputDissembler produtoDissembler;
 
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping
     public ResponseEntity<List<ProdutoDto>> listar(@RequestParam String nome,
                                                    @RequestParam boolean isAtivo,
@@ -44,6 +46,7 @@ public class ProdutoController implements ProdutoControllerOpenApi {
         return ResponseEntity.ok(produtosDto);
     }
 
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping(value = "/{produtoId}")
     public ResponseEntity<ProdutoDto> buscarPorId(@PathVariable Long produtoId) {
         Produto produto = service.buscarPorId(produtoId);
@@ -51,6 +54,7 @@ public class ProdutoController implements ProdutoControllerOpenApi {
         return ResponseEntity.ok(produtoDto);
     }
 
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping(value = "/categoria/{categoriaId}")
     public ResponseEntity<List<ProdutoDto>> buscarPorCategoria(@PathVariable Long categoriaId){
         List<Produto> produtos = repository.buscarPorCategoria(categoriaId);
@@ -58,6 +62,7 @@ public class ProdutoController implements ProdutoControllerOpenApi {
         return ResponseEntity.ok(produtosDto);
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @PostMapping
     public ResponseEntity<ProdutoDto> adicionar(@RequestBody @Valid ProdutoInput produtoInput) {
         Produto produto = produtoDissembler.toDomainObject(produtoInput);
@@ -66,6 +71,7 @@ public class ProdutoController implements ProdutoControllerOpenApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(produtoDto);
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @PutMapping(value = "/{produtoId}")
     public ResponseEntity<ProdutoDto> alterar(@RequestBody @Valid ProdutoInput produtoInput, @PathVariable Long produtoId) {
         Produto produto = service.buscarPorId(produtoId);
@@ -75,6 +81,7 @@ public class ProdutoController implements ProdutoControllerOpenApi {
 
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @DeleteMapping("/{produtoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable Long produtoId){
@@ -82,6 +89,7 @@ public class ProdutoController implements ProdutoControllerOpenApi {
 
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @DeleteMapping("/{produtoId}/desativar")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void desativar(@PathVariable Long produtoId){

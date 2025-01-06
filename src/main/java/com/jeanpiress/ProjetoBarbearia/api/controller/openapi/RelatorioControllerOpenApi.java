@@ -38,7 +38,7 @@ public interface RelatorioControllerOpenApi {
                                                                                                 @Parameter(description = "Data final da pesquisa")
                                                                                                     String dataFim,
                                                                                                 @Parameter(description = "ID de um profissional", example = "1")
-                                                                                                    Long profissionalId);
+                                                                                                    Long profissionalId) throws Exception;
 
     @Operation(summary ="Busca os clientes que não voltaram", responses = {
             @ApiResponse(responseCode = "400", description = "Informações invalidas", content = @Content(schema = @Schema(ref = "Problema")))

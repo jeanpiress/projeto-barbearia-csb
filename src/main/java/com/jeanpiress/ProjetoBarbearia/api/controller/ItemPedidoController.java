@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -35,6 +36,7 @@ public class ItemPedidoController implements ItemPedidoControllerOpenApi {
     @Autowired
     private ItemPedidoInputDissembler itemPedidoDissembler;
 
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping
     public ResponseEntity<List<ItemPedidoDto>> listar(){
         List<ItemPedido> itensPedido = repository.findAll();
@@ -42,6 +44,7 @@ public class ItemPedidoController implements ItemPedidoControllerOpenApi {
         return ResponseEntity.ok(itensPedidoDto);
     }
 
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping(value = "/{itemPedidoId}")
     public ResponseEntity<ItemPedidoDto> buscarPorId(@PathVariable Long itemPedidoId) {
         ItemPedido itemPedido = service.buscarPorId(itemPedidoId);
@@ -49,6 +52,7 @@ public class ItemPedidoController implements ItemPedidoControllerOpenApi {
         return ResponseEntity.ok(itemPedidoDto);
     }
 
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @PostMapping
     public ResponseEntity<ItemPedidoDto> adicionar(@RequestBody @Valid ItemPedidoInput itemPedidoInput) {
         ItemPedido itemPedido = itemPedidoDissembler.toDomainObject(itemPedidoInput);
@@ -57,6 +61,7 @@ public class ItemPedidoController implements ItemPedidoControllerOpenApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(itemPedidoDto);
     }
 
+    @PreAuthorize("hasAuthority('CLIENTE')")
     @PutMapping(value = "/{itemPedidoId}")
     public ResponseEntity<ItemPedidoDto> alterar(@RequestBody @Valid ItemPedidoInput itemPedidoInput, @PathVariable Long itemPedidoId) {
         ItemPedido itemPedido = service.buscarPorId(itemPedidoId);
@@ -65,6 +70,7 @@ public class ItemPedidoController implements ItemPedidoControllerOpenApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(itemPedidoDto);
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @DeleteMapping("/{itemPedidoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable Long itemPedidoId){

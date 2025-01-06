@@ -12,7 +12,7 @@ public interface CaixaControllerOpenApi {
 
 
     @Operation(summary ="Busca o caixa aberto")
-    public ResponseEntity<CaixaModel> buscarCaixaDiario();
+    public CaixaModel buscarCaixaDiario();
 
     @Operation(summary ="Fecha o caixa")
     @ApiResponse(responseCode = "204", description = "Caixa fechado")

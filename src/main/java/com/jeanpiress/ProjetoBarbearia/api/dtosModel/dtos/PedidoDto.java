@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +73,7 @@ public class PedidoDto {
     private UsuarioResumo recibidoPor;
 
     @Schema(description ="Pedido pago no horario:", example = "2024-01-25T14:30:00-03:00")
-    private OffsetDateTime dataPagamento;
+    private LocalDateTime dataPagamento;
 
     private UsuarioResumo canceladoPor;
 
@@ -95,5 +96,8 @@ public class PedidoDto {
 
     @Schema(description ="Hora programada para terminar o atendimento", example = "2024-01-25T14:45:00-03:00")
     private OffsetDateTime fim_horario;
+
+    @Schema(description ="Hora que o cliente chegou", example = "2024-01-25T14:45:00-03:00")
+    private OffsetDateTime inicioEspera;
 
 }

@@ -80,9 +80,7 @@ public class PedidoService {
         if(Objects.nonNull(pedido.getHorario()) && pedido.getHorario().isBefore(OffsetDateTime.now())){
             throw new HorarioInvalidoException("Não é possivel marcar um horario em uma data que já passou");
         }
-        if(Objects.isNull(pedido.getHorario())){
-            pedido.setHorario(OffsetDateTime.now());
-        }
+
         if(Objects.nonNull(pedido.getDuracao())) {
             pedido.setFimHorario(adicionarFimHorario(pedido.getHorario(), pedido.getDuracao()));
         }
@@ -101,9 +99,15 @@ public class PedidoService {
             pedido.setProfissional(profissional);
         }
 
+        if(!pedido.getIsAgendamento()){
+            pedido.setInicioEspera(OffsetDateTime.now());
+        }
+
+        if(statusPedidoFinal == StatusPedido.EMATENDIMENTO){
+            pedido.setInicioAtendimento(OffsetDateTime.now());
+        }
+
         pedido.setCliente(cliente);
-        List<ItemPedido> itensPedidos = new ArrayList<>();
-        pedido.setItemPedidos(itensPedidos);
         preencherPedido(pedido);
         pedido.setCriadoAs(OffsetDateTime.now());
         Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
@@ -187,7 +191,6 @@ public class PedidoService {
         if(!pedido.getItemPedidos().contains(itemPedido)) {
             throw new PedidoNaoContemItemPedidoException(pedido.getId(), itemPedido.getId());
         }
-        pedido.removerItemPedido(itemPedido);
         itemPedidoService.remover(itemPedidoId);
         BigDecimal comissaoGerada = comissaoPorItem(profissionalId, itemPedido);
         BigDecimal comissaoPedido = pedido.getComissaoGerada().subtract(comissaoGerada);
@@ -293,12 +296,13 @@ public class PedidoService {
 
         pedido.setStatusPedido(StatusPedido.FINALIZADO);
 
-        pedido = repository.save(pedido);
-
         log.info(pedido.getCliente().getNome());
 
         Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
         pedido.setRecibidoPor(usuario);
+        pedido.setDataPagamento(LocalDateTime.now());
+
+        pedido = repository.save(pedido);
 
         eventPublisher.publishEvent(new ClienteAtendidoEvento(pedido.getCliente()));
 
@@ -349,6 +353,14 @@ public class PedidoService {
         Pedido pedido = buscarPorId(pedidoId);
 
         StatusPedido statusPedidoFinal = StatusPedido.valueOf(statusPedido.toUpperCase());
+
+        if(statusPedidoFinal == StatusPedido.AGUARDANDO){
+            pedido.setInicioEspera(OffsetDateTime.now());
+        }
+
+        if(statusPedidoFinal == StatusPedido.EMATENDIMENTO){
+            pedido.setInicioEspera(OffsetDateTime.now());
+        }
 
         if(pedido.getStatusPedido().equals(StatusPedido.CANCELADO) ||
                 pedido.getStatusPedido().equals(StatusPedido.FINALIZADO)){

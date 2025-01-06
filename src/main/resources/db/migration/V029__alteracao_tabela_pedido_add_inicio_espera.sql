@@ -1,0 +1,1 @@
+ALTER TABLE pedido add COLUMN inicio_espera TIMESTAMP;

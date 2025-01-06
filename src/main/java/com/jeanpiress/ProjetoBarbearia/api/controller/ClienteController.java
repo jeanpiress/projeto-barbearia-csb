@@ -37,7 +37,7 @@ public class ClienteController implements ClienteControllerOpenApi {
     @Autowired
     private ClienteInputDissembler clienteDissembler;
 
-    @PreAuthorize("hasAuthority('GERENTE')")
+    @PreAuthorize("hasAuthority('PROFISSIONAL')")
     @GetMapping
     public ResponseEntity<List<ClienteDto>> listar(@RequestParam String nome, @RequestParam boolean ativo){
         if(Objects.nonNull(nome)  && !nome.isBlank()){
@@ -49,6 +49,7 @@ public class ClienteController implements ClienteControllerOpenApi {
         }
     }
 
+    @PreAuthorize("hasAuthority('PROFISSIONAL')")
     @GetMapping(value = "/{clienteId}")
     public ResponseEntity<ClienteDto> buscarPorId(@PathVariable Long clienteId) {
         Cliente cliente = service.buscarPorId(clienteId);
@@ -56,7 +57,7 @@ public class ClienteController implements ClienteControllerOpenApi {
         return ResponseEntity.ok(clienteDto);
     }
 
-
+    @PreAuthorize("hasAuthority('PROFISSIONAL')")
     @PostMapping
     public ResponseEntity<ClienteDto> adicionar(@RequestBody @Valid ClienteInput clienteInput) {
         Cliente cliente = clienteDissembler.toDomainObject(clienteInput);
@@ -66,6 +67,7 @@ public class ClienteController implements ClienteControllerOpenApi {
     }
 
 
+    @PreAuthorize("hasAuthority('PROFISSIONAL')")
     @PutMapping(value = "/{clienteId}")
     public ResponseEntity<ClienteDto> alterar(@RequestBody @Valid ClienteInput clienteInput, @PathVariable Long clienteId) {
         Cliente cliente = service.buscarPorId(clienteId);
@@ -74,7 +76,7 @@ public class ClienteController implements ClienteControllerOpenApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteDto);
     }
 
-
+    @PreAuthorize("hasAuthority('GERENTE')")
     @DeleteMapping("/{clienteId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable Long clienteId){
@@ -82,6 +84,7 @@ public class ClienteController implements ClienteControllerOpenApi {
 
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @DeleteMapping("/{clienteId}/desativar")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void desativar(@PathVariable Long clienteId){

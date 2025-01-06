@@ -106,6 +106,12 @@ insert into comissao (id, profissional_id, produto_id, porcentagem_comissao) val
 insert into usuario(id, email, senha, cliente_id, profissional_id, permissao, nome) values (1, "jean.m.pires@gmail.com",
                     "$2a$12$yXbDuQ0PtltBXPiP8wnhrOYfY647RoyNOOcD70kBnSzwgESEISFE.", null, 1, "GERENTE", "Jean");
 
+insert into usuario(id, email, senha, cliente_id, profissional_id, permissao, nome) values (2, "profissional@gmail.com",
+                    "$2a$12$yXbDuQ0PtltBXPiP8wnhrOYfY647RoyNOOcD70kBnSzwgESEISFE.", null, 2, "PROFISSIONAL", "Cliente");
+
+insert into usuario(id, email, senha, cliente_id, profissional_id, permissao, nome) values (3, "cliente@gmail.com",
+                    "$2a$12$yXbDuQ0PtltBXPiP8wnhrOYfY647RoyNOOcD70kBnSzwgESEISFE.", 3, null, "CLIENTE", "Cliente");
+
 
 insert into permissao(id, nome, descricao) values(1, "Gerente", "Acesso total");
 
@@ -123,6 +129,12 @@ insert into usuario_permissao(usuario_id, permissao_id) values (1, 2);
 insert into usuario_permissao(usuario_id, permissao_id) values (1, 3);
 
 insert into usuario_permissao(usuario_id, permissao_id) values (1, 4);
+
+insert into usuario_permissao(usuario_id, permissao_id) values (2, 3);
+
+insert into usuario_permissao(usuario_id, permissao_id) values (2, 4);
+
+insert into usuario_permissao(usuario_id, permissao_id) values (3, 4);
 
 
 insert into pacote(id, nome, descricao, cliente_id, data_compra, validade, data_vencimento) values (1, '4 barbas', null, 1, timestamp('2024-04-19 14:30:45.12'), 31, timestamp('2024-05-19 23:59:59.00'));

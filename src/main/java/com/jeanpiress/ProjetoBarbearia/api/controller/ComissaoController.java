@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -33,6 +34,7 @@ public class ComissaoController implements ComissaoControllerOpenApi {
     @Autowired
     private ComissaoInputDissembler comissaoDissembler;
 
+    @PreAuthorize("hasAuthority('PROFISSIONAL')")
     @GetMapping
     public ResponseEntity<List<ComissaoDto>> listar(){
         List<Comissao> comissoes = repository.findAll();
@@ -40,6 +42,7 @@ public class ComissaoController implements ComissaoControllerOpenApi {
         return ResponseEntity.ok(comissoesDto);
     }
 
+    @PreAuthorize("hasAuthority('PROFISSIONAL')")
     @GetMapping(value = "/{comissaoId}")
     public ResponseEntity<ComissaoDto> buscarPorId(@PathVariable Long comissaoId) {
         Comissao comissao = service.buscarPorId(comissaoId);
@@ -47,6 +50,7 @@ public class ComissaoController implements ComissaoControllerOpenApi {
         return ResponseEntity.ok(comissaoDto);
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @PostMapping
     public ResponseEntity<ComissaoDto> adicionar(@RequestBody @Valid ComissaoInput comissaoInput) {
         Comissao comissao = comissaoDissembler.toDomainObject(comissaoInput);
@@ -55,6 +59,7 @@ public class ComissaoController implements ComissaoControllerOpenApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(comissaoDto);
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @PutMapping(value = "/{comissaoId}")
     public ResponseEntity<ComissaoDto> alterar(@RequestBody @Valid ComissaoInput comissaoInput, @PathVariable Long comissaoId) {
         Comissao comissao = service.buscarPorId(comissaoId);
@@ -63,6 +68,7 @@ public class ComissaoController implements ComissaoControllerOpenApi {
         return ResponseEntity.status(HttpStatus.CREATED).body(comissaoDto);
     }
 
+    @PreAuthorize("hasAuthority('GERENTE')")
     @DeleteMapping("/{comissaoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletar(@PathVariable Long comissaoId){
