@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -66,10 +67,13 @@ class ComissaoControllerTest {
     public void setup() {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(comissaoController).alwaysDo(print()).build();
+
         produto = new Produto(1L, "corte", BigDecimal.valueOf(45), true, false, null,
                 false, BigDecimal.ONE, BigDecimal.ONE, null, BigDecimal.valueOf(50), Categoria.builder().build(), null);
-        profissional = new Profissional(1L, "Jean Pires", "Jean", "34999999999", null,
-                OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), BigDecimal.ZERO, null, true, null);
+
+        profissional = new Profissional(1L, "João Silva", "João", "34999999999",
+                null, LocalDate.parse("1991-11-13"), BigDecimal.ZERO, null, true, null);
+
         comissao = new Comissao(1L, produto, profissional, BigDecimal.valueOf(50));
         comissaoDto = new ComissaoDto();
     }

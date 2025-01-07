@@ -11,7 +11,6 @@ import com.jeanpiress.ProjetoBarbearia.api.dtosModel.resumo.*;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPedido;
-import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.FormaPagamentoJson;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealizacaoItemPacote;
 import com.jeanpiress.ProjetoBarbearia.domain.model.*;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.PedidoRepository;
@@ -28,6 +27,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -66,7 +67,6 @@ class PedidoControllerTest {
     PedidoInput pedidoInput;
     PedidoAlteracaoInput pedidoAlteracaoInput;
     RealizacaoItemPacote realizacaoItemPacote;
-    FormaPagamentoJson formaPagamento;
     Cliente cliente;
     Profissional profissional;
     Produto produto;
@@ -77,33 +77,33 @@ class PedidoControllerTest {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(pedidoController).alwaysDo(print()).build();
 
-        cliente = new Cliente(1L, "João", "34999999999", OffsetDateTime.parse("1991-11-13T00:00:00-03:00"),
-                null, BigDecimal.ZERO, null, null, 30, profissional, null);
+        cliente = new Cliente(1L, "João", "34999999999", LocalDate.parse("1991-11-13"),
+                null, BigDecimal.ZERO, null, null, 30, true, profissional, null);
         profissional = new Profissional(1L, "João Silva", "João", "34999999999",
-                null, OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), BigDecimal.ZERO, null, true, null);
+                null, LocalDate.parse("1991-11-13"), BigDecimal.ZERO, null, true, null);
+
         produto = new Produto(1L, "corte", BigDecimal.valueOf(45), true, false, null,
                 false, BigDecimal.ONE, BigDecimal.ONE,null, BigDecimal.valueOf(50),
                 Categoria.builder().id(1L).build(), null);
         itemPedido = new ItemPedido(1L, BigDecimal.valueOf(45), BigDecimal.valueOf(90), 2, null, produto);
-        pedido = new Pedido(1L, OffsetDateTime.parse("2024-05-19T15:30:00-03:00"), List.of(itemPedido), StatusPagamento.PAGO,
-                FormaPagamento.DINHEIRO, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(45), BigDecimal.valueOf(90),
-                BigDecimal.valueOf(90), true, BigDecimal.valueOf(90), OffsetDateTime.now(), null, null,
-                null, null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
+
+         pedido = pedidoCriado();
+
         pedidoDto = new PedidoDto();
         pedidoInput = new PedidoInput(OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), ClienteId.builder().id(1L).build(),
-                ProfissionalId.builder().id(1L).build());
+                ProfissionalId.builder().id(1L).build(), "corte e barba", "01:00", true);
         pedidoAlteracaoInput = PedidoAlteracaoInput.builder().horario(OffsetDateTime.now().plusDays(1)).
                 profissional(ProfissionalId.builder().id(1L).build()).build();
         realizacaoItemPacote = new RealizacaoItemPacote(ProfissionalId.builder().id(1L).build(), PacoteId.builder().id(1L).build(),
                 ItemPacoteId.builder().id(1L).build());
-        formaPagamento = new FormaPagamentoJson("dinheiro");
     }
+
 
     @Test
     void deveListarTodosPedidos() throws Exception {
         List<Pedido> pedidos = Arrays.asList(pedido);
 
-        when(pedidoRepository.findByPagoAndCaixaAberto()).thenReturn(pedidos);
+        when(pedidoRepository.findAll()).thenReturn(pedidos);
         when(pedidoAssembler.collectionToModel(pedidos)).thenReturn(Arrays.asList(pedidoDto));
 
         mockMvc.perform(get("/pedidos")
@@ -111,7 +111,7 @@ class PedidoControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        verify(pedidoRepository).findByPagoAndCaixaAberto();
+        verify(pedidoRepository).findAll();
         verifyNoMoreInteractions(pedidoRepository);
     }
 
@@ -134,17 +134,18 @@ class PedidoControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         when(pedidoDissembler.toDomainObject(any(PedidoInput.class))).thenReturn(pedido);
-        when(pedidoService.criar(any(Pedido.class))).thenReturn(pedido);
+        when(pedidoService.criar(any(Pedido.class), eq( "AGUARDANDO"))).thenReturn(pedido);
         when(pedidoAssembler.toModel(any(Pedido.class))).thenReturn(pedidoDto);
 
         mockMvc.perform(post("/pedidos")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(pedido)))
+                        .content(objectMapper.writeValueAsString(pedidoInput))
+                        .param("statusPedido", "AGUARDANDO"))
                 .andExpect(status().isCreated())
                 .andReturn();
 
         verify(pedidoDissembler).toDomainObject(any(PedidoInput.class));
-        verify(pedidoService).criar(any(Pedido.class));
+        verify(pedidoService).criar(any(Pedido.class), eq("AGUARDANDO"));
         verify(pedidoAssembler).toModel(any(Pedido.class));
         verifyNoMoreInteractions(pedidoService);
     }
@@ -153,11 +154,23 @@ class PedidoControllerTest {
     void deveCancelarUmPedido() throws Exception {
         doNothing().when(pedidoService).cancelarPedido(anyLong());
 
-        mockMvc.perform(delete("/pedidos/{pedidoId}", 1L)
+        mockMvc.perform(delete("/pedidos/cancelar/{pedidoId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         verify(pedidoService).cancelarPedido(1L);
+        verifyNoMoreInteractions(pedidoService);
+    }
+
+    @Test
+    void deveExcluirUmPedido() throws Exception {
+        doNothing().when(pedidoService).cancelarPedido(anyLong());
+
+        mockMvc.perform(delete("/pedidos/excluir/{pedidoId}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        verify(pedidoService).excluirPedido(1L);
         verifyNoMoreInteractions(pedidoService);
     }
 
@@ -215,16 +228,16 @@ class PedidoControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
 
-        when(pedidoService.realizarPagamento(any(FormaPagamentoJson.class), anyLong())).thenReturn(pedido);
+        when(pedidoService.realizarPagamento("DINHEIRO", 1L)).thenReturn(pedido);
         when(pedidoAssembler.toModel(any(Pedido.class))).thenReturn(pedidoDto);
 
         mockMvc.perform(put("/pedidos/{pedidoId}/pagar", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(formaPagamento)))
+                        .param("formaPagamento", "DINHEIRO"))
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        verify(pedidoService).realizarPagamento(any(FormaPagamentoJson.class), anyLong());
+        verify(pedidoService).realizarPagamento("DINHEIRO", 1L);
         verify(pedidoAssembler).toModel(any(Pedido.class));
         verifyNoMoreInteractions(pedidoService);
     }
@@ -249,14 +262,36 @@ class PedidoControllerTest {
     }
 
     @Test
-    void deveConfirmarPedido() throws Exception {
-        doNothing().when(pedidoService).confirmarPedido(anyLong());
+    void deveAlterarStatusPeido() throws Exception {
+        doNothing().when(pedidoService).alterarStatusPedido(anyLong(), anyString());
 
-        mockMvc.perform(put("/pedidos/{pedidoId}/confirmar", 1L)
+        mockMvc.perform(put("/pedidos/{pedidoId}/statusPedido", 1L)
+                        .param("statusPedido", "CONFIRMADO")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        verify(pedidoService).confirmarPedido(1L);
+        verify(pedidoService).alterarStatusPedido(1L, "CONFIRMADO");
         verifyNoMoreInteractions(pedidoService);
+    }
+
+    private Pedido pedidoCriado() {
+       Pedido pedido = Pedido.builder()
+                .id(1L)
+                .horario(OffsetDateTime.parse("2024-05-19T15:30:00-03:00"))
+                .itemPedidos(List.of(itemPedido))
+                .statusPagamento(StatusPagamento.PAGO)
+                .formaPagamento(FormaPagamento.DINHEIRO)
+                .statusPedido(StatusPedido.FINALIZADO)
+                .cliente(cliente)
+                .profissional(profissional)
+                .comissaoGerada(BigDecimal.valueOf(45))
+                .pontuacaoProfissionalGerada(BigDecimal.valueOf(90))
+                .pontuacaoClienteGerada(BigDecimal.valueOf(90))
+                .caixaAberto(true)
+                .valorTotal(BigDecimal.valueOf(90))
+                .dataPagamento(LocalDateTime.now())
+                .build();
+
+        return pedido;
     }
 }

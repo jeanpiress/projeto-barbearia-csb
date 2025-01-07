@@ -13,8 +13,8 @@ import java.time.OffsetDateTime;
 @Setter
 public class DataInicioFimMes {
 
-    private LocalDate inicioPrimeiroMes;
-    private LocalDate fimPrimeiroMes;
-    private LocalDate inicioSegundoMes;
-    private LocalDate fimSegundoMes;
+    private LocalDateTime inicioPrimeiroMes;
+    private LocalDateTime fimPrimeiroMes;
+    private LocalDateTime inicioSegundoMes;
+    private LocalDateTime fimSegundoMes;
 }

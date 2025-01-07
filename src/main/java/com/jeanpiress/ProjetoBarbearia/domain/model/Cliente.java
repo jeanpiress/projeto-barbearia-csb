@@ -22,9 +22,9 @@ public class Cliente {
     private String nome;
     private String celular;
     private LocalDate dataNascimento;
-    private OffsetDateTime ultimaVisita;
+    private LocalDate ultimaVisita;
     private BigDecimal pontos;
-    private OffsetDateTime previsaoRetorno;
+    private LocalDate previsaoRetorno;
     private String observacao;
     private Integer diasRetorno;
     private boolean ativo = true;

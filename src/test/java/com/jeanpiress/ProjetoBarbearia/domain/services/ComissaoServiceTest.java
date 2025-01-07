@@ -16,8 +16,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -61,11 +61,10 @@ class ComissaoServiceTest {
         produtoNovo = new Produto(2L, "shampoo", BigDecimal.valueOf(60), true, true, 1,
                 false, BigDecimal.ONE, BigDecimal.ONE,null, BigDecimal.valueOf(10), Categoria.builder().build(), null);
 
-        profissional = new Profissional(1L, "Jean Pires", "Jean", "34999999999", null,
-                OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), BigDecimal.ZERO,null, true, null);
+        profissional = new Profissional(1L, "João Silva", "João", "34999999999",
+                null, LocalDate.parse("1991-11-13"), BigDecimal.ZERO, null, true, null);
 
-        profissional2 = new Profissional();
-        profissional2.setId(2L);
+        profissional2 = Profissional.builder().id(2L).build();
 
         comissao = new Comissao(1L, produto, profissional, BigDecimal.valueOf(50));
 

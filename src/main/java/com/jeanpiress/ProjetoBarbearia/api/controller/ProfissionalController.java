@@ -60,7 +60,7 @@ public class ProfissionalController implements ProfissionalControllerOpenApi {
         return ResponseEntity.ok(profissionaisDto);
     }
 
-    @PreAuthorize("hasAuthority('CLIENTE')")
+    @PreAuthorize("hasAuthority('PROFISSIONAL')")
     @GetMapping(value = "/{profissionalId}")
     public ResponseEntity<ProfissionalDto> buscarPorId(@PathVariable Long profissionalId) {
         Profissional profissional = service.buscarPorId(profissionalId);

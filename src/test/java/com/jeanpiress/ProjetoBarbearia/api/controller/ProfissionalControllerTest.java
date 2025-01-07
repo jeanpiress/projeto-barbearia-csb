@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -63,8 +64,9 @@ class ProfissionalControllerTest {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(profissionalController).alwaysDo(print()).build();
 
-        profissional = new Profissional(1L, "João Silva", "João", "34999999999", null,
-                OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), BigDecimal.ZERO, null, true, null);
+        profissional = new Profissional(1L, "João Silva", "João", "34999999999",
+                null, LocalDate.parse("1991-11-13"), BigDecimal.ZERO, null, true, null);
+
         profissionalDto = new ProfissionalDto();
         profissionalInput = new ProfissionalInput();
     }

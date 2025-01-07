@@ -20,6 +20,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 
@@ -45,9 +46,11 @@ class ClienteServiceTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        endereco = new Endereco("23456789", "Rua canção", "123", "ape 456", "morumbi");
-        cliente = new Cliente(1L, "João", "34999999999", OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), null,
-                BigDecimal.ZERO, null, null, 30, Profissional.builder().build(), endereco);
+        endereco = new Endereco("23456789", "Rua canção", "123", "ape 456", "morumbi", "Uberlandia", "Minas Gerais");
+
+        cliente = new Cliente(1L, "João", "34999999999", LocalDate.parse("1991-11-13"),
+                null, BigDecimal.ZERO, null, null, 30, true,
+                Profissional.builder().build(), endereco);
 
         clienteAtendidoEvento = new ClienteAtendidoEvento(cliente);
 

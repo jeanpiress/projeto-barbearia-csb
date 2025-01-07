@@ -8,7 +8,6 @@ import com.jeanpiress.ProjetoBarbearia.core.security.CsbSecurity;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPedido;
-import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.FormaPagamentoJson;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.RealizacaoItemPacote;
 import com.jeanpiress.ProjetoBarbearia.domain.eventos.ClienteAtendidoEvento;
 import com.jeanpiress.ProjetoBarbearia.domain.eventos.PacoteRealizadoEvento;
@@ -26,6 +25,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -96,18 +97,17 @@ class PedidoServiceTest {
     List<ItemPedido> listaComItemPedidoUmProduto = new ArrayList<>();
     List<ItemPacote> listaItemPacoteVazia = new ArrayList<>();
     RealizacaoItemPacote realizacaoItemPacote;
-    FormaPagamentoJson formaPagamentoJson = new FormaPagamentoJson();
     PedidoAlteracaoInput pedidoAlteracaoInput;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
 
-        cliente = new Cliente(1L, "João", "34999999999", OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), null,
-                BigDecimal.ZERO, null, null, 30, Profissional.builder().build(), null);
+        cliente = new Cliente(1L, "João", "34999999999", LocalDate.parse("1991-11-13"),
+                null, BigDecimal.ZERO, null, null, 30, true, profissional, null);
 
-        profissional = new Profissional(1L, "João Silva", "João", "34999999999", null, OffsetDateTime.parse("1991-11-13T00:00:00-03:00"),
-                BigDecimal.ZERO, null, true, null);
+        profissional = new Profissional(1L, "João Silva", "João", "34999999999",
+                null, LocalDate.parse("1991-11-13"), BigDecimal.ZERO, null, true, null);
 
         usuario = new Usuario(1L, "joao@csb.com", "123456", "joao", "PROFISSIONAL", null,
                 profissional, null);
@@ -122,29 +122,16 @@ class PedidoServiceTest {
         listaComItemPedidoDoisProdutos.add(itemPedidoDoisProdutos);
         listaComItemPedidoUmProduto.add(itemPedidoUmProduto);
 
-        pedidoNovo = new Pedido().builder().cliente(cliente).profissional(profissional).horario(OffsetDateTime.parse("2024-05-19T15:30:00-03:00")).build();
+        pedidoNovo = new Pedido().builder().cliente(cliente).profissional(profissional).horario(OffsetDateTime.now().plusDays(1))
+                .formaPagamento(FormaPagamento.AGUARDANDO_PAGAMENTO).isAgendamento(true).build();
 
+        pedidoPago = pedidoCriado(1L, listaComItemPedidoDoisProdutos, StatusPagamento.PAGO, FormaPagamento.DINHEIRO, StatusPedido.FINALIZADO);
 
-        pedidoPago = new Pedido(1L, OffsetDateTime.parse("2024-05-19T15:30:00-03:00"), listaComItemPedidoDoisProdutos, StatusPagamento.PAGO,
-                FormaPagamento.DINHEIRO, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(45), BigDecimal.valueOf(90),
-                BigDecimal.valueOf(90),true, BigDecimal.valueOf(90), OffsetDateTime.now(), null, null, null,
-                null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
+        pedidoSemItemPedido = pedidoCriado(2L, listaItemPedidoVazia, StatusPagamento.AGUARDANDO_PAGAMENTO, null, StatusPedido.AGENDADO);
 
+        pedidoAguardandoPg = pedidoCriado(3L, listaComItemPedidoUmProduto, StatusPagamento.AGUARDANDO_PAGAMENTO, null, StatusPedido.AGENDADO);
 
-        pedidoSemItemPedido = new Pedido(2L, OffsetDateTime.parse("2024-05-19T15:30:00-03:00"), listaItemPedidoVazia,
-                StatusPagamento.AGUARDANDO_PAGAMENTO,null, StatusPedido.AGENDADO, cliente, profissional, BigDecimal.ZERO,
-                BigDecimal.ZERO, BigDecimal.ZERO,true, BigDecimal.ZERO, OffsetDateTime.now(), null,
-                null, null,null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
-
-        pedidoAguardandoPg = new Pedido(3L, OffsetDateTime.parse("2024-05-19T15:30:00-03:00"), listaComItemPedidoUmProduto, StatusPagamento.AGUARDANDO_PAGAMENTO,
-                null, StatusPedido.AGENDADO, cliente, profissional, BigDecimal.valueOf(22.5), BigDecimal.valueOf(45), BigDecimal.valueOf(45),
-                true, BigDecimal.valueOf(45), OffsetDateTime.now(), null, null, null,
-                null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
-
-        pedidoAguardandoPgPorPacote = new Pedido(4L, OffsetDateTime.parse("2024-05-19T15:30:00-03:00"), listaComItemPedidoUmProduto, StatusPagamento.AGUARDANDO_PAGAMENTO,
-                null, StatusPedido.AGENDADO, cliente, null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
-                true, BigDecimal.ZERO, OffsetDateTime.now(), null, null, null,
-                null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
+        pedidoAguardandoPgPorPacote = pedidoCriado(4L, listaComItemPedidoUmProduto, StatusPagamento.AGUARDANDO_PAGAMENTO, null, StatusPedido.AGENDADO);
 
 
         itemPacoteConsumidoAntigo = new ItemPacote(1L, itemPedidoDoisProdutos, profissional, OffsetDateTime.parse("2024-04-19T15:30:00-03:00"));
@@ -177,7 +164,7 @@ class PedidoServiceTest {
                 PacoteId.builder().id(2L).build(), ItemPacoteId.builder().id(3L).build());
 
         pedidoAlteracaoInput = PedidoAlteracaoInput.builder().horario(OffsetDateTime.now().plusDays(1)).
-                profissional(ProfissionalId.builder().id(2L).build()).build();
+                profissional(ProfissionalId.builder().id(2L).build()).duracao("01:00").build();
 
         profissionalVazio = Profissional.builder().id(2L).build();
     }
@@ -295,7 +282,7 @@ class PedidoServiceTest {
         when(profissionalService.buscarPorId(1L)).thenReturn(profissional);
         when(usuarioService.buscarPorId(any())).thenReturn(usuario);
 
-        pedidoService.criar(pedidoNovo);
+        pedidoService.criar(pedidoNovo, "AGENDADO");
 
         ArgumentCaptor<Pedido> pedidoCaptor = ArgumentCaptor.forClass(Pedido.class);
         verify(pedidoRepository).save(pedidoCaptor.capture());
@@ -331,10 +318,10 @@ class PedidoServiceTest {
         Pedido pedidoSalvo = pedidoCaptor.getValue();
 
         assertTrue(pedidoSalvo.getItemPedidos().contains(itemPedidoDoisProdutos));
-        assertEquals(pedidoSalvo.getComissaoGerada(), BigDecimal.valueOf(45.0));
-        assertEquals(pedidoSalvo.getValorTotal(), BigDecimal.valueOf(90));
-        assertEquals(pedidoSalvo.getPontuacaoProfissionalGerada(), BigDecimal.valueOf(90));
-        assertEquals(pedidoSalvo.getPontuacaoClienteGerada(), BigDecimal.valueOf(90));
+        assertEquals(pedidoSalvo.getComissaoGerada(), BigDecimal.valueOf(90.0));
+        assertEquals(pedidoSalvo.getValorTotal(), BigDecimal.valueOf(180));
+        assertEquals(pedidoSalvo.getPontuacaoProfissionalGerada(), BigDecimal.valueOf(180));
+        assertEquals(pedidoSalvo.getPontuacaoClienteGerada(), BigDecimal.valueOf(180));
 
         verify(pedidoService).buscarPorId(2L);
         verify(itemPedidoService).buscarPorId(1L);
@@ -375,10 +362,10 @@ class PedidoServiceTest {
         Pedido pedidoSalvo = pedidoCaptor.getValue();
 
         assertFalse(pedidoSalvo.getItemPedidos().contains(itemPedidoUmProduto));
-        assertEquals(pedidoSalvo.getComissaoGerada(), BigDecimal.valueOf(0.0));
-        assertEquals(pedidoSalvo.getValorTotal(), BigDecimal.ZERO);
-        assertEquals(pedidoSalvo.getPontuacaoProfissionalGerada(), BigDecimal.ZERO);
-        assertEquals(pedidoSalvo.getPontuacaoClienteGerada(), BigDecimal.ZERO);
+        assertEquals(pedidoSalvo.getComissaoGerada(), BigDecimal.valueOf(22.5));
+        assertEquals(pedidoSalvo.getValorTotal(), BigDecimal.valueOf(45));
+        assertEquals(pedidoSalvo.getPontuacaoProfissionalGerada(), BigDecimal.valueOf(45));
+        assertEquals(pedidoSalvo.getPontuacaoClienteGerada(), BigDecimal.valueOf(45));
 
         verify(pedidoService).buscarPorId(3L);
         verify(itemPedidoService).buscarPorId(2L);
@@ -428,7 +415,7 @@ class PedidoServiceTest {
         ClienteAtendidoEvento capturedEvent = eventCaptor.getValue();
 
         assertEquals(pedidoSalvo.getPontuacaoProfissionalGerada(), BigDecimal.valueOf(45));
-        assertEquals(pedidoSalvo.getPontuacaoClienteGerada(), BigDecimal.ZERO);
+        assertEquals(pedidoSalvo.getPontuacaoClienteGerada(), BigDecimal.valueOf(90));
         assertEquals(pedidoSalvo.getStatusPedido(), StatusPedido.FINALIZADO);
         assertEquals(pedidoSalvo.getFormaPagamento(), FormaPagamento.VOUCHER);
         assertEquals(pedidoSalvo.getStatusPagamento(), StatusPagamento.PAGO);
@@ -525,9 +512,8 @@ class PedidoServiceTest {
         doReturn(pedidoAguardandoPg).when(pedidoService).buscarPorId(3L);
         when(pedidoRepository.save(any())).thenReturn(pedidoAguardandoPg);
         when(usuarioService.buscarPorId(any())).thenReturn(usuario);
-        formaPagamentoJson.setFormaPagamento("dinheiro");
 
-        pedidoService.realizarPagamento(formaPagamentoJson, 3L);
+        pedidoService.realizarPagamento("dinheiro", 3L);
 
         ArgumentCaptor<Pedido> pedidoCaptor = ArgumentCaptor.forClass(Pedido.class);
         verify(pedidoRepository).save(pedidoCaptor.capture());
@@ -545,7 +531,7 @@ class PedidoServiceTest {
 
         verify(pedidoService).buscarPorId(3L);
         verify(pedidoRepository).save(any());
-        verify(pedidoService).realizarPagamento(formaPagamentoJson, 3L);
+        verify(pedidoService).realizarPagamento("dinheiro", 3L);
         verify(usuarioService).buscarPorId(any());
         verifyNoMoreInteractions(pedidoRepository, eventPublisher, pedidoService, usuarioService);
 
@@ -557,9 +543,8 @@ class PedidoServiceTest {
         doReturn(pedidoAguardandoPg).when(pedidoService).buscarPorId(3L);
         when(pedidoRepository.save(any())).thenReturn(pedidoAguardandoPg);
         when(usuarioService.buscarPorId(any())).thenReturn(usuario);
-        formaPagamentoJson.setFormaPagamento("pix");
 
-        pedidoService.realizarPagamento(formaPagamentoJson, 3L);
+        pedidoService.realizarPagamento("Pix", 3L);
 
         ArgumentCaptor<Pedido> pedidoCaptor = ArgumentCaptor.forClass(Pedido.class);
         verify(pedidoRepository).save(pedidoCaptor.capture());
@@ -577,7 +562,7 @@ class PedidoServiceTest {
 
         verify(pedidoService).buscarPorId(3L);
         verify(pedidoRepository).save(any());
-        verify(pedidoService).realizarPagamento(formaPagamentoJson, 3L);
+        verify(pedidoService).realizarPagamento("Pix", 3L);
         verify(usuarioService).buscarPorId(any());
         verifyNoMoreInteractions(pedidoRepository, eventPublisher, pedidoService, usuarioService);
     }
@@ -587,9 +572,8 @@ class PedidoServiceTest {
         doReturn(pedidoAguardandoPg).when(pedidoService).buscarPorId(3L);
         when(pedidoRepository.save(any())).thenReturn(pedidoAguardandoPg);
         when(usuarioService.buscarPorId(any())).thenReturn(usuario);
-        formaPagamentoJson.setFormaPagamento("debito");
 
-        pedidoService.realizarPagamento(formaPagamentoJson, 3L);
+        pedidoService.realizarPagamento("Debito", 3L);
 
         ArgumentCaptor<Pedido> pedidoCaptor = ArgumentCaptor.forClass(Pedido.class);
         verify(pedidoRepository).save(pedidoCaptor.capture());
@@ -607,7 +591,7 @@ class PedidoServiceTest {
 
         verify(pedidoService).buscarPorId(3L);
         verify(pedidoRepository).save(any());
-        verify(pedidoService).realizarPagamento(formaPagamentoJson, 3L);
+        verify(pedidoService).realizarPagamento("Debito", 3L);
         verify(usuarioService).buscarPorId(any());
         verifyNoMoreInteractions(pedidoRepository, eventPublisher, pedidoService, usuarioService);
     }
@@ -617,9 +601,8 @@ class PedidoServiceTest {
         doReturn(pedidoAguardandoPg).when(pedidoService).buscarPorId(3L);
         when(pedidoRepository.save(any())).thenReturn(pedidoAguardandoPg);
         when(usuarioService.buscarPorId(any())).thenReturn(usuario);
-        formaPagamentoJson.setFormaPagamento("credito");
 
-        pedidoService.realizarPagamento(formaPagamentoJson, 3L);
+        pedidoService.realizarPagamento("Credito", 3L);
 
         ArgumentCaptor<Pedido> pedidoCaptor = ArgumentCaptor.forClass(Pedido.class);
         verify(pedidoRepository).save(pedidoCaptor.capture());
@@ -637,7 +620,7 @@ class PedidoServiceTest {
 
         verify(pedidoService).buscarPorId(3L);
         verify(pedidoRepository).save(any());
-        verify(pedidoService).realizarPagamento(formaPagamentoJson, 3L);
+        verify(pedidoService).realizarPagamento("Credito", 3L);
         verify(usuarioService).buscarPorId(any());
         verifyNoMoreInteractions(pedidoRepository, eventPublisher, pedidoService, usuarioService);
 
@@ -646,16 +629,15 @@ class PedidoServiceTest {
     @Test
     public void deveLancarOperacaoNaoRealizadaExceptionAoTentarFazerPagentoComoVoucher() {
         doReturn(pedidoAguardandoPg).when(pedidoService).buscarPorId(3L);
-        formaPagamentoJson.setFormaPagamento("voucher");
 
         OperacaoNaoRealizadaException exception = Assertions.assertThrows(OperacaoNaoRealizadaException.class,
-                () -> {pedidoService.realizarPagamento(formaPagamentoJson, 3L);
+                () -> {pedidoService.realizarPagamento("voucher", 3L);
                 });
 
         assertEquals("Operação não pode ser realizada, existe outro recurso para essa operação", exception.getMessage());
 
         verify(pedidoService).buscarPorId(3L);
-        verify(pedidoService).realizarPagamento(formaPagamentoJson, 3L);
+        verify(pedidoService).realizarPagamento("voucher", 3L);
         verifyNoMoreInteractions(pedidoService);
 
     }
@@ -663,16 +645,15 @@ class PedidoServiceTest {
     @Test
     public void deveLancarOperacaoNaoRealizadaExceptionAoTentarFazerPagentoComoPonto() {
         doReturn(pedidoAguardandoPg).when(pedidoService).buscarPorId(3L);
-        formaPagamentoJson.setFormaPagamento("ponto");
 
         OperacaoNaoRealizadaException exception = Assertions.assertThrows(OperacaoNaoRealizadaException.class,
-                () -> {pedidoService.realizarPagamento(formaPagamentoJson, 3L);
+                () -> {pedidoService.realizarPagamento("ponto", 3L);
                 });
 
         assertEquals("Operação não pode ser realizada, existe outro recurso para essa operação", exception.getMessage());
 
         verify(pedidoService).buscarPorId(3L);
-        verify(pedidoService).realizarPagamento(formaPagamentoJson, 3L);
+        verify(pedidoService).realizarPagamento("ponto", 3L);
         verifyNoMoreInteractions(pedidoService);
 
     }
@@ -680,16 +661,15 @@ class PedidoServiceTest {
     @Test
     public void deveFormaPagamentoNaoReconhecidaExceptionAoTentarFazerPagentoComFormaDePagamentoNaoCadastrada() {
         doReturn(pedidoAguardandoPg).when(pedidoService).buscarPorId(3L);
-        formaPagamentoJson.setFormaPagamento("ouro");
 
         FormaPagamentoNaoReconhecidaException exception = Assertions.assertThrows(FormaPagamentoNaoReconhecidaException.class,
-                () -> {pedidoService.realizarPagamento(formaPagamentoJson, 3L);
+                () -> {pedidoService.realizarPagamento("ouro", 3L);
                 });
 
         assertEquals("Forma de pagamento não reconhecida", exception.getMessage());
 
         verify(pedidoService).buscarPorId(3L);
-        verify(pedidoService).realizarPagamento(formaPagamentoJson, 3L);
+        verify(pedidoService).realizarPagamento("ouro", 3L);
         verifyNoMoreInteractions(pedidoService);
     }
 
@@ -745,33 +725,6 @@ class PedidoServiceTest {
         verifyNoMoreInteractions(pedidoService);
     }
 
-    @Test
-    public void deveConfirmarPedido() {
-        doReturn(pedidoSemItemPedido).when(pedidoService).buscarPorId(2L);
-
-        pedidoService.confirmarPedido(2L);
-
-        assertEquals(pedidoSemItemPedido.getStatusPedido(), StatusPedido.CONFIRMADO);
-
-        verify(pedidoService).buscarPorId(2L);
-        verify(pedidoService).confirmarPedido(2L);
-        verifyNoMoreInteractions(pedidoService);
-    }
-
-    @Test
-    public void deveLancarPedidoNaoPodeSerConfirmadoExceptionAoTentarConfirmarUmPedidoQueNaoEstejaComoMarcado() {
-        doReturn(pedidoPago).when(pedidoService).buscarPorId(1L);
-
-        PedidoNaoPodeSerConfirmadoException exception = Assertions.assertThrows(PedidoNaoPodeSerConfirmadoException.class,
-                () -> {pedidoService.confirmarPedido(1L);
-                });
-
-        assertEquals("O pedido de codigo 1 não pode ser confirmado pois já foi finalizado ou cancelado", exception.getMessage());
-
-        verify(pedidoService).buscarPorId(1L);
-        verify(pedidoService).confirmarPedido(1L);
-        verifyNoMoreInteractions(pedidoService);
-    }
 
     @Test
     public void deveCancelarPedidoAgendadoPorQualquerUsuario(){
@@ -784,7 +737,7 @@ class PedidoServiceTest {
         pedidoService.cancelarPedido(1L);
 
         assertEquals(pedidoSemItemPedido.getStatusPedido(), StatusPedido.CANCELADO);
-        assertEquals(pedidoSemItemPedido.getStatusPagamento(), StatusPagamento.CANCELADO);
+        assertEquals(pedidoSemItemPedido.getStatusPagamento(), StatusPagamento.AGUARDANDO_PAGAMENTO);
         assertEquals(pedidoSemItemPedido.getCanceladoAs().getHour(), OffsetDateTime.now().getHour());
         assertEquals(pedidoSemItemPedido.getCanceladoPor(), usuario);
 
@@ -815,16 +768,14 @@ class PedidoServiceTest {
 
     @Test
     public void deveCancelarPedidoPagoComUsuairoGerente(){
-        Permissao permissao = new Permissao(1L, "GERENTE", null, Set.of(usuario));
-        usuario.setPermissoes(Set.of(permissao));
+        usuario.setMaiorPermissao("GERENTE");
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedidoPago));
         when(usuarioService.buscarPorId(any())).thenReturn(usuario);
-        when(pedidoRepository.save(pedidoPago)).thenReturn(pedidoPago);
 
         pedidoService.cancelarPedido(1L);
 
         assertEquals(pedidoPago.getStatusPedido(), StatusPedido.CANCELADO);
-        assertEquals(pedidoPago.getStatusPagamento(), StatusPagamento.CANCELADO);
+        assertEquals(pedidoPago.getStatusPagamento(), StatusPagamento.AGUARDANDO_PAGAMENTO);
         assertEquals(pedidoPago.getCanceladoAs().getHour(), OffsetDateTime.now().getHour());
         assertEquals(pedidoPago.getCanceladoPor(), usuario);
 
@@ -833,5 +784,29 @@ class PedidoServiceTest {
         verify(pedidoRepository).save(pedidoPago);
         verifyNoMoreInteractions(usuarioService, pedidoRepository);
 
+    }
+
+    private Pedido pedidoCriado(Long id, List<ItemPedido> itensPedidos, StatusPagamento statusPagamento,
+                                FormaPagamento formaPagamento, StatusPedido statusPedido) {
+        Pedido pedido = Pedido.builder()
+                .id(id)
+                .horario(OffsetDateTime.parse("2024-05-19T15:30:00-03:00"))
+                .itemPedidos(itensPedidos)
+                .statusPagamento(statusPagamento)
+                .formaPagamento(formaPagamento)
+                .statusPedido(statusPedido)
+                .cliente(cliente)
+                .profissional(profissional)
+                .comissaoGerada(BigDecimal.valueOf(45))
+                .pontuacaoProfissionalGerada(BigDecimal.valueOf(90))
+                .pontuacaoClienteGerada(BigDecimal.valueOf(90))
+                .caixaAberto(true)
+                .valorTotal(BigDecimal.valueOf(90))
+                .dataPagamento(LocalDateTime.now())
+                .isAgendamento(true)
+                .duracao("01:00")
+                .build();
+
+        return pedido;
     }
 }

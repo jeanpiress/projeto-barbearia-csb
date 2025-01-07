@@ -17,6 +17,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 
@@ -39,8 +40,8 @@ class ProfissionalServiceTest {
     public void setup() {
         MockitoAnnotations.openMocks(this);
 
-        profissional = new Profissional(1L, "João Silva", "João", "34999999999", null,
-                OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), BigDecimal.ZERO, null, true, null);
+        profissional = new Profissional(1L, "João Silva", "João", "34999999999",
+                null, LocalDate.parse("1991-11-13"), BigDecimal.ZERO, null, true, null);
 
     }
 

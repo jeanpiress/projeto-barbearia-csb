@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -66,13 +67,13 @@ class PacoteControllerTest {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(pacoteController).alwaysDo(print()).build();
 
-        profissional = new Profissional(1L, "João Silva", "João", "34999999999", null,
-                OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), BigDecimal.ZERO, null, true, null);
+        profissional = new Profissional(1L, "João Silva", "João", "34999999999",
+                null, LocalDate.parse("1991-11-13"), BigDecimal.ZERO, null, true, null);
 
         itemPacote = new ItemPacote(1L, null, profissional, null);
 
-        cliente = new Cliente(1L, "João", "34999999999", OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), null,
-                BigDecimal.ZERO, null, null, 30, profissional, null);
+        cliente = new Cliente(1L, "João", "34999999999", LocalDate.parse("1991-11-13"),
+                null, BigDecimal.ZERO, null, null, 30, true, profissional, null);
 
         pacote = new Pacote(1L, cliente, OffsetDateTime.parse("2024-05-22T13:00:00-03:00"), 30,
                 OffsetDateTime.parse("2024-06-22T13:00:00-03:00"), "2 barbas", null, List.of(itemPacote),

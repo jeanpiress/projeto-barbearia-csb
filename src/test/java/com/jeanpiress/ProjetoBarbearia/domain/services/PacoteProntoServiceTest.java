@@ -14,6 +14,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,8 +66,9 @@ class PacoteProntoServiceTest {
         pacotePronto = new PacotePronto(1L, "2 Barbas", null, 31, true, BigDecimal.valueOf(50), BigDecimal.ZERO, BigDecimal.ZERO,
                 itensPacote, Categoria.builder().build());
 
-        cliente = new Cliente(1L, "João", "34999999999", OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), null,
-                BigDecimal.ZERO, null, null, 30, Profissional.builder().build(), null);
+        cliente = new Cliente(1L, "João", "34999999999", LocalDate.parse("1991-11-13"),
+                null, BigDecimal.ZERO, null, null, 30, true,
+                Profissional.builder().build(), null);
     }
 
     @Test

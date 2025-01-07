@@ -4,6 +4,7 @@ import com.jeanpiress.ProjetoBarbearia.domain.model.Cliente;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @Getter
@@ -19,7 +20,7 @@ public class ClientesRetorno {
     private Long diasPassadosRetorno;
 
     @Schema(description = "Previsão de retorno")
-    private OffsetDateTime previsaoRetorno;
+    private LocalDate previsaoRetorno;
 
 
 }

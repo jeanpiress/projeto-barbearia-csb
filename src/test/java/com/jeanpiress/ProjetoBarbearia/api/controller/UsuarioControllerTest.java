@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -73,15 +74,21 @@ class UsuarioControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(usuarioController).alwaysDo(print()).build();
 
         Permissao permissao = new Permissao(1L, "GERENTE", null, null);
-        profissional = new Profissional(1L, "João Silva", "João", "34999999999", null,
-                OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), BigDecimal.ZERO, null, true, null);
-        cliente = new Cliente(1L, "João", "34999999999", OffsetDateTime.parse("1991-11-13T00:00:00-03:00"),
-                null, BigDecimal.ZERO, null, null, 30, profissional, null);
+        profissional = new Profissional(1L, "João Silva", "João", "34999999999",
+                null, LocalDate.parse("1991-11-13"), BigDecimal.ZERO, null, true, null);
+
+        cliente = new Cliente(1L, "João", "34999999999", LocalDate.parse("1991-11-13"),
+                null, BigDecimal.ZERO, null, null, 30, true, profissional, null);
+
         usuario = new Usuario(1L, "joao@csb.com", "123456", "joao", "GERENTE", null,
                 null, Set.of(permissao));
+
         usuarioDto = new UsuarioDto();
+
         usuarioInput = new UsuarioInput("joao@csb.com", "123456", "joao", "GERENTE");
+
         usuarioNovaSenhaInput = new UsuarioNovaSenhaInput("joao@csb.com", "123456", "789123", "789123");
+
         usuarioNovo = new Usuario(2L, "joao@csb.com", "123456", "João", "GERENTE", null, null, null);
     }
 

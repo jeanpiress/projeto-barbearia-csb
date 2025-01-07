@@ -71,19 +71,48 @@ class ProdutoControllerTest {
     }
 
     @Test
-    void deveListarTodosProdutos() throws Exception {
+    void deveListarProdutosComParametros() throws Exception {
+        // Arrange
         List<Produto> produtos = Arrays.asList(produto);
 
-        when(produtoRepository.findAll()).thenReturn(produtos);
+        String nome = "Produto Teste";
+        boolean isAtivo = true;
+        Long categoriaId = 1L;
+
+        when(produtoRepository.findByNome(nome, isAtivo, categoriaId)).thenReturn(produtos);
         when(produtoAssembler.collectionToModel(produtos)).thenReturn(Arrays.asList(produtoDto));
 
         mockMvc.perform(get("/produtos")
+                        .param("nome", nome)
+                        .param("isAtivo", String.valueOf(isAtivo))
+                        .param("categoriaId", String.valueOf(categoriaId))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
+                .andExpect(status().isOk());
 
-        verify(produtoRepository).findAll();
-        verifyNoMoreInteractions(produtoRepository);
+        verify(produtoRepository).findByNome(nome, isAtivo, categoriaId);
+        verify(produtoAssembler).collectionToModel(produtos);
+        verifyNoMoreInteractions(produtoRepository, produtoAssembler);
+    }
+
+    @Test
+    void deveListarProdutosSemCategoriaId() throws Exception {
+        List<Produto> produtos = Arrays.asList(produto);
+
+        String nome = "Produto Teste";
+        boolean isAtivo = true;
+
+        when(produtoRepository.findByNome(nome, isAtivo, null)).thenReturn(produtos);
+        when(produtoAssembler.collectionToModel(produtos)).thenReturn(Arrays.asList(produtoDto));
+
+        mockMvc.perform(get("/produtos")
+                        .param("nome", nome)
+                        .param("isAtivo", String.valueOf(isAtivo))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(produtoRepository).findByNome(nome, isAtivo, null);
+        verify(produtoAssembler).collectionToModel(produtos);
+        verifyNoMoreInteractions(produtoRepository, produtoAssembler);
     }
 
     @Test

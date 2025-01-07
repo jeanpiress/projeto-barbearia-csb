@@ -201,6 +201,7 @@ public class PedidoService {
         pedido.setPontuacaoProfissionalGerada(pontuacaoProfissional);
         BigDecimal pontuacaoCliente = pedido.getPontuacaoClienteGerada().subtract(gerarPontuacaoCliente(itemPedido));
         pedido.setPontuacaoClienteGerada(pontuacaoCliente);
+        pedido.getItemPedidos().remove(itemPedido);
 
         return repository.save(pedido);
     }
@@ -266,8 +267,8 @@ public class PedidoService {
         if(Objects.isNull(pedido.getProfissional())){
             throw new PedidoSemProfissionalException(pedidoId);
         }
-
-        FormaPagamento formaPagamentoFinal = FormaPagamento.valueOf(formaPagamento.toUpperCase());
+        try {
+            FormaPagamento formaPagamentoFinal = FormaPagamento.valueOf(formaPagamento.toUpperCase());
 
         if(formaPagamentoFinal.equals(FormaPagamento.DINHEIRO)){
             pedido.setFormaPagamento(FormaPagamento.DINHEIRO);
@@ -287,9 +288,7 @@ public class PedidoService {
         else if(formaPagamentoFinal.equals(FormaPagamento.PONTO)){
             throw new OperacaoNaoRealizadaException();
         }
-        else{
-            throw new FormaPagamentoNaoReconhecidaException();
-        }
+
         pedido.setDataPagamento(LocalDateTime.now());
 
         pedido.setStatusPagamento(StatusPagamento.PAGO);
@@ -305,7 +304,9 @@ public class PedidoService {
         pedido = repository.save(pedido);
 
         eventPublisher.publishEvent(new ClienteAtendidoEvento(pedido.getCliente()));
-
+        } catch (IllegalArgumentException e){
+            throw new FormaPagamentoNaoReconhecidaException();
+        }
         return pedido;
     }
 
@@ -379,8 +380,8 @@ public class PedidoService {
     public void cancelarPedido(Long pedidoId) {
         Pedido pedido = buscarPorId(pedidoId);
         Usuario usuario = usuarioService.buscarPorId(security.getUsuarioId());
-        if(pedido.getStatusPagamento().equals(StatusPagamento.PAGO)){
-            throw new PedidoNaoPodeSerCanceladoException("Pedidos pagos não podem ser cancelados");
+        if(pedido.getStatusPagamento().equals(StatusPagamento.PAGO) && !usuario.getMaiorPermissao().equals("GERENTE")){
+            throw new PedidoNaoPodeSerCanceladoException("Apenas os gerentes do sistema pode cancelar pedidos pagos");
         }
         pedido.setStatusPedido(StatusPedido.CANCELADO);
         pedido.setStatusPagamento(StatusPagamento.AGUARDANDO_PAGAMENTO);

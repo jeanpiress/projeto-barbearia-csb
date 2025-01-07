@@ -18,6 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
 
@@ -72,11 +73,11 @@ class UsuarioServiceTest {
         permissaoProfissional = new Permissao(3L, "PROFISSIONAL", null, null);
         permissaoCliente = new Permissao(4L, "CLIENTE", null, null);
 
-        profissional = new Profissional(1L, "João Silva", "João", "34999999999", null,
-                OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), BigDecimal.ZERO, null, true, null);
+        cliente = new Cliente(1L, "João", "34999999999", LocalDate.parse("1991-11-13"),
+                null, BigDecimal.ZERO, null, null, 30, true, profissional, null);
 
-        cliente = new Cliente(1L, "João", "34999999999", OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), 
-                null, BigDecimal.ZERO, null, null, 30, profissional, null);
+        profissional = new Profissional(1L, "João Silva", "João", "34999999999",
+                null, LocalDate.parse("1991-11-13"), BigDecimal.ZERO, null, true, null);
 
         usuarioGerente = new Usuario(1L, "joao@csb.com", "123456", "joao", "GERENTE", null,
                 null, permissoes );

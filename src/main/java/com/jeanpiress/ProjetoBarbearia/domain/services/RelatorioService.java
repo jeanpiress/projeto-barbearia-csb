@@ -1,7 +1,5 @@
 package com.jeanpiress.ProjetoBarbearia.domain.services;
 
-import com.jeanpiress.ProjetoBarbearia.api.converteDto.assebler.PedidoAssembler;
-import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.PedidoDto;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios.*;
 import com.jeanpiress.ProjetoBarbearia.core.security.CsbSecurity;
 import com.jeanpiress.ProjetoBarbearia.domain.corpoRequisicao.DataInicioFimMes;
@@ -54,21 +52,21 @@ public class RelatorioService {
 
     public ComparacaoMes compararMetricasMesFechado(String dataInicio, String dataFim){
 
-        DataInicioFimMes dataMes = gerarDatasParaComparar(LocalDate.parse(dataInicio), LocalDate.parse(dataFim));
-        List<Pedido> pedidosPrimeiroMes = pedidoRepository.findByDataPagamento(dataMes.getInicioPrimeiroMes().atStartOfDay(),
-                                                                               dataMes.getFimPrimeiroMes().atTime(LocalTime.MAX));
-        List<Pedido> pedidosSegundoMes = pedidoRepository.findByDataPagamento(dataMes.getInicioSegundoMes().atStartOfDay(),
-                                                                              dataMes.getFimSegundoMes().atTime(LocalTime.MAX));
+        DataInicioFimMes dataMes = gerarDatasParaComparar(dataInicio, dataFim);
+        List<Pedido> pedidosPrimeiroMes = pedidoRepository.findByDataPagamento(dataMes.getInicioPrimeiroMes(),
+                                                                               dataMes.getFimPrimeiroMes());
+        List<Pedido> pedidosSegundoMes = pedidoRepository.findByDataPagamento(dataMes.getInicioSegundoMes(),
+                                                                              dataMes.getFimSegundoMes());
 
         ComparacaoMes comparacaoMes = compararFaturamentos(pedidosPrimeiroMes, pedidosSegundoMes);
-        comparacaoMes.setDataInicio(dataMes.getInicioPrimeiroMes());
-        comparacaoMes.setDataFim(dataMes.getFimSegundoMes());
+        comparacaoMes.setDataInicio(dataMes.getInicioPrimeiroMes().toLocalDate());
+        comparacaoMes.setDataFim(dataMes.getFimSegundoMes().toLocalDate());
 
         return comparacaoMes;
     }
 
     public ComparacaoMes compararMetricasDataAtualMesmoPeriodoMesSelecionado(LocalDate dataFornecida){
-        LocalDateTime dataAtual = LocalDateTime.now();
+        LocalDateTime dataAtual = LocalDateTime.now().withSecond(0).withNano(0);
         List<Month> mesesComTrintaDias = Arrays.asList(Month.APRIL, Month.JUNE, Month.SEPTEMBER, Month.NOVEMBER);
         List<Integer> maisDeVinteNoveDias = Arrays.asList(29, 30, 31);
         LocalDate dataPesquisa;
@@ -164,7 +162,7 @@ public class RelatorioService {
         List<ClientesRetorno> clientesRetorno = new ArrayList<>();
 
         for(Cliente cliente: clientes){
-            long diferencaDias = ChronoUnit.DAYS.between(dataAtual, cliente.getPrevisaoRetorno());
+            long diferencaDias = ChronoUnit.DAYS.between(LocalDate.now(), cliente.getPrevisaoRetorno());
 
             ClientesRetorno clienteRetorno = ClientesRetorno.builder()
                     .cliente(cliente)
@@ -179,20 +177,20 @@ public class RelatorioService {
         return clientesRetorno;
     }
 
-    public DataInicioFimMes gerarDatasParaComparar(LocalDate dataIncio, LocalDate dataFim) {
-        LocalDate inicioPrimeiroMes = dataIncio.withDayOfMonth(1);
+    public DataInicioFimMes gerarDatasParaComparar(String dataIncio, String dataFim) {
+        LocalDate inicioPrimeiroMes = LocalDate.parse(dataIncio).withDayOfMonth(1);
 
         LocalDate fimPrimeiroMes = inicioPrimeiroMes.plusMonths(1).minusDays(1);
 
-        LocalDate inicioSegundoMes = dataFim.withDayOfMonth(1);
+        LocalDate inicioSegundoMes = LocalDate.parse(dataFim).withDayOfMonth(1);
 
         LocalDate fimSegundoMes = inicioSegundoMes.plusMonths(1).minusDays(1);
 
         return DataInicioFimMes.builder()
-                .inicioPrimeiroMes(inicioPrimeiroMes)
-                .fimPrimeiroMes(fimPrimeiroMes)
-                .inicioSegundoMes(inicioSegundoMes)
-                .fimSegundoMes(fimSegundoMes)
+                .inicioPrimeiroMes(inicioPrimeiroMes.atStartOfDay())
+                .fimPrimeiroMes(fimPrimeiroMes.atTime(LocalTime.MAX))
+                .inicioSegundoMes(inicioSegundoMes.atStartOfDay())
+                .fimSegundoMes(fimSegundoMes.atTime(LocalTime.MAX))
                 .build();
 
     }

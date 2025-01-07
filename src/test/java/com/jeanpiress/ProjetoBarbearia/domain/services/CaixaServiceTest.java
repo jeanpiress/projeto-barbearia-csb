@@ -1,6 +1,7 @@
 package com.jeanpiress.ProjetoBarbearia.domain.services;
 
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios.CaixaModel;
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.relatorios.FaturamentoDia;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.FormaPagamento;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPagamento;
 import com.jeanpiress.ProjetoBarbearia.domain.Enuns.StatusPedido;
@@ -17,6 +18,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.junit.runner.RunWith;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +27,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -48,12 +52,15 @@ class CaixaServiceTest {
     List<ItemPedido> itensPedido;
     Cliente cliente;
     Profissional profissional;
+    FaturamentoDia faturamentoDia;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        caixaModel = new CaixaModel(BigDecimal.valueOf(100), BigDecimal.valueOf(200), BigDecimal.valueOf(300), BigDecimal.valueOf(400),
-                BigDecimal.valueOf(500), BigDecimal.valueOf(600), BigDecimal.valueOf(1000), 6, 12);
+        faturamentoDia = new FaturamentoDia(LocalDate.now(), BigDecimal.valueOf(360), BigDecimal.valueOf(90), 6);
+
+        caixaModel = new CaixaModel(BigDecimal.valueOf(90), BigDecimal.valueOf(90), BigDecimal.valueOf(90), BigDecimal.valueOf(90),
+                BigDecimal.valueOf(90), BigDecimal.valueOf(90), BigDecimal.valueOf(360), 6, 12, List.of(faturamentoDia));
 
         profissional = new Profissional();
         cliente = new Cliente();
@@ -62,29 +69,12 @@ class CaixaServiceTest {
         itensPedido = new ArrayList<>();
         itensPedido.add(itemPedido);
 
-        pedidoDinheiro = new Pedido(1L, OffsetDateTime.parse("2024-05-19T15:30:00-03:00"), itensPedido, StatusPagamento.PAGO,
-                FormaPagamento.DINHEIRO, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(50), BigDecimal.valueOf(100),
-                BigDecimal.valueOf(100),true, BigDecimal.valueOf(100), OffsetDateTime.now(), null, null, null, null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
-
-        pedidoPix = new Pedido(2L, OffsetDateTime.parse("2024-05-18T15:30:00-03:00"), itensPedido, StatusPagamento.PAGO,
-                FormaPagamento.PIX, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(100), BigDecimal.valueOf(200),
-                BigDecimal.valueOf(200), true, BigDecimal.valueOf(200), OffsetDateTime.now(), null, null, null, null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
-
-        pedidoCredito = new Pedido(3L, OffsetDateTime.parse("2024-05-17T15:30:00-03:00"), itensPedido, StatusPagamento.PAGO,
-                FormaPagamento.CREDITO, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(150), BigDecimal.valueOf(300),
-                BigDecimal.valueOf(300), true, BigDecimal.valueOf(300), OffsetDateTime.now(), null, null, null, null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
-
-        pedidoDebito = new Pedido(4L, OffsetDateTime.parse("2024-05-16T15:30:00-03:00"), itensPedido, StatusPagamento.PAGO,
-                FormaPagamento.DEBITO, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(200), BigDecimal.valueOf(400),
-                BigDecimal.valueOf(400), true, BigDecimal.valueOf(400), OffsetDateTime.now(), null, null, null, null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
-
-        pedidoVoucher = new Pedido(5L, OffsetDateTime.parse("2024-05-15T15:30:00-03:00"), itensPedido, StatusPagamento.PAGO,
-                FormaPagamento.VOUCHER, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(250), BigDecimal.valueOf(500),
-                BigDecimal.valueOf(500), true, BigDecimal.valueOf(500), OffsetDateTime.now(), null, null, null, null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
-
-        pedidoPontos = new Pedido(6L, OffsetDateTime.parse("2024-05-14T15:30:00-03:00"), itensPedido, StatusPagamento.PAGO,
-                FormaPagamento.PONTO, StatusPedido.FINALIZADO, cliente, profissional, BigDecimal.valueOf(300), BigDecimal.valueOf(600),
-                BigDecimal.valueOf(600), true, BigDecimal.valueOf(600), OffsetDateTime.now(), null, null, null, null, null, null, null, Usuario.builder().build(), OffsetDateTime.now(), null);
+        pedidoDinheiro = pedidoCriado(1L, FormaPagamento.DINHEIRO, 1L);
+        pedidoPix = pedidoCriado(2L, FormaPagamento.PIX, 2L);
+        pedidoCredito = pedidoCriado(3L, FormaPagamento.CREDITO, 3L);
+        pedidoDebito = pedidoCriado(4L, FormaPagamento.DEBITO, 4L);
+        pedidoVoucher = pedidoCriado(5L, FormaPagamento.VOUCHER, 5L);
+        pedidoPontos = pedidoCriado(6L, FormaPagamento.PONTO, 6L);
 
         pedidos = new ArrayList<>();
         pedidos.addAll(Arrays.asList(pedidoDinheiro, pedidoPix, pedidoCredito, pedidoDebito, pedidoVoucher, pedidoPontos));
@@ -94,7 +84,7 @@ class CaixaServiceTest {
 
     @Test
     public void deveGerarCaixaDiario() {
-        Mockito.when(pedidoRepository.findByPagoAndCaixaAberto()).thenReturn(pedidos);
+        Mockito.when(pedidoRepository.findByEqualStatusAndIsCaixaAberto(true, StatusPagamento.PAGO)).thenReturn(pedidos);
 
         CaixaModel caixaCalculado = caixaService.gerarCaixaDiario();
 
@@ -114,16 +104,37 @@ class CaixaServiceTest {
 
     @Test
     public void deveFecharCaixa() {
-        Mockito.when(pedidoRepository.findByPagoAndCaixaAberto()).thenReturn(pedidos);
+        Mockito.when(pedidoRepository.findByEqualStatusAndIsCaixaAberto(true, StatusPagamento.PAGO)).thenReturn(pedidos);
 
         caixaService.fecharCaixa();
         for(Pedido pedido: pedidos){
             Assertions.assertFalse(pedido.isCaixaAberto());
         }
 
-        verify(pedidoRepository).findByPagoAndCaixaAberto();
+        verify(pedidoRepository).findByEqualStatusAndIsCaixaAberto(true, StatusPagamento.PAGO);
         verify(pedidoRepository).saveAll(pedidos);
         verifyNoMoreInteractions(pedidoRepository);
+    }
+
+    private Pedido pedidoCriado(Long id, FormaPagamento formaPagamento, Long clienteId) {
+        Pedido pedido = Pedido.builder()
+                .id(id)
+                .horario(OffsetDateTime.parse("2024-05-19T15:30:00-03:00"))
+                .itemPedidos(List.of(itemPedido))
+                .statusPagamento(StatusPagamento.PAGO)
+                .formaPagamento(formaPagamento)
+                .statusPedido(StatusPedido.FINALIZADO)
+                .cliente(Cliente.builder().id(clienteId).build())
+                .profissional(profissional)
+                .comissaoGerada(BigDecimal.valueOf(45))
+                .pontuacaoProfissionalGerada(BigDecimal.valueOf(90))
+                .pontuacaoClienteGerada(BigDecimal.valueOf(90))
+                .caixaAberto(true)
+                .valorTotal(BigDecimal.valueOf(90))
+                .dataPagamento(LocalDateTime.now())
+                .build();
+
+        return pedido;
     }
 
 }

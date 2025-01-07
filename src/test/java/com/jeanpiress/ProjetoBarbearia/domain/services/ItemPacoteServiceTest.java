@@ -12,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -40,8 +41,8 @@ class ItemPacoteServiceTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        profissional = new Profissional(1L, "João Silva", "João", "34999999999", null, OffsetDateTime.parse("1991-11-13T00:00:00-03:00"),
-                BigDecimal.ZERO, null, true, null);
+        profissional = new Profissional(1L, "João Silva", "João", "34999999999",
+                null, LocalDate.parse("1991-11-13"), BigDecimal.ZERO, null, true, null);
         itemPedido = new ItemPedido(1L, null, null, 2, null, Produto.builder().build());
         itemPacote = new ItemPacote(1L, itemPedido, profissional, null);
         pacotePronto = new PacotePronto(1L, "2 barbas", null, 30, true, BigDecimal.valueOf(50),

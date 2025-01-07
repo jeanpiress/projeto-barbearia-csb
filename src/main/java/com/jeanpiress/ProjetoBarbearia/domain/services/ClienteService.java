@@ -11,6 +11,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @Service
@@ -52,8 +53,7 @@ public class ClienteService {
         try{
             Cliente cliente = clienteAtendido.getCliente();
             Integer DiasRetorno = cliente.getDiasRetorno();
-            OffsetDateTime agora = OffsetDateTime.now();
-            OffsetDateTime previsaoRetorno = agora.plusDays(DiasRetorno);
+            LocalDate previsaoRetorno = LocalDate.now().plusDays(DiasRetorno);
             cliente.setPrevisaoRetorno(previsaoRetorno);
 
             repository.save(cliente);

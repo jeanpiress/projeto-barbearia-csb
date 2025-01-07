@@ -18,6 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,8 +73,8 @@ class PacoteServiceTest {
         itensPacoteAtivos.add(itemPacote);
         itensPacote.add(itemPacote);
 
-        pacote = new Pacote(1L, Cliente.builder().build(), OffsetDateTime.parse("2024-05-22T13:00:00-03:00"), 30,
-                OffsetDateTime.parse("2024-06-22T13:00:00-03:00"), "2 barbas", null, itensPacoteAtivos,
+        pacote = new Pacote(1L, Cliente.builder().build(), OffsetDateTime.now(), 30,
+                OffsetDateTime.now().plusDays(30), "2 barbas", null, itensPacoteAtivos,
                 itensPacoteConsumidos, itensPacoteExpirados);
 
         pacoteItensAtivosVazio = new Pacote(2L, Cliente.builder().build(), OffsetDateTime.parse("2024-04-22T13:00:00-03:00"), 30,
@@ -89,8 +90,8 @@ class PacoteServiceTest {
         realizacaoItemPacote = new RealizacaoItemPacote(ProfissionalId.builder().id(1L).build(), PacoteId.builder().id(1L).build(),
                 ItemPacoteId.builder().id(1L).build());
 
-        profissional = new Profissional(1L, "João Silva", "João", "34999999999", null,
-                OffsetDateTime.parse("1991-11-13T00:00:00-03:00"), BigDecimal.ZERO, null, true, null);
+        profissional = new Profissional(1L, "João Silva", "João", "34999999999",
+                null, LocalDate.parse("1991-11-13"), BigDecimal.ZERO, null, true, null);
     }
 
     @Test
