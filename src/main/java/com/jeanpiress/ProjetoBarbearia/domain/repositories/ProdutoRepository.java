@@ -1,6 +1,5 @@
 package com.jeanpiress.ProjetoBarbearia.domain.repositories;
 
-import com.jeanpiress.ProjetoBarbearia.domain.model.Cliente;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Produto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -10,7 +10,6 @@ import com.jeanpiress.ProjetoBarbearia.domain.model.Pedido;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.ClienteRepository;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.PedidoRepository;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.ProfissionalRepository;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,6 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-@Log4j2
 @Service
 public class RelatorioService {
 
