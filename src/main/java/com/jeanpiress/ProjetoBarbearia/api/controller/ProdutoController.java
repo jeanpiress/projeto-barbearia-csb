@@ -6,7 +6,7 @@ import com.jeanpiress.ProjetoBarbearia.api.converteDto.assebler.ProdutoAssembler
 import com.jeanpiress.ProjetoBarbearia.api.converteDto.dissembler.ProdutoInputDissembler;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.FotoProdutoDto;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.ProdutoDto;
-import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.FotoProdutoInput;
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.FotoInput;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.ProdutoInput;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.EntidadeNaoEncontradaException;
 import com.jeanpiress.ProjetoBarbearia.domain.model.FotoProduto;
@@ -56,8 +56,11 @@ public class ProdutoController implements ProdutoControllerOpenApi {
 
     @Autowired
     private FotoStorageService fotoStorageService;
+
     @Autowired
     private FotoProdutoRepository fotoProdutoRepository;
+
+    private static final String DIRETORIO = "produtos";
 
     @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping
@@ -122,20 +125,20 @@ public class ProdutoController implements ProdutoControllerOpenApi {
 
     @PreAuthorize("hasAuthority('CLIENTE')")
     @PutMapping(value = "/{produtoId}/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public FotoProdutoDto atualizarFoto(@PathVariable Long produtoId, @Valid FotoProdutoInput fotoProdutoInput) throws IOException {
+    public FotoProdutoDto atualizarFoto(@PathVariable Long produtoId, @Valid FotoInput fotoInput) throws IOException {
         Produto produto = service.buscarPorId(produtoId);
 
-        MultipartFile arquivo = fotoProdutoInput.getArquivo();
+        MultipartFile arquivo = fotoInput.getArquivo();
 
         FotoProduto foto = FotoProduto.builder()
                 .produto(produto)
-                .descricao(fotoProdutoInput.getDescricao())
+                .descricao(fotoInput.getDescricao())
                 .contentType(arquivo.getContentType())
                 .tamanho(arquivo.getSize())
                 .nomeArquivo(arquivo.getOriginalFilename())
                 .build();
 
-        return fotoProdutoAssembler.toModel(fotoProdutoService.salvar(foto, arquivo.getInputStream()));
+        return fotoProdutoAssembler.toModel(fotoProdutoService.salvar(foto, arquivo.getInputStream(), DIRETORIO));
     }
 
     @PreAuthorize("hasAuthority('CLIENTE')")
@@ -156,9 +159,9 @@ public class ProdutoController implements ProdutoControllerOpenApi {
             MediaType mediaTypeFoto = MediaType.parseMediaType(fotoProduto.getContentType());
             List<MediaType> mediaTypesAceitas = MediaType.parseMediaTypes(acceptHeader);
 
-            verificarCompatibilidadeMediaType(mediaTypeFoto, mediaTypesAceitas);
+            fotoStorageService.verificarCompatibilidadeMediaType(mediaTypeFoto, mediaTypesAceitas);
 
-            FotoRecuperada fotoRecuperada = fotoStorageService.recuperar(fotoProduto.getNomeArquivo());
+            FotoRecuperada fotoRecuperada = fotoStorageService.recuperar(fotoProduto.getNomeArquivo(), DIRETORIO);
 
             if(fotoRecuperada.temUrl()){
                 return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, fotoRecuperada.getUrl()).build();
@@ -174,17 +177,7 @@ public class ProdutoController implements ProdutoControllerOpenApi {
     public void deletarFoto(@PathVariable Long produtoId){
         FotoProduto fotoProduto = fotoProdutoService.buscarbyId(produtoId);
         fotoProdutoRepository.delete(fotoProduto);
-        fotoStorageService.remover(fotoProduto.getNomeArquivo());
-    }
-
-    private void verificarCompatibilidadeMediaType(MediaType mediaTypeFoto, List<MediaType> mediaTypesAceitas) throws HttpMediaTypeNotAcceptableException {
-        boolean compativel = mediaTypesAceitas.stream()
-                .anyMatch(mediaTypeAceita -> mediaTypeAceita.isCompatibleWith(mediaTypeFoto));
-
-        if (!compativel) {
-            throw new HttpMediaTypeNotAcceptableException(mediaTypesAceitas);
-        }
-
+        fotoStorageService.remover(fotoProduto.getNomeArquivo(), DIRETORIO);
     }
 
 }

@@ -17,10 +17,10 @@ public class LocalFotoStorageService implements FotoStorageService {
     private StorageProperties storageProperties;
 
     @Override
-    public void armazenar(NovaFoto novaFoto) {
+    public void armazenar(NovaFoto novaFoto, String diretorio) {
 
         try{
-            Path arquivoPath = getArquivoPath(novaFoto.getNomeArquivo());
+            Path arquivoPath = getArquivoPath(novaFoto.getNomeArquivo(), diretorio);
 
             FileCopyUtils.copy(novaFoto.getInputStream(), Files.newOutputStream(arquivoPath));
         }catch (Exception e){
@@ -29,9 +29,9 @@ public class LocalFotoStorageService implements FotoStorageService {
     }
 
     @Override
-    public void remover(String nomeArquivo) {
+    public void remover(String nomeArquivo, String diretorio) {
         try {
-            Path arquivoPath = getArquivoPath(nomeArquivo);
+            Path arquivoPath = getArquivoPath(nomeArquivo, diretorio);
             Files.deleteIfExists(arquivoPath);
         } catch (Exception e){
             throw new StorageException("Não foi possivel excluir arquivo", e);
@@ -40,9 +40,9 @@ public class LocalFotoStorageService implements FotoStorageService {
     }
 
     @Override
-    public FotoRecuperada recuperar(String nomeArquivo) {
+    public FotoRecuperada recuperar(String nomeArquivo, String diretorio) {
         try{
-            Path arquivoPath = getArquivoPath(nomeArquivo);
+            Path arquivoPath = getArquivoPath(nomeArquivo, diretorio);
 
             return FotoRecuperada.builder()
                     .inputStream(Files.newInputStream(arquivoPath))
@@ -54,14 +54,17 @@ public class LocalFotoStorageService implements FotoStorageService {
     }
 
     @Override
-    public void substituir(String nomeArquivoAntigo, NovaFoto novaFoto) {
-        this.armazenar(novaFoto);
+    public void substituir(String nomeArquivoAntigo, NovaFoto novaFoto, String diretorio) {
+        this.armazenar(novaFoto, diretorio);
         if(nomeArquivoAntigo != null) {
-            this.remover(nomeArquivoAntigo);
+            this.remover(nomeArquivoAntigo, diretorio);
         }
     }
 
-    private Path getArquivoPath(String nomeArquivo) {
-        return storageProperties.getLocal().getDiretorioFotos().resolve(Path.of(nomeArquivo));
+    private Path getArquivoPath(String nomeArquivo, String diretorio) {
+        return storageProperties.getLocal().getDiretorioFotos()
+                .resolve(diretorio)
+                .resolve(nomeArquivo);
     }
+
 }

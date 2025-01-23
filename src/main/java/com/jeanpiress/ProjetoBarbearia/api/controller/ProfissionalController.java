@@ -3,13 +3,18 @@ package com.jeanpiress.ProjetoBarbearia.api.controller;
 import com.jeanpiress.ProjetoBarbearia.api.controller.openapi.ProfissionalControllerOpenApi;
 import com.jeanpiress.ProjetoBarbearia.api.converteDto.assebler.ProfissionalAssembler;
 import com.jeanpiress.ProjetoBarbearia.api.converteDto.dissembler.ProfissionalInputDissembler;
+import com.jeanpiress.ProjetoBarbearia.api.converteDto.dissembler.UsuarioInputDissembler;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.ProfissionalDto;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.ProfissionalInput;
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.ProfissionalUsuarioInput;
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.UsuarioInput;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.ProfissionalNaoEncontradoException;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.NegocioException;
 import com.jeanpiress.ProjetoBarbearia.domain.model.Profissional;
+import com.jeanpiress.ProjetoBarbearia.domain.model.Usuario;
 import com.jeanpiress.ProjetoBarbearia.domain.services.ProfissionalService;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.ProfissionalRepository;
+import com.jeanpiress.ProjetoBarbearia.domain.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,10 +36,16 @@ public class ProfissionalController implements ProfissionalControllerOpenApi {
     private ProfissionalService service;
 
     @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
     private ProfissionalAssembler profissionalAssembler;
 
     @Autowired
     private ProfissionalInputDissembler profissionalDissembler;
+
+    @Autowired
+    private UsuarioInputDissembler usuarioDissembler;
 
     @PreAuthorize("hasAuthority('CLIENTE')")
     @GetMapping
@@ -70,9 +81,14 @@ public class ProfissionalController implements ProfissionalControllerOpenApi {
 
     @PreAuthorize("hasAuthority('GERENTE')")
     @PostMapping
-    public ResponseEntity<ProfissionalDto> adicionar(@RequestBody @Valid ProfissionalInput profissionalInput) {
+    public ResponseEntity<ProfissionalDto> adicionar(@RequestBody @Valid ProfissionalUsuarioInput input) {
+        ProfissionalInput profissionalInput = input.getProfissional();
+        UsuarioInput usuarioInput = input.getUsuario();
         Profissional profissional = profissionalDissembler.toDomainObject(profissionalInput);
         Profissional profissionalCriado = service.adicionar(profissional);
+        usuarioService.confimacaoSenha(usuarioInput);
+        Usuario usuario = usuarioDissembler.toDomainObject(usuarioInput);
+        usuarioService.criarUsuarioProfissionalExistente(usuario, profissionalCriado.getId());
         ProfissionalDto profissionalDto = profissionalAssembler.toModel(profissionalCriado);
         return ResponseEntity.status(HttpStatus.CREATED).body(profissionalDto);
     }

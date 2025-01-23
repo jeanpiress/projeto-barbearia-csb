@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class UsuarioInput {
 
     @NotBlank
@@ -20,6 +21,10 @@ public class UsuarioInput {
     @NotBlank
     @Schema(example = "123456", required = true)
     private String senha;
+
+    @NotBlank
+    @Schema(example = "123456", required = true)
+    private String confirmacao;
 
     @NotBlank
     @Schema(example = "GERENTE")

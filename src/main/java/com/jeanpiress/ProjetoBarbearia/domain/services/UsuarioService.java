@@ -1,12 +1,17 @@
 package com.jeanpiress.ProjetoBarbearia.domain.services;
 
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.ProfissionalInput;
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.UsuarioInput;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.UsuarioNovaSenhaInput;
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.*;
 import com.jeanpiress.ProjetoBarbearia.domain.model.*;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -40,6 +45,22 @@ public class UsuarioService {
                 .orElseThrow(() -> new UsuarioNaoEncontradoException());
     }
 
+    public Usuario buscarPorIdProfissionalCliente(Long id, String ocupacao){
+
+        Long profissionalId = null;
+        Long clienteId = null;
+
+        if(ocupacao.equals("PROFISSIONAL")){
+            profissionalId = id;
+        }else if(ocupacao.equals("CLIENTE")){
+            clienteId = id;
+        }else {
+            throw new HttpMessageNotReadableException("Mensagem incompreensivel");
+        }
+
+        return usuarioRepository.findByIdProfissionalCliente(profissionalId,clienteId)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException());
+    }
 
     public Usuario criarUsuarioClienteExistente(Usuario usuario, Long clienteId){
         verificarSeEmailExistente(usuario);
@@ -55,7 +76,7 @@ public class UsuarioService {
     public Usuario criarUsuario(Usuario usuario){
         verificarSeEmailExistente(usuario);
         if(usuario.getMaiorPermissao() == null){
-            throw new PermissaoNaoEncontradaException("Permissao é obrigátorio");
+            usuario.setMaiorPermissao("CLIENTE");
         }
         String permissao = usuario.getMaiorPermissao();
         Long permissaoId = buscarIdPermissaoPorNome(permissao.toUpperCase());
@@ -131,6 +152,12 @@ public class UsuarioService {
     private void verificarSeEmailExistente(Usuario usuario){
         if(usuarioRepository.existsByEmail(usuario.getEmail())){
             throw new EmailExistenteException();
+        }
+    }
+
+    public void confimacaoSenha(UsuarioInput usuarioInput){
+        if(!usuarioInput.getSenha().equals(usuarioInput.getConfirmacao())){
+            throw new SenhaNaoConfirmadaException();
         }
     }
 }

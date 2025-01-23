@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class FotoProdutoInput {
+public class FotoInput {
 
     @NotNull
     private MultipartFile arquivo;

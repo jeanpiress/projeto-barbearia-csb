@@ -2,6 +2,7 @@ package com.jeanpiress.ProjetoBarbearia.api.controller.openapi;
 
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.dtos.ProfissionalDto;
 import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.ProfissionalInput;
+import com.jeanpiress.ProjetoBarbearia.api.dtosModel.input.ProfissionalUsuarioInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,8 +36,8 @@ public interface ProfissionalControllerOpenApi {
             @ApiResponse(responseCode = "400", description = "Id do profissional inválido", content = @Content(schema = @Schema(ref = "Problema"))),
             @ApiResponse(responseCode = "404", description = "Profissional não encontrado", content = @Content(schema = @Schema(ref = "Problema")))
     })
-    public ResponseEntity<ProfissionalDto> adicionar(@Parameter(description = "Representação de um novo profissional")
-                                                       ProfissionalInput profissionalInput);
+    public ResponseEntity<ProfissionalDto> adicionar(@Parameter(description = "Representação de um novo profissional e um novo Usuario")
+                                                     ProfissionalUsuarioInput input);
    
     @Operation(summary ="Altera um profissional", responses ={
             @ApiResponse(responseCode = "200", description = "Profissional atualizado"),

@@ -2,8 +2,10 @@ package com.jeanpiress.ProjetoBarbearia.domain.services;
 
 import com.jeanpiress.ProjetoBarbearia.domain.exceptions.FotoNaoEncontradaException;
 import com.jeanpiress.ProjetoBarbearia.domain.model.FotoProduto;
+import com.jeanpiress.ProjetoBarbearia.domain.model.FotoUsuario;
 import com.jeanpiress.ProjetoBarbearia.domain.model.NovaFoto;
 import com.jeanpiress.ProjetoBarbearia.domain.repositories.FotoProdutoRepository;
+import com.jeanpiress.ProjetoBarbearia.domain.repositories.FotoUsuarioRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,34 +14,34 @@ import java.io.InputStream;
 
 @Log4j2
 @Service
-public class FotoProdutoService {
+public class FotoUsuarioService {
 
     @Autowired
-    private FotoProdutoRepository fotoProdutoRepository;
+    private FotoUsuarioRepository fotoUsuarioRepository;
 
     @Autowired
     private FotoStorageService fotoStorageService;
 
-    public FotoProduto buscarbyId(Long id){
-        return fotoProdutoRepository.findById(id).
-                orElseThrow(() -> new FotoNaoEncontradaException("Não foi encontrada foto para esse produto"));
+    public FotoUsuario buscarbyId(Long id){
+        return fotoUsuarioRepository.findById(id).
+                orElseThrow(() -> new FotoNaoEncontradaException("Não foi encontrada foto para esse usuario"));
     }
 
-     public FotoProduto salvar(FotoProduto foto, InputStream dadosArquivo, String diretorio) {
-         Long fotoId = foto.getProduto().getId();
+     public FotoUsuario salvar(FotoUsuario foto, InputStream dadosArquivo, String diretorio) {
+         Long fotoId = foto.getUsuario().getId();
          String nomeArquivoExistente = null;
 
-         if(fotoProdutoRepository.existsById(fotoId)) {
+         if(fotoUsuarioRepository.existsById(fotoId)) {
              nomeArquivoExistente = buscarbyId(fotoId).getNomeArquivo();
-             fotoProdutoRepository.deleteById(fotoId);
-             log.info("Foto do produto de id: {} foi excluida", fotoId);
+             fotoUsuarioRepository.deleteById(fotoId);
+             log.info("Foto do usuario de id: {} foi excluida", fotoId);
          }
 
          String nomeNovoArquivo = fotoStorageService.gerarNomeArquivo(foto.getNomeArquivo());
          foto.setNomeArquivo(nomeNovoArquivo);
 
-         foto = fotoProdutoRepository.save(foto);
-         fotoProdutoRepository.flush();
+         foto = fotoUsuarioRepository.save(foto);
+         fotoUsuarioRepository.flush();
 
          NovaFoto novaFoto = NovaFoto.builder()
                  .nomeArquivo(foto.getNomeArquivo())
